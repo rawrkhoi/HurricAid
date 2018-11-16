@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
+import { keys } from '../../config';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WeatherComponent } from './weather/weather.component';
@@ -33,7 +33,7 @@ import { AgmCoreModule } from '@agm/core';
     AppRoutingModule,
     HttpClientModule,
     AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyAettYu6SMK2uhkFNGTsQ_Wd2I1pZ-UMiY'
+      apiKey: `${keys.googleMaps}`
     })
   ],
   providers: [],
