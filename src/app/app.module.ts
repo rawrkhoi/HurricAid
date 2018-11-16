@@ -12,6 +12,8 @@ import { NewsComponent } from './news/news.component';
 import { PinsComponent } from './pins/pins.component';
 import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
+import { HttpClientModule } from '@angular/common/http';
+import { AgmCoreModule } from '@agm/core';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,11 @@ import { NavComponent } from './nav/nav.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyAettYu6SMK2uhkFNGTsQ_Wd2I1pZ-UMiY'
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]
