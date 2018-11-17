@@ -1,5 +1,4 @@
 const { config } = require('../config');
-
 const client = require('twilio')(config.accountSid, config.authToken);
 
 
@@ -8,8 +7,8 @@ client.autopilot.assistants(config.assistant)
   .update({
     defaults: {
       defaults: {
-        assistant_initiation: 'task://test',
-        fallback: 'task://test'
+        assistant_initiation: 'task://twiliobot/test-bot',
+        fallback: 'task://twiliobot/test-bot'
       }
     }
   })
