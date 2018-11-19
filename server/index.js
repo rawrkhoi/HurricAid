@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 var client = new twilio(config.config.accountSid, config.config.authToken);
 const app = express();
 
-app.use(express.static(`${__dirname}/../dist/emergency`));
+app.use(express.static(__dirname + '/app'));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // app.get('/', (req, res) => {
