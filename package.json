@@ -21,9 +21,12 @@
     "@angular/platform-browser": "~7.0.0",
     "@angular/platform-browser-dynamic": "~7.0.0",
     "@angular/router": "~7.0.0",
+    "body-parser": "^1.18.3",
     "core-js": "^2.5.4",
+    "express": "^4.16.4",
     "rxjs": "~6.3.3",
     "tslint-config-airbnb": "^5.11.1",
+    "twilio": "^3.24.0",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {

@@ -33,9 +33,11 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+config.js
 
 # System Files
 .DS_Store
 Thumbs.db
 package-lock.json
 config.js
+service-account-file.json
