@@ -14,6 +14,7 @@ import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
+import { AwsComponent } from './aws/aws.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { AgmCoreModule } from '@agm/core';
     NewsComponent,
     PinsComponent,
     InfoComponent,
-    NavComponent
+    NavComponent,
+    AwsComponent
   ],
   imports: [
     BrowserModule,
