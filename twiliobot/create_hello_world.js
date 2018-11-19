@@ -3,9 +3,9 @@ const client = require('twilio')(config.accountSid, config.authToken);
 
 
 // Build task actions that say something and listens for a repsonse.
-testBotTaskActions = {
+helloWorldTaskActions = {
   actions: [
-    { say: 'HELLO PLEASE SAY SOMETHING DIFFERENT!' },
+    { say: 'Hi there, I\'m your virtual assistant!  whayttawssss?' },
     { listen: true }
   ]
 };
@@ -15,8 +15,8 @@ testBotTaskActions = {
 client.autopilot.assistants(config.assistant)
   .tasks
   .create({
-    uniqueName: 'test-bot',
-    actions: testBotTaskActions,
+    uniqueName: 'test',
+    actions: helloWorldTaskActions,
   })
   .then(assistant => console.log(assistant.sid))
   .done();
