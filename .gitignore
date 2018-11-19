@@ -33,9 +33,15 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+config.js
 
 # System Files
 .DS_Store
 Thumbs.db
 package-lock.json
+<<<<<<< HEAD
 config.js
+=======
+config.js
+service-account-file.json
+>>>>>>> 2584cda8b980028b90d94ef439e76d4886990fbb
