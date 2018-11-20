@@ -39,10 +39,6 @@ config.js
 .DS_Store
 Thumbs.db
 package-lock.json
-<<<<<<< HEAD
-config.js
-=======
 config.js
 service-account-file.json
 AWSDeploy.pem
->>>>>>> 562137e805269330f5f9f6956f136f65628a7133
