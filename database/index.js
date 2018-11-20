@@ -13,10 +13,4 @@ sequelize.authenticate()
   .catch((err) => {
     console.log('Error connecting to database', err);
   });
-
-sequelize.sync({ force: false })
-  .then(() => {
-    console.log('It worked!');
-  }, (err) => {
-    console.log('An error occurred while creating the table:', err);
-});
+  
