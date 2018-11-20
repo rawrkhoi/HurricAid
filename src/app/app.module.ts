@@ -1,3 +1,5 @@
+import { NgtUniversalModule } from '@ng-toolkit/universal';
+import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { keys } from '../../config';
@@ -28,8 +30,11 @@ import { AgmCoreModule } from '@agm/core';
     InfoComponent,
     NavComponent
   ],
-  imports: [
-    BrowserModule,
+  imports:[
+ CommonModule,
+NgtUniversalModule,
+ 
+    
     AppRoutingModule,
     HttpClientModule,
     AgmCoreModule.forRoot({
@@ -37,6 +42,5 @@ import { AgmCoreModule } from '@agm/core';
     })
   ],
   providers: [],
-  bootstrap: [AppComponent]
 })
 export class AppModule { }
