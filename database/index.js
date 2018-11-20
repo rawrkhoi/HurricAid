@@ -13,6 +13,7 @@ sequelize.authenticate()
   .catch((err) => {
     console.log('Error connecting to database', err);
   });
+<<<<<<< HEAD
 
 const User = sequelize.define('user', {
   firstName: {
@@ -29,3 +30,6 @@ sequelize.sync({ force: false })
   }, (err) => {
     console.log('An error occurred while creating the table:', err);
 });
+=======
+  
+>>>>>>> 3eff553f124edf01181429a468799c7f8d48c5f5

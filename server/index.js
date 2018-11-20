@@ -10,7 +10,7 @@ const bodyParser = require('body-parser');
 var client = new twilio(config.config.accountSid, config.config.authToken);
 const app = express();
 
-app.use(express.static(__dirname + '/app'));
+app.use(express.static(`${__dirname}/../dist/emergency`));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // app.get('/', (req, res) => {
@@ -38,5 +38,8 @@ app.post('/sms', (req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/xml' });
   res.end(twiml.toString());
 })
+
+
+
 
 http.createServer(app).listen(port, () => console.log(`Express server listening on port ${port}!`));
