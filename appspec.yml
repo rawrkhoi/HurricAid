@@ -6,11 +6,3 @@ files:
     destination: /var/www/html
     overwrite: yes
 
-hooks:
-  ApplicationStart:
-    - location: scripts/changepermission.sh
-      timeout: 3600
-  ValidateService:
-    - location: scripts/status_apache.sh
-      timeout: 3600
-      runas: root
