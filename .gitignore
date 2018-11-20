@@ -34,6 +34,7 @@ yarn-error.log
 testem.log
 /typings
 config.js
+AWSDeploy.pem
 
 # System Files
 .DS_Store
@@ -41,4 +42,3 @@ Thumbs.db
 package-lock.json
 config.js
 service-account-file.json
-AWSDeploy.pem
