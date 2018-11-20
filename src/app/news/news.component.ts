@@ -13,7 +13,11 @@ export class NewsComponent implements OnInit {
 
   lat: string = '';
   lng: string = '';
-  news: string = '';
+  news: {
+    time: string,
+    desc: string,
+  };
+  articles: Array<object>;
 
   constructor(private map: MapsService, private http: HttpClient) { }
 
@@ -22,10 +26,14 @@ export class NewsComponent implements OnInit {
       console.log(data);
       this.lat = data.latitude;
       this.lng = data.longitude;
-      this.http.get((`https://api.predicthq.com/v1/events/?category=severe-weather,disasters,terror&within=10km@${this.lat},${this.lng}`), 
+      this.http.get((`https://api.predicthq.com/v1/events/?category=community&within=10km@${this.lat},${this.lng}`), 
         { headers: { Authorization: `Bearer ${newsHeaders.Authorization}` }})
           .subscribe((response) => {
-            console.log(response, 'THIS IS THE RESPONSE');
+            this.news = {
+              time: response['results'][1]['updated'],
+              desc: response['results'][1]['description'],
+            }
+            this.articles = response['results'];
           })
     })
   }

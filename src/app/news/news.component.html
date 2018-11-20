@@ -1,9 +1,16 @@
 <div class="newsfeed">
   <div class="header">
-    Your Local News
+    Today's Local News
   </div>
-  <div class="newsfeed-body">
-    BODY
-  </div>
+  <ul class="newsfeed-body">
+    <li *ngFor="let article of articles">
+      <span class="single-article-time">
+        {{article.updated.slice(12, 16)}}
+      </span>
+      <span>
+        {{article.description}}
+      </span>
+    </li>
+  </ul>
 </div>
 
