@@ -1,16 +1,18 @@
 const { db } = require('../config');
-const Sequelize = require('sequelize');
-const sequelize = new Sequelize( db.dbName, db.username, db.password, {
-  host: db.host,
-  port: 5432,
-  dialect: 'postgres',
-});
+const pgp = require('pg-promise')();
 
-sequelize.authenticate()
-  .then(() => {
-    console.log('Connection to database successful');
-  })
-  .catch((err) => {
-    console.log('Error connecting to database', err);
-  });
-  
+const connection = {
+  host: db.host, 
+  port: 5432,
+  database: db.dbName,
+  user: db.username,
+  password: db.password,
+};
+
+const datab = pgp(connection);
+
+module.exports = {
+  getUserById: (userId) => datab.any(`SELECT * FROM public."Users" WHERE id = $1`, [userId]).then(([user]) => user),
+  addNewUser: () => datab.any(`INSERT INTO public."Users" (first_name, last_name, email, password, photo_url, emergency_contact) VALUES ()`, []),
+  addNewPhone: (num) => datab.any(`INSERT INTO public."Phone" (number) VALUES ($1)`, [num]),
+};
