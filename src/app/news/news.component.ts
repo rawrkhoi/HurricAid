@@ -22,7 +22,7 @@ export class NewsComponent implements OnInit {
       this.lat = data.latitude;
       this.lng = data.longitude;
     })
-    this.http.get(`https://api.predicthq.com/v1/events/?within=10km@${this.lat},${this.lng}`, newsHeaders.newsHeaders.header)
+    this.http.get(`https://api.predicthq.com/v1/events/?within=10km@${this.lat},${this.lng}`, newsHeaders.header)
   }
 
 }

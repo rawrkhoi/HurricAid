@@ -13,6 +13,7 @@ const app = express();
 app.use(express.static(`${__dirname}/../dist/emergency`));
 app.use(bodyParser.urlencoded({ extended: false }));
 
+<<<<<<< HEAD
 // app.get('/', (req, res) => {
 //  res.send('done');
 // })
@@ -31,6 +32,8 @@ app.get('/test', (req, res) => {
   .done();
 }); 
 
+=======
+>>>>>>> 562137e805269330f5f9f6956f136f65628a7133
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
   twiml.message('Hi! It looks like your phone number was born ' + req.body.FromCountry );
