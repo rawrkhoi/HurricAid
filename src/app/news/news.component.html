@@ -1,16 +1,21 @@
 <div class="newsfeed">
-  <div class="header">
+  <div class="newsfeed-header">
     Today's Local News
   </div>
-  <ul class="newsfeed-body">
-    <li *ngFor="let article of articles">
-      <span class="single-article-time">
-        {{article.updated.slice(12, 16)}}
-      </span>
-      <span>
-        {{article.description}}
-      </span>
-    </li>
-  </ul>
+  <div *ngIf="newsDisplay">No disaster news today!</div>
+  <div>
+    <ul class="newsfeed-body">
+      <li *ngFor="let article of articles">
+        <span class="single-article-time">
+          {{article.updated.slice(12, 16)}}
+        </span>
+        <span class="single-article-desc">
+          {{article.description}}
+        </span>
+      </li>
+    </ul>
+  </div>
+  
+  
 </div>
 
