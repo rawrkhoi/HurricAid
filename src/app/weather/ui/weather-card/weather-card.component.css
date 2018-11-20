@@ -16,7 +16,7 @@ Weather Card Styling
   cursor: pointer;
   background-color: white;
   border-radius: 1.75rem;
-  animation: fadein 1.25s ease-in-out 0ms 1;
+  animation: 1.25s ease-in-out 0ms 1 fadein;
 }
 
 .weather__card-dark {
@@ -103,4 +103,3 @@ Weather Card Styling
 .weather-icon__container > svg {
   width: 10rem;
 }
-
