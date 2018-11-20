@@ -14,7 +14,8 @@ app.use(express.static(`${__dirname}/../dist/emergency`));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/test', (req, res) => {
-  db.addNewPhone('504-420-6969').then(() => console.log('number inserted'));
+  // testing phone number insertion query
+  db.addNewPhone('000-000-0000').then(() => console.log('number inserted'));
   res.end(); 
 }); 
 
