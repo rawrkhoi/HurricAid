@@ -14,8 +14,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/test', (req, res) => {
   let first = 'Ethan';
-  db.sequelize.query(`INSERT INTO users (name_first) VALUES ('${first}')`); 
-  res.end(); 
+  db.sequelize.query(`INSERT INTO users (name_first) VALUES ('${first}')`);
+  res.end();
 }); 
 
 app.post('/sms', (req, res) => {
