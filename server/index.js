@@ -2,20 +2,19 @@ const config = require('../config')
 const express = require('express');
 const http = require('http');
 const port = process.env.port || 3000;
-const db = require('../database');
-
-var twilio = require('twilio');
+const db = require('../models');
+const twilio = require('twilio');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const bodyParser = require('body-parser');
-var client = new twilio(config.config.accountSid, config.config.authToken);
+const client = new twilio(config.config.accountSid, config.config.authToken);
 const app = express();
 
-app.use(express.static(`${__dirname}/../dist/emergency`));
+app.use(express.static(`${__dirname}/../dist/browser`));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/test', (req, res) => {
-  // testing phone number insertion query
-  db.addNewPhone('000-000-0000').then(() => console.log('number inserted'));
+  let first = 'Ethan';
+  db.sequelize.query(`INSERT INTO users (name_first) VALUES ('${first}')`); 
   res.end(); 
 }); 
 
