@@ -2,7 +2,7 @@ const config = require('../config')
 const express = require('express');
 const http = require('http');
 const port = process.env.port || 3000;
-const db = require('../database'); 
+const db = require('../database');
 
 var twilio = require('twilio');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
@@ -21,7 +21,7 @@ app.post('/test', (req, res) => {
 
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
-  
+
   if (req.body.Body.toLowerCase() === 'help@') {
     twiml.message('What can we help you with?');
   } else if (req.body.Body.toLowerCase() === 'have@') {

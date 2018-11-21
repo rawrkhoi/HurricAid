@@ -1,3 +1,21 @@
-<p>
-  news works!
-</p>
+<div class="newsfeed">
+  <div class="newsfeed-header">
+    Today's Local News
+  </div>
+  <div *ngIf="newsDisplay">No disaster news today!</div>
+  <div>
+    <ul class="newsfeed-body">
+      <li *ngFor="let article of articles">
+        <span class="single-article-time">
+          {{article.updated.slice(12, 16)}}
+        </span>
+        <span class="single-article-desc">
+          {{article.description}}
+        </span>
+      </li>
+    </ul>
+  </div>
+  
+  
+</div>
+

@@ -1,5 +1,26 @@
-<h1>Map</h1>
+<h1>Map Working</h1>
 
 <agm-map [latitude]="lat" [longitude]="lng">
   <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
 </agm-map>
+
+<div class='pinmaker'>
+  <div class="pinmaker-header">
+    <h2>Create Pin</h2>
+    <h3>I want to offer:</h3>
+    <input type="checkbox" name="food" value="Food"> Food<br>
+    <input type="checkbox" name="water" value="Water"> Water<br>
+    <input type="checkbox" name="shelter" value="Shelter"> Shelter<br>
+    <input type="checkbox" name="other" value="Other"> Other<br>
+    <form>
+      <input type="text" name="othermessage" placeholder="Explain other items"><br>
+    </form>
+    <h3>Help me!</h3>
+    <form>
+      <input type="text" name="othermessage" placeholder="Message (optional)"><br>
+    </form>
+    <h3>Where are you?</h3>
+    <input type="radio" name="address" value="default-address">Default Address<br>
+    <input type="radio" name="address" value="different-address">Different Address<br>
+  </div>
+</div>

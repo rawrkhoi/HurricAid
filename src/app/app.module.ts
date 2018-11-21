@@ -1,3 +1,5 @@
+import { NgtUniversalModule } from '@ng-toolkit/universal';
+import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { keys } from '../../config';
@@ -14,6 +16,8 @@ import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
+import { WeatherService } from './weather/services/weather/weather.service';
+import { UiService } from './nav/ui/ui.service';
 
 @NgModule({
   declarations: [
@@ -28,7 +32,9 @@ import { AgmCoreModule } from '@agm/core';
     InfoComponent,
     NavComponent
   ],
-  imports: [
+  imports:[
+    CommonModule,
+    NgtUniversalModule,
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
@@ -36,7 +42,10 @@ import { AgmCoreModule } from '@agm/core';
       apiKey: `${keys.googleMaps}`
     })
   ],
-  providers: [],
+  providers: [
+    WeatherService,
+    UiService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
