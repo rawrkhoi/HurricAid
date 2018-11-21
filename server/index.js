@@ -15,14 +15,37 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
-
-  if (req.body.Body.slice(0, 5).toLowerCase() === 'help@') {
-    console.log(req.body);
-    twiml.message('What can we help you with?');
-  } else if (req.body.Body.toLowerCase() === 'have@') {
-    twiml.message('What do you have? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
+  let textObj = {};
+  
+  if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
+    twiml.message("Text one of these commands: 'help@[address]', 'have@[address]', or 'need@[address]'");
+    // they send a message back. we add to db and we send one back to them
+  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
+    textObj.number = req.body.From.slice(1);
+    textObj.address = req.body.Body.slice(5);
+    console.log(textObj);
+    twiml.message('SOS pin created. You may now send a brief message with details (optional).');
+    // they send a message back. we add to db and we send one back to them
+  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
+    textObj.number = req.body.From.slice(1);
+    textObj.address = req.body.Body.slice(5);
+    console.log(textObj);
+    twiml.message('What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
+    // we need to let them know that they need to remove things when they run OUT
+  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
+    textObj.number = req.body.From.slice(1);
+    textObj.address = req.body.Body.slice(5);
+    console.log(textObj);
+    twiml.message('What do you need? Text 1 for Food, 2 for Water, 3 for Shelter');
+    // send back a message with 3 closest places who have that
+  } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
+    textObj.number = req.body.From.slice(1);
+    textObj.address = req.body.Body.slice(5);
+    console.log(textObj);
+    twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
+    // they let us know what they're out of and we remove from db
   } else {
-    twiml.message("Error: We don\'t know what you\'re trying to say.")
+    twiml.message("Error: We don\'t know what you\'re mean. Please enter 'help@[address]', 'have@[address]', or 'need@[address]'")
   }
 
   res.writeHead(200, { 'Content-Type': 'text/xml' });
