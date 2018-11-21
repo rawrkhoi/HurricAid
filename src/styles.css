@@ -12,10 +12,6 @@ body {
   font-size: 18px;
 }
 
-a {
-  text-decoration: none;
-}
-
 .container {
   width: 80%;
   margin: 0 auto; 
@@ -24,13 +20,17 @@ a {
   grid-template-columns: 30% auto;
 }
 
-a {
-  color: whitesmoke;
-}
-
-
 section {
   width: 80%;
   margin: 0 auto;
   padding: 2em;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

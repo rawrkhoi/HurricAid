@@ -21,5 +21,5 @@ export class AppComponent implements OnInit {
     }
 
 
- constructor(@Inject(PLATFORM_ID) private platformId: any, @Inject(DOCUMENT) private document: any) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: any, @Inject(DOCUMENT) private document: any) {}
 }
