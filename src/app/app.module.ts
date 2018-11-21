@@ -18,6 +18,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
 import { WeatherService } from './weather/services/weather/weather.service';
 import { UiService } from './nav/ui/ui.service';
+import { FormsModule } from '@angular/forms';
+
 
 @NgModule({
   declarations: [
@@ -30,7 +32,7 @@ import { UiService } from './nav/ui/ui.service';
     NewsComponent,
     PinsComponent,
     InfoComponent,
-    NavComponent
+    NavComponent, 
   ],
   imports:[
     CommonModule,
@@ -38,6 +40,7 @@ import { UiService } from './nav/ui/ui.service';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    FormsModule,
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`
     })
