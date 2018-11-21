@@ -16,7 +16,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
 
-  if (req.body.Body.toLowerCase() === 'help@') {
+  if (req.body.Body.slice(0, 5).toLowerCase() === 'help@') {
+    console.log(req.body);
     twiml.message('What can we help you with?');
   } else if (req.body.Body.toLowerCase() === 'have@') {
     twiml.message('What do you have? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
