@@ -10,8 +10,14 @@ const bodyParser = require('body-parser');
 var client = new twilio(config.config.accountSid, config.config.authToken);
 const app = express();
 
-app.use(express.static(`${__dirname}/../dist/emergency`));
+app.use(express.static(`${__dirname}/../dist/browser`));
 app.use(bodyParser.urlencoded({ extended: false }));
+
+
+app.post('/signup', (req, res) => {
+  // THIS MUST BE CHANGED. WHAT WE WANT IS FOR THE INFORMATION TO BE SENT TO THE DATABASE
+  console.log(req.body);
+});
 
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
