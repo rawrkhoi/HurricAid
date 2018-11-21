@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { UiService } from './services/ui/ui.service';
 import { keys } from '../../../config';
 
 @Component({
@@ -11,20 +10,9 @@ export class WeatherComponent implements OnInit {
   showMenu = false;
   darkModeActive: boolean;
 
-  constructor(public ui: UiService) { }
+  constructor() { }
 
   ngOnInit() {
-    this.ui.darkModeState.subscribe((value) => {
-      this.darkModeActive = value;
-    });
-  }
-
-  toggleMenu() {
-    this.showMenu = !this.showMenu;
-  }
-
-  modeToggleSwitch() {
-    this.ui.darkModeState.next(!this.darkModeActive);
   }
 
 }
