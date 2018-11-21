@@ -7,67 +7,47 @@
     </label>
     <div class="signup-form-group">
       <label for="firstName">First Name</label>
-      <input type="text" class="form-control" id="firstName" placeholder="John" name="first" [(ngModel)]="model.firstName" #firstName="ngModel" [ngClass]="{ 'is-invalid': f.submitted && firstName.invalid }" required/>
+      <input type="text" class="form-control" id="firstName" placeholder="John" name="firstName" [(ngModel)]="model.firstName" #firstName="ngModel" [ngClass]="{ 'is-invalid': f.submitted && firstName.invalid }" required/>
     </div>
     <div class="signup-form-group">
-      <label for="lastName">
-        Last Name
-      </label>
-      <input type="text" class="form-control" id="lastName" placeholder="Doe" name="last" [(ngModel)]="model.firstName" #lastName="ngModel" [ngClass]="{ 'is-invalid': f.submitted && lastName.invalid }" required/>
+      <label for="lastName">Last Name</label>
+      <input type="text" class="form-control" id="lastName" placeholder="Doe" name="lastName" [(ngModel)]="model.firstName" #lastName="ngModel" [ngClass]="{ 'is-invalid': f.submitted && lastName.invalid }" required/>
     </div>
     <div class="signup-form-group">
-      <label for="inputEmail">
-        Email
-      </label>
-      <input type="email" class="form-control" id="inputEmail" placeholder="johndoe@gmail.com" />
+      <label for="email">Email</label>
+      <input type="email" class="form-control" id="email" placeholder="johndoe@gmail.com" name="email" [(ngModel)]="model.email" #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.invalid }" required email/>
     </div>
     <div class="signup-form-group">
-      <label for="createPassword">
-        Create Password
-      </label>
-      <input type="password" class="form-control" id="createPassword" />
+      <label for="createPassword">Create Password</label>
+      <input type="password" class="form-control" id="createPassword" name="createPassword" [(ngModel)]="model.createPassword" #createPassword="ngModel" [ngClass]="{ 'is-invalid': f.submitted && createPassword.invalid }" required minlength="6"/>
     </div>
     <div class="signup-form-group">
-      <label for="confirmPassword">
-        Confirm Password
-      </label>
-      <input type="password" class="form-control" id="confirmPassword" />
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" [(ngModel)]="model.confirmPassword" #confirmPassword="ngModel" [ngClass]="{ 'is-invalid': f.submitted && confirmPassword.invalid }" required/>
     </div>
     <div class="signup-form-group">
-      <label for="inputEmergencyContact">
-        Emergency Contact
-      </label>
-      <input type="tel" class="form-control" id="inputEmergencyContact" placeholder="(555)555-5555"/>
+      <label for="phone">Add Phone Number</label>
+      <input type="tel" class="form-control" id="phone" placeholder="(555)555-5555" name="phone" [(ngModel)]="model.phone" #phone="ngModel" [ngClass]="{ 'is-invalid': f.submitted && phone.invalid }" required />
     </div>
     <div class="signup-form-group">
-      <label for="addPicture">
-        Add Photo
-      </label>
-      <input type="text" class="form-control" id="addPicture" placeholder="https://pbs.twimg.com/profile_images.jpg"/>
+      <label for="emergencyContact">Emergency Contact</label>
+      <input type="tel" class="form-control" id="emergencyContact" placeholder="(555)555-5555" name="emergencyContact" [(ngModel)]="model.emergencyContact" #emergencyContact="ngModel" [ngClass]="{ 'is-invalid': f.submitted && emergencyContact.invalid }" required emergency contact/>
     </div>
     <div class="signup-form-group">
-      <label for="inputPhone">
-        Add Phone Number
-      </label>
-      <input type="tel" class="form-control" id="inputPhone" placeholder="(555)555-5555" />
+      <label for="profImg">Add Photo</label>
+      <input type="text" class="form-control" id="profImg" placeholder="https://pbs.twimg.com/image.jpg" name="profImg" [(ngModel)]="model.profImg" #profImg="ngModel" [ngClass]="{ 'is-invalid': f.submitted && profImg.invalid }" required/>
     </div>
     <div class="signup-form-group">
-      <label for="inputCity">
-        City
-      </label>
-      <input type="text" class="form-control" id="inputCity" placeholder="New Orleans" />
+      <label for="city">City</label>
+      <input type="text" class="form-control" id="city" placeholder="New Orleans" name="city" [(ngModel)]="model.city" #city="ngModel" [ngClass]="{ 'is-invalid': f.submitted && city.invalid }" required city/>
     </div>
     <div class="signup-form-group">
-      <label for="inputState">
-        State
-      </label>
-      <input type="text" class="form-control" id="inputState" placeholder="Louisiana" />
+      <label for="state">State</label>
+      <input type="text" class="form-control" id="state" placeholder="Louisiana" name="state" [(ngModel)]="model.state" #state="ngModel" [ngClass]="{ 'is-invalid': f.submitted && state.invalid }" required/>
     </div>
     <div class="signup-form-group">
-      <label for="inputZip">
-        Zip Code
-      </label>
-      <input type="text" class="form-control" id="inputZip" placeholder="Zip Code" />
+      <label for="zip">Zip Code</label>
+      <input type="text" class="form-control" id="zip" placeholder="70122" name="zip" [(ngModel)]="model.zip" #zip="ngModel" [ngClass]="{ 'is-invalid': f.submitted && zip.invalid }" required/>
     </div>
     <div class="form-group">
     </div>
