@@ -1,7 +1,7 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {WeatherService} from '../../services/weather/weather.service';
-import {UiService} from '../../services/ui/ui.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { WeatherService } from '../../services/weather/weather.service';
+import { UiService } from '../../../nav/ui/ui.service';
 
 @Component({
   selector: 'app-weather-card',
@@ -26,20 +26,20 @@ export class WeatherCardComponent implements OnInit, OnDestroy {
       this.darkMode = isDark;
     });
 
-    this.weather.getWeatherState('Paris')
-      .subscribe((data: string) => {
-        this.condition = data;
-      });
+    // this.weather.getWeatherState('Paris')
+    //   .subscribe((data: string) => {
+    //     this.condition = data;
+    //   });
 
-    this.weather.getCurrentTemp('Paris').subscribe((data: number) => {
-      this.currentTemp = data;
-    });
-    this.weather.getMinTemp('Paris').subscribe((data: number) => {
-      this.minTemp = data;
-    });
-    this.weather.getMaxTemp('Paris').subscribe((data: number) => {
-      this.maxTemp = data;
-    });
+    // this.weather.getCurrentTemp('Paris').subscribe((data: number) => {
+    //   this.currentTemp = data;
+    // });
+    // this.weather.getMinTemp('Paris').subscribe((data: number) => {
+    //   this.minTemp = data;
+    // });
+    // this.weather.getMaxTemp('Paris').subscribe((data: number) => {
+    //   this.maxTemp = data;
+    // });
   }
 
   ngOnDestroy() {

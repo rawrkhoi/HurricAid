@@ -1,6 +1,5 @@
-import {inject, TestBed} from '@angular/core/testing';
-
-import {UiService} from './ui.service';
+import { inject, TestBed } from '@angular/core/testing';
+import { UiService } from './ui.service';
 
 describe('UiService', () => {
   beforeEach(() => {
