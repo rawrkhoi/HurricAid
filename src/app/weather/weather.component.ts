@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { UiService } from './services/ui/ui.service';
+import { keys } from '../../../config';
 
 @Component({
   selector: 'app-weather',
@@ -6,10 +8,23 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./weather.component.css']
 })
 export class WeatherComponent implements OnInit {
+  showMenu = false;
+  darkModeActive: boolean;
 
-  constructor() { }
+  constructor(public ui: UiService) { }
 
   ngOnInit() {
+    this.ui.darkModeState.subscribe((value) => {
+      this.darkModeActive = value;
+    });
+  }
+
+  toggleMenu() {
+    this.showMenu = !this.showMenu;
+  }
+
+  modeToggleSwitch() {
+    this.ui.darkModeState.next(!this.darkModeActive);
   }
 
 }
