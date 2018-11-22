@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../maps.service';
 import { Marker } from '@agm/core/services/google-maps-types';
-import { AgmMarker } from '@agm/core';
 
 @Component({
   selector: 'app-map',
@@ -22,16 +21,19 @@ export class MapComponent implements OnInit {
       name: 'Baton Rouge',
       lat: '30.443319',
       lng: '-91.187492',
+      help: false,
     },
     {
       name: 'New Orleans',
       lat: '29.951065',
       lng: '-90.071533',
+      help: true,
     },
     {
       name: 'Shreveport',
       lat: '32.525150',
       lng: '-93.750175',
+      help: false,
     }
   ]
   constructor(private map: MapsService) { }
@@ -52,11 +54,12 @@ export class MapComponent implements OnInit {
       name:"New Marker",
       lat: event.coords.lat,
       lng: event.coords.lng,
+      help: false,
     }
     this.markers.push(newMarker);
     console.log('markers', this.markers)
   }
   markerClicked(marker:Marker, index:number){
-    console.log(`Marker: ${marker.name}, Index:${index}`)
+    console.log(`Marker: ${marker}, Index:${index}`)
   }
 }
