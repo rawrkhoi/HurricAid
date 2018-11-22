@@ -26,10 +26,11 @@ app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
   let textObj = {};
   const smsCount = req.session.counter || 0;
-  
+  // OPTIONS //
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
-    twiml.message("Text one of these commands: 'help@[address]', 'have@[address]', or 'need@[address]'");
+    twiml.message("Try one of these commands: 'help@[address]', 'have@[address]', or 'need@[address]'");
     // they send a message back. we add to db and we send one back to them
+    // HELP //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
     if (!req.session.counter){
       req.session.counter = smsCount;
@@ -50,18 +51,21 @@ app.post('/sms', (req, res) => {
       db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
       req.session.counter = smsCount + 1;
     }; 
+    // HAVE //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
     console.log(textObj);
     twiml.message('What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
     // we need to let them know that they need to remove things when they run OUT
+    // NEED //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
     console.log(textObj);
     twiml.message('What do you need? Text 1 for Food, 2 for Water, 3 for Shelter');
     // send back a message with 3 closest places who have that
+    // OUT //
   } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
@@ -69,14 +73,16 @@ app.post('/sms', (req, res) => {
     twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
     // they let us know what they're out of and we remove from db
   } else {
-    // if (req.session.counter > 0) {
-    //   textObj.message = req.body.Body;
-    //   console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
-    //   db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = phones.id`);
-    //   twiml.message("Message added to marker.");
-    //   req.session.counter = smsCount + 1;
-    // };
-    twiml.message("Error: We don\'t know what you mean. Please enter 'help@[address]', 'have@[address]', or 'need@[address]'")
+    if (req.session.counter > 0) {
+      textObj.message = req.body.Body;
+      textObj.number = req.body.From.slice(1);
+      console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
+      db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = (select id from phones where number='${textObj.number}')`);
+      twiml.message("Message added to marker.");
+      req.session.counter = smsCount + 1;
+    } else {
+      twiml.message("Error: We don\'t know what you mean. Please enter 'help@[address]', 'have@[address]', or 'need@[address]'")
+    }
   }
 
   res.writeHead(200, { 'Content-Type': 'text/xml' });
