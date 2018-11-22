@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MapsService } from '../maps.service';
-import { newsHeaders } from 'config';
+import { keys } from 'config';
 
 
 @Component({
@@ -24,7 +24,7 @@ export class NewsComponent implements OnInit {
       this.lat = data.latitude;
       this.lng = data.longitude;
       this.http.get((`https://api.predicthq.com/v1/events/?category=severe-weather,disasters,terror&within=10km@${this.lat},${this.lng}`), 
-        { headers: { Authorization: `Bearer ${newsHeaders.Authorization}` }})
+        { headers: { Authorization: `Bearer ${keys.predictHQ}` }})
           .subscribe((response) => {
             if (response['results'].length === 0){
               this.newsDisplay = true;
