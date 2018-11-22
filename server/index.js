@@ -37,12 +37,12 @@ app.post('/sms', (req, res) => {
     console.log(req.session, 'REQUEST SESSION');
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
-    if (req.session.counter > 0) {
-        console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
-        db.sequelize.query(`INSERT INTO help_pins (message) values ('${req.body.Body}')`)
-        twiml.message("Message added to marker.");
-      req.session.counter = smsCount + 1;
-    };
+    // if (req.session.counter > 0) {
+    //     console.log(textObj, 'SECOND MESSAGE OBJECT?????????')
+    //     db.sequelize.query(`INSERT INTO help_pins (message) values ('${req.body.Body}')`)
+    //     twiml.message("Message added to marker.");
+    //   req.session.counter = smsCount + 1;
+    // };
     if (req.session.counter === 0){
       twiml.message('SOS marker created. You may now send a brief message with details (optional).')
       // they send a message back. we add to db and we send one back to them
@@ -72,7 +72,7 @@ app.post('/sms', (req, res) => {
     // if (req.session.counter > 0) {
     //   textObj.message = req.body.Body;
     //   console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
-    //   db.sequelize.query(`UPDATE help_pins SET message = ('${req.body.Body}') where id_phone = phones.number = '${textObj.number}'`);
+    //   db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = phones.id`);
     //   twiml.message("Message added to marker.");
     //   req.session.counter = smsCount + 1;
     // };
