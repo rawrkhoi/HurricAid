@@ -17,8 +17,11 @@ app.use(session({
 }))
 
 app.post('/test', (req, res) => {
-  let first = 'Ethan';
-  db.sequelize.query(`INSERT INTO users (name_first) VALUES ('${first}')`);
+  let number = '15042615621';
+  db.sequelize.query(`SELECT number from phones where number='${number}'`).then((num) => {
+    // console.log(num[0][0].number);
+    console.log(num[0].length);
+  });
   res.end();
 }); 
 
@@ -38,25 +41,37 @@ app.post('/sms', (req, res) => {
     console.log(req.session, 'REQUEST SESSION');
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
-    // if (req.session.counter > 0) {
-    //     console.log(textObj, 'SECOND MESSAGE OBJECT?????????')
-    //     db.sequelize.query(`INSERT INTO help_pins (message) values ('${req.body.Body}')`)
-    //     twiml.message("Message added to marker.");
-    //   req.session.counter = smsCount + 1;
-    // };
-    if (req.session.counter === 0){
       twiml.message('SOS marker created. You may now send a brief message with details (optional).')
       // they send a message back. we add to db and we send one back to them
-      db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
-      db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
+      db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
+        if (num[0].length === 0){
+          db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
+        } 
+        db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
+      });
       req.session.counter = smsCount + 1;
-    }; 
     // HAVE //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
     console.log(textObj);
     twiml.message('What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
+    if (!req.session.counter) {
+      req.session.counter = smsCount;
+    }
+    console.log(req.session, 'REQUEST SESSION');
+    db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
+      if (num[0].length === 0) {
+        db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
+      }
+      db.sequelize.query(`INSERT INTO have_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
+    });
+    req.session.counter = smsCount + 1;
+    
+    
+    
+    
+    
     // we need to let them know that they need to remove things when they run OUT
     // NEED //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
