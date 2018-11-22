@@ -33,23 +33,21 @@ app.post('/sms', (req, res) => {
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
     if (!req.session.counter){
       req.session.counter = smsCount;
-    } else {
-      req.session.counter+=1;
-    }
+    } 
     console.log(req.session, 'REQUEST SESSION');
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
     if (req.session.counter > 0) {
-      let aMessage = '';
-        console.log(req.body.Body, 'SECOND MESSAGE??????')
-        twiml.message("thanks for the message");
+        console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
+        db.sequelize.query(`INSERT INTO help_pins (message) values ('${req.body.Body}')`)
+        twiml.message("Message added to marker.");
       req.session.counter = smsCount + 1;
     };
     if (req.session.counter === 0){
-      twiml.message('SOS pin created. You may now send a brief message with details (optional).')
+      twiml.message('SOS marker created. You may now send a brief message with details (optional).')
       // they send a message back. we add to db and we send one back to them
-      db.sequelize.query(`INSERT INTO help_pins (address) values ('${textObj.address}')`);
       db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
+      db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
       req.session.counter = smsCount + 1;
     }; 
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
@@ -71,6 +69,13 @@ app.post('/sms', (req, res) => {
     twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
     // they let us know what they're out of and we remove from db
   } else {
+    // if (req.session.counter > 0) {
+    //   textObj.message = req.body.Body;
+    //   console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
+    //   db.sequelize.query(`UPDATE help_pins SET message = ('${req.body.Body}') where id_phone = phones.number = '${textObj.number}'`);
+    //   twiml.message("Message added to marker.");
+    //   req.session.counter = smsCount + 1;
+    // };
     twiml.message("Error: We don\'t know what you mean. Please enter 'help@[address]', 'have@[address]', or 'need@[address]'")
   }
 
