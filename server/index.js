@@ -25,30 +25,33 @@ app.post('/test', (req, res) => {
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
   let textObj = {};
-  req.session.counter = 0;
-  const smsCount = req.session.counter;
+  const smsCount = req.session.counter || 0;
   
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
     twiml.message("Text one of these commands: 'help@[address]', 'have@[address]', or 'need@[address]'");
     // they send a message back. we add to db and we send one back to them
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
+    if (!req.session.counter){
+      req.session.counter = smsCount;
+    } else {
+      req.session.counter+=1;
+    }
     console.log(req.session, 'REQUEST SESSION');
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
-    console.log(textObj);
-    twiml.message('SOS pin created. You may now send a brief message with details (optional).')
-    // they send a message back. we add to db and we send one back to them
-    db.sequelize.query(`INSERT INTO help_pins (address) values ('${textObj.address}')`);
-    db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
-
-    let aMessage = '';
-    if(smsCount > 0) {
-      aMessage = "thanks for the message"
-      console.log(req.body.Body, 'SECOND MESSAGE??????')
-    }
-    req.session.counter = smsCount + 1;
-    const newTwiml = new MessagingResponse();
-    newTwiml.message(aMessage);
+    if (req.session.counter > 0) {
+      let aMessage = '';
+        console.log(req.body.Body, 'SECOND MESSAGE??????')
+        twiml.message("thanks for the message");
+      req.session.counter = smsCount + 1;
+    };
+    if (req.session.counter === 0){
+      twiml.message('SOS pin created. You may now send a brief message with details (optional).')
+      // they send a message back. we add to db and we send one back to them
+      db.sequelize.query(`INSERT INTO help_pins (address) values ('${textObj.address}')`);
+      db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
+      req.session.counter = smsCount + 1;
+    }; 
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
