@@ -42,3 +42,4 @@ package-lock.json
 config.js
 service-account-file.json
 AWSDeploy.pem
+config/

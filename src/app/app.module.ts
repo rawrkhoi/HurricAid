@@ -11,12 +11,10 @@ import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
 import { ProfileComponent } from './profile/profile.component';
 import { NewsComponent } from './news/news.component';
-import { PinsComponent } from './pins/pins.component';
 import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
-import { WeatherService } from './weather/services/weather/weather.service';
 import { UiService } from './nav/ui/ui.service';
 
 @NgModule({
@@ -28,7 +26,6 @@ import { UiService } from './nav/ui/ui.service';
     MapComponent,
     ProfileComponent,
     NewsComponent,
-    PinsComponent,
     InfoComponent,
     NavComponent
   ],
@@ -43,7 +40,6 @@ import { UiService } from './nav/ui/ui.service';
     })
   ],
   providers: [
-    WeatherService,
     UiService,
   ],
   bootstrap: [AppComponent]
