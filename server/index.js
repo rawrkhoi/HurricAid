@@ -33,6 +33,7 @@ app.post('/sms', (req, res) => {
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
     twiml.message("Try one of these commands: 'help@[address]', 'have@[address]', or 'need@[address]'");
     // they send a message back. we add to db and we send one back to them
+
     // HELP //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
     if (!req.session.counter){
@@ -50,6 +51,7 @@ app.post('/sms', (req, res) => {
         db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
       });
       req.session.counter = smsCount + 1;
+
     // HAVE //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
     textObj.number = req.body.From.slice(1);
@@ -88,13 +90,34 @@ app.post('/sms', (req, res) => {
     twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
     // they let us know what they're out of and we remove from db
   } else {
+    let regexp = /[A-Z]/gi;
     if (req.session.counter > 0) {
       textObj.message = req.body.Body;
       textObj.number = req.body.From.slice(1);
-      console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
-      db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = (select id from phones where number='${textObj.number}')`);
-      twiml.message("Message added to marker.");
-      req.session.counter = smsCount + 1;
+      let split = textObj.message.split(''); 
+      if (!textObj.message.match(regexp)) {
+        if (split.includes('1')){
+          db.sequelize.query(`UPDATE have_pins SET food = 'true' from phones where phones.number = '${textObj.number}' and have_pins.id_phone = (select id from phones where number='${textObj.number}')`);
+          twiml.message("Added have_pin");
+        } 
+        if (split.includes('2')) {
+          db.sequelize.query(`UPDATE have_pins SET water = 'true' from phones where phones.number = '${textObj.number}' and have_pins.id_phone = (select id from phones where number='${textObj.number}')`);
+          twiml.message("Added have_pin");
+        } 
+        if (split.includes('3')) {
+          db.sequelize.query(`UPDATE have_pins SET shelter = 'true' from phones where phones.number = '${textObj.number}' and have_pins.id_phone = (select id from phones where number='${textObj.number}')`);
+          twiml.message("Added have_pin");
+        } 
+        if (split.includes('4')) {
+          db.sequelize.query(`UPDATE have_pins SET other = 'true' from phones where phones.number = '${textObj.number}' and have_pins.id_phone = (select id from phones where number='${textObj.number}')`);
+          twiml.message("Added have_pin");
+        } 
+      } else {
+            console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
+            db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = (select id from phones where number='${textObj.number}')`);
+            twiml.message("Message added to marker.");
+          }
+          req.session.counter = smsCount + 1;
     } else {
       twiml.message("Error: We don\'t know what you mean. Please enter 'help@[address]', 'have@[address]', or 'need@[address]'")
     }
