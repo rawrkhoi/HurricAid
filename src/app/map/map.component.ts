@@ -9,14 +9,15 @@ import { Marker } from '@agm/core/services/google-maps-types';
 })
 export class MapComponent implements OnInit {
 
-  name: string = '';
+  model: any = {};
+  name: any;
   lat: any;
   lng: any;
-
-  location: Object;
-  
+  address: boolean = false;
+  help: boolean;
+  have: boolean;
   zoom: number = 10;
-  markers = [
+  markers: any = [
     {
       name: 'Baton Rouge',
       lat: '30.443319',
@@ -59,7 +60,26 @@ export class MapComponent implements OnInit {
     this.markers.push(newMarker);
     console.log('markers', this.markers)
   }
-  markerClicked(marker:Marker, index:number){
-    console.log(`Marker: ${marker}, Index:${index}`)
+  markerClicked(marker:any, index:number){
+    console.log(`Marker: ${marker.name}, Index:${index}`)
+  }
+  onSubmit() {
+    alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.model))
+  }
+  showAddressField() {
+    this.address = true;
+    console.log(this.address);
+  }
+  hideAddressField() {
+    this.address = false;
+    console.log(this.address);
+  }
+  toggleHelp() {
+    this.help = !this.help;
+    console.log(this.help);
+  }
+  toggleHave() {
+    this.have = !this.have;
+    console.log(this.have);
   }
 }

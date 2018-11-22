@@ -18,24 +18,45 @@
     </agm-info-window>
   </agm-marker>
 </agm-map>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <h2>Pin It Up</h2>
+      <input type="checkbox" name="helper" value="assist" (click)="toggleHelp()"> Help me!<br>
+      <div *ngIf="help" class="help-input">
+        <form>
+          <input type="text" name="othermessage" placeholder="Message (optional)"><br>
+        </form>
+      </div>
 
-<div class='pinmaker'>
-  <div class="pinmaker-header">
-    <h2>Create Pin</h2>
-    <h3>I want to offer:</h3>
-    <input type="checkbox" name="food" value="Food"> Food<br>
-    <input type="checkbox" name="water" value="Water"> Water<br>
-    <input type="checkbox" name="shelter" value="Shelter"> Shelter<br>
-    <input type="checkbox" name="other" value="Other"> Other<br>
-    <form>
-      <input type="text" name="othermessage" placeholder="Explain other items"><br>
-    </form>
-    <h3>Help me!</h3>
-    <form>
-      <input type="text" name="othermessage" placeholder="Message (optional)"><br>
-    </form>
-    <h3>Where are you?</h3>
-    <input type="radio" name="address" value="default-address">Default Address<br>
-    <input type="radio" name="address" value="different-address">Different Address<br>
+      <input type="checkbox" name="haver" value="provide" (click)="toggleHave()"> Offer amenities
+      <ul *ngIf="have" class="help-input">
+        <input type="checkbox" name="food" value="Food"> Food<br>
+        <input type="checkbox" name="water" value="Water"> Water<br>
+        <input type="checkbox" name="shelter" value="Shelter"> Shelter<br>
+        <input type="checkbox" name="other" value="Other"> Other<br>
+        <form>
+          <input type="text" name="othermessage" placeholder="Explain other items"><br>
+        </form>
+      </ul>
+      <h3>Where are you?</h3>
+      <form>
+        <label>
+          <input type="radio" name="address" value="default-address" (click)="hideAddressField()">
+          Saved Address
+        </label><br>
+        <label>
+          <input type="radio" (click)="showAddressField()">
+          Other Address
+        </label><br>
+      </form>
+      <div *ngIf="address" class="address-input">
+        <form>
+          <input type="text" name="other-address" value="different-address" placeholder="Enter Address Here">
+          <br> or <br>
+          <input type="text" name="other-zip" value="different-address" placeholder="Zip Code">
+        </form>
+      </div>
+    </div>
   </div>
 </div>
