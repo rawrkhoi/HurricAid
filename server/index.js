@@ -1,5 +1,6 @@
 const config = require('../config')
 const express = require('express');
+const fallback = require('express-history-api-fallback');
 const http = require('http');
 const port = process.env.port || 3000;
 const db = require('../models');
@@ -12,6 +13,7 @@ const app = express();
 app.use(express.static(`${__dirname}/../dist/browser`));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 
 app.post('/helpPin', (req, res) => {
   let { message, address, lat, lng } = req.body.pin;
@@ -27,7 +29,7 @@ app.get('/getHelpPins', (req, res) => {
 
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
-
+  
   if (req.body.Body.toLowerCase() === 'help@') {
     twiml.message('What can we help you with?');
   } else if (req.body.Body.toLowerCase() === 'have@') {
@@ -35,9 +37,11 @@ app.post('/sms', (req, res) => {
   } else {
     twiml.message("Error: We don\'t know what you\'re trying to say.")
   }
-
+  
   res.writeHead(200, { 'Content-Type': 'text/xml' });
   res.end(twiml.toString());
-})
+});
+
+app.use(fallback('index.html', {root: './dist/browser'}));
 
 http.createServer(app).listen(port, () => console.log(`Express server listening on port ${port}!`));
