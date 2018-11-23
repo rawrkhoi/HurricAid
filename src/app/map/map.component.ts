@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../maps.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { keys } from '../../../config';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-map',
@@ -25,8 +26,8 @@ export class MapComponent implements OnInit {
   address: string;
   lat: any;
   lng: any;
-  helpMarkers: any;
-  haveMarkers: any;
+  helpMarkers: any = [];
+  haveMarkers: any = [];
 
   constructor(private map: MapsService, private http: HttpClient) { }
 
@@ -37,11 +38,37 @@ export class MapComponent implements OnInit {
       this.lng = data.longitude;
     })
     // query all the pins from db and push to markers
-    this.http.get('/getHelpPins').subscribe((pins) => {
-      this.helpMarkers = pins;
+    this.http.get('/getHelpPins').subscribe((pins: any) => {
+      for (let i = 0; i < pins.length; i ++) {
+        this.helpMarkers.push({
+          address: pins[i].address,
+          createdAt: moment(pins[i].createdAt).format('llll'),
+          id: pins[i].id,
+          id_phone: pins[i].id_phone,
+          latitude: pins[i].latitude,
+          longitude: pins[i].longitude,
+          message: pins[i].message,
+          updatedAt: moment(pins[i].updatedAt).format('llll'),
+        });
+      }
     }); 
-    this.http.get('/getHavePins').subscribe((pins) => {
-      this.haveMarkers = pins;
+    this.http.get('/getHavePins').subscribe((pins: any) => {
+      for (let i = 0; i < pins.length; i++) {
+        this.haveMarkers.push ({
+          address: pins[i].address,
+          createdAt: moment(pins[i].createdAt).format('llll'),
+          id: pins[i].id,
+          id_phone: pins[i].id_phone,
+          latitude: pins[i].latitude,
+          longitude: pins[i].longitude,
+          message: pins[i].message,
+          updatedAt: moment(pins[i].updatedAt).format('llll'),
+          food: pins[i].food,
+          other: pins[i].other,
+          shelter: pins[i].shelter,
+          water: pins[i].water,
+        });
+      }
     }); 
   }
   setMsgAddress() {
