@@ -6,18 +6,43 @@
   [zoom]="zoom"
 >
   <agm-marker
-    *ngFor="let m of markers;let i = index"
+    *ngFor="let m of helpMarkers;let i = index"
     [latitude]="m.latitude"
     [longitude]="m.longitude"
   >
     <agm-info-window>
-      <strong>{{m.message}}</strong>
+      <strong>Help</strong>
+      <br>
+      <i>{{m.message}}</i>
       <br>
       <i>Address:</i> {{m.address}}
       <br>
       <i>Created at:</i> {{m.createdAt}}
     </agm-info-window>
   </agm-marker>
+
+  <agm-marker
+  *ngFor="let p of haveMarkers;let i = index"
+  [latitude]="p.latitude"
+  [longitude]="p.longitude"
+  >
+    <agm-info-window>
+      <strong>Have</strong>
+      <br>
+      <i>Address:</i> {{p.address}}
+      <br>
+      <i>Food:</i> {{p.food}}
+      <br>
+      <i>Water:</i> {{p.water}}
+      <br>
+      <i>Shelter:</i> {{p.shelter}}
+      <br>
+      <i>Other:</i> {{p.other}}
+      <br>
+      <i>Created at:</i> {{p.createdAt}}
+    </agm-info-window>
+  </agm-marker>
+
 </agm-map>
 <div class="container">
   <div class="row">
@@ -54,10 +79,6 @@
           <mat-checkbox name="other" (click)="toggleOther()">Other</mat-checkbox><br>
           <mat-form-field>
             <input matInput name="message-other" matInput #message maxlength="255" [(ngModel)]="model.message_other" placeholder="Other Ammenities">
-            <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
-          </mat-form-field>
-          <mat-form-field>
-            <input matInput name="message" matInput #message maxlength="255" [(ngModel)]="model.message" placeholder="Message (Optional)">
             <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
           </mat-form-field>
           <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>

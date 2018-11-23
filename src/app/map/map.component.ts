@@ -25,7 +25,8 @@ export class MapComponent implements OnInit {
   address: string;
   lat: any;
   lng: any;
-  markers: any;
+  helpMarkers: any;
+  haveMarkers: any;
 
   constructor(private map: MapsService, private http: HttpClient) { }
 
@@ -37,7 +38,10 @@ export class MapComponent implements OnInit {
     })
     // query all the pins from db and push to markers
     this.http.get('/getHelpPins').subscribe((pins) => {
-      this.markers = pins;
+      this.helpMarkers = pins;
+    }); 
+    this.http.get('/getHavePins').subscribe((pins) => {
+      this.haveMarkers = pins;
     }); 
   }
   setMsgAddress() {
@@ -75,7 +79,6 @@ export class MapComponent implements OnInit {
         }
         if (this.have) {
           const newHavePin = {
-            message: this.model.message,
             lat: response.results[0].geometry.location.lat,
             lng: response.results[0].geometry.location.lng,
             address: response.results[0].formatted_address,
