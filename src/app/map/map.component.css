@@ -1,17 +1,7 @@
 agm-map{
-  height: 500px;
-}
-.example-h2 {
-  margin: 10px;
+  height: 300px;
 }
 
-.example-section {
-  display: flex;
-  align-content: center;
-  align-items: center;
-  height: 60px;
-}
-
-.help-input {
-  margin: 0 10px;
+.pin-input {
+  margin: 0 15px;
 }
