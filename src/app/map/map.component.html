@@ -7,14 +7,13 @@
 >
   <agm-marker
     *ngFor="let m of markers;let i = index"
-    (markerClick)="markerClicked(m, i)"
     [latitude]="m.lat"
     [longitude]="m.lng"
   >
     <agm-info-window>
-      <strong>{{m.name}}</strong>
+      <strong>{{m.message}}</strong>
       <br>
-      Lat: {{lat}} Lng: {{lng}}
+      Address: {{address}}
     </agm-info-window>
   </agm-marker>
 </agm-map>
@@ -34,9 +33,6 @@
         </label><br>
         <div *ngIf="addressField" class="address-input">
           <input type="text" name="other-address" placeholder="Enter Address Here" [(ngModel)]="model.address">
-          <br> or <br>
-          <input type="text" name="latitude" placeholder="Enter Latitude" [(ngModel)]="model.lat">
-          <input type="text" name="longitude" placeholder="Enter Longitude" [(ngModel)]="model.lng">
           <!-- <input type="text" name="other-zip" placeholder="Zip Code"> -->
         </div>
         <h4>Do you need help or wanting to help?</h4>
@@ -54,7 +50,7 @@
           <input type="text" name="othermessage" placeholder="Explain other items" [(ngModel)]="model.message"><br>
         </ul>
         <br>
-        <input type="button" value="Create Pin" (click)="createHelp()">
+        <input type="button" value="Create Pin" (click)="createHelp()" (click)="getCoords()">
         <!-- <button mat-button color="primary" (click)="createHave()">Create Pin</button> -->
       </form>
     </div>
