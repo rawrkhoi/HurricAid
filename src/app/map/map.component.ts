@@ -25,18 +25,8 @@ export class MapComponent implements OnInit {
   name: any;
   lat: any;
   lng: any;
-  markers: any = [
-    {
-      message: 'Baton Rouge',
-      lat: '30.443319',
-      lng: '-91.187492',
-    },
-    {
-      message: 'New Orleans',
-      lat: '29.951065',
-      lng: '-90.071533',
-    },
-  ]
+  markers: any;
+
   constructor(private map: MapsService, private http: HttpClient) { }
 
   ngOnInit() {
@@ -46,6 +36,9 @@ export class MapComponent implements OnInit {
       this.lng = data.longitude;
     })
     // query all the pins from db and push to markers
+    this.http.get('/getHelpPins').subscribe((pins) => {
+      this.markers = pins;
+    }); 
   }
   mapClicked(event) {
     console.log(`Map clicked at latitude:${event.coords.lat} an longitude:${event.coords.lng}`)
@@ -83,7 +76,7 @@ export class MapComponent implements OnInit {
           lng: response.results[0].geometry.location.lng,
           address: response.results[0].formatted_address,
         }
-        this.markers.push(newHelpPin);
+        // this.markers.push(newHelpPin);
         // insert the pin into the database
         const headers = new HttpHeaders({
           'Content-Type': 'application/json',

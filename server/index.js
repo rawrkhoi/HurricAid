@@ -19,6 +19,12 @@ app.post('/helpPin', (req, res) => {
   res.end(); 
 }); 
 
+app.get('/getHelpPins', (req, res) => {
+  db.sequelize.query(`SELECT * FROM help_pins`).then(([pins]) => {
+    res.send(pins);
+  });
+});
+
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
 
