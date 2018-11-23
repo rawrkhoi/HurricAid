@@ -17,8 +17,9 @@ app.use(bodyParser.json());
 
 app.post('/helpPin', (req, res) => {
   let { message, address, lat, lng } = req.body.pin;
-  db.sequelize.query(`INSERT INTO help_pins (message, address, latitude, longitude) VALUES ('${message}', '${address}', '${lat}', '${lng}')`);
-  res.end(); 
+  db.sequelize.query(`INSERT INTO help_pins (message, address, latitude, longitude) VALUES ('${message}', '${address}', '${lat}', '${lng}')`).then(() => {
+    res.end(); 
+  });
 }); 
 
 app.get('/getHelpPins', (req, res) => {
