@@ -67,7 +67,6 @@ app.post('/sms', (req, res) => {
     textObj.address = req.body.Body.slice(5);
     req.session.address = textObj.address;
     twiml.message('What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
-    console.log(req.session, 'REQUEST SESSION');
     db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
       if (num[0].length === 0) {
         db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
@@ -84,15 +83,21 @@ app.post('/sms', (req, res) => {
       })
     });
     req.session.counter = smsCount + 1;
-    
-    // we need to let them know that they need to remove things when they run OUT
+
     // NEED //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
+    req.session.command = "need";
+    if (!req.session.counter) {
+      req.session.counter = smsCount;
+    }
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
-    console.log(textObj);
+    req.session.address = textObj.address;
     twiml.message('What do you need? Text 1 for Food, 2 for Water, 3 for Shelter');
     // send back a message with 3 closest places who have that
+    req.session.counter = smsCount + 1;
+
+
     // OUT //
   } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
     textObj.number = req.body.From.slice(1);
@@ -126,15 +131,15 @@ app.post('/sms', (req, res) => {
             })
             if (split.includes('1')){
               updateSupplies('food');
-              twiml.message("Added have_pin");
+              twiml.message("Added pin. To remove a pin, type out@[address]");
             } 
             if (split.includes('2')) {
               updateSupplies('water');
-              twiml.message("Added have_pin");
+              twiml.message("Added pin. To remove a pin, type out@[address]");
             } 
             if (split.includes('3')) {
               updateSupplies('shelter');
-              twiml.message("Added have_pin");
+              twiml.message("Added pin. To remove a pin, type out@[address]");
             } 
             if (split.includes('4')) {
               updateSupplies('other');
@@ -156,6 +161,33 @@ app.post('/sms', (req, res) => {
           // update other to a new message
           test = false;
         } 
+      } else if (req.session.command === 'need') {
+        textObj.message = req.body.Body;
+        textObj.number = req.body.From.slice(1);
+        let split = textObj.message.split('');
+        if (!textObj.message.match(regexp)) {
+          let findSupplies = (supply) =>  db.have_pins.findAll({
+            where: {
+              [supply]: true,
+            },
+            raw: true,
+          });
+          if (split.includes('5')) {
+              findSupplies('food').then((entries) => {
+                console.log(entries, 'THESE ARE THE ENTRIES');
+                console.log(req.body, 'REQUEST body FOR TWIML MESSAGE')
+                twiml.message("YOU DID IT GIRL");
+              })
+            }
+            // if (split.includes('2')) {
+            //   findSupplies('water');
+            //   twiml.message();
+            // }
+            // if (split.includes('3')) {
+            //   findSupplies('shelter');
+            //   twiml.message();
+            // }
+        }
       } else {
             console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
             db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = (select id from phones where number='${textObj.number}')`);
@@ -163,7 +195,7 @@ app.post('/sms', (req, res) => {
           }
           req.session.counter = smsCount + 1;
     } else {
-      twiml.message("Error: We don\'t know what you mean. Please enter 'help@[address]', 'have@[address]', or 'need@[address]'")
+      twiml.message("Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]")
     }
   }
 
