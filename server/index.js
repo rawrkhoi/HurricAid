@@ -232,6 +232,7 @@ app.post('/sms', (req, res) => {
   res.end(twiml.toString());
 });
 
+// for page refresh
 app.use(fallback('index.html', {root: './dist/browser'}));
 
 http.createServer(app).listen(port, () => console.log(`Express server listening on port ${port}!`));

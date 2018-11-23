@@ -5,6 +5,7 @@
   grid-template-columns: auto;
   grid-template-rows: 0.5fr auto;
   position: relative;
+  background: whitesmoke;
 }
 
 /*
@@ -70,7 +71,7 @@
 }
 
 .menu-header {
-  background: linear-gradient(to right, #00FF9B, #5f84fb);
+  background: lightcoral;
   display: grid;
   grid-template-rows: 1fr 4fr;
   grid-template-columns: 1fr 4fr;
@@ -145,6 +146,7 @@
   align-items: center;
   transition: background-color 500ms linear;
   animation: fadein 1s ease-in-out 0ms 1;
+  background-color: lightcoral;
 }
 
 .main__header-dark {
