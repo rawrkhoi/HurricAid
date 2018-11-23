@@ -11,12 +11,14 @@ import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
 import { ProfileComponent } from './profile/profile.component';
 import { NewsComponent } from './news/news.component';
-import { PinsComponent } from './pins/pins.component';
 import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
 import { UiService } from './nav/ui/ui.service';
+import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatFormFieldModule, MatButtonModule, MatCheckboxModule, MatSelectModule, MatInputModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,6 @@ import { UiService } from './nav/ui/ui.service';
     MapComponent,
     ProfileComponent,
     NewsComponent,
-    PinsComponent,
     InfoComponent,
     NavComponent
   ],
@@ -37,6 +38,13 @@ import { UiService } from './nav/ui/ui.service';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    FormsModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`
     })

@@ -1,26 +1,58 @@
-<h1>Map Working</h1>
+<h1>Map Markers</h1>
 
-<agm-map [latitude]="lat" [longitude]="lng">
-  <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+<agm-map
+  [latitude]="lat"
+  [longitude]="lng"
+  (mapClick)="mapClicked($event)"
+>
+  <agm-marker
+    *ngFor="let m of markers;let i = index"
+    [latitude]="m.lat"
+    [longitude]="m.lng"
+  >
+    <agm-info-window>
+      <strong>{{m.message}}</strong>
+      <br>
+      <i>Address:</i> {{m.address}}
+    </agm-info-window>
+  </agm-marker>
 </agm-map>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <form name="form" onSubmit="return false" (ngSubmit)="f.form.valid && createMarker()" #f="ngForm" novalidate>
+        <h2>Pin It Up</h2>
+        <h3>Where are you?</h3>
+        <label>
+          <input type="radio" name="addressField" (click)="hideAddressField()">
+          Saved Address
+        </label><br>
+        <label>
+          <input type="radio" name="addressField" (click)="showAddressField()">
+          Other Address
+        </label><br>
+        <div *ngIf="addressField" class="address-input">
+          <input type="text" name="other-address" placeholder="Enter Address Here" [(ngModel)]="model.address">
+          <!-- <input type="text" name="other-zip" placeholder="Zip Code"> -->
+        </div>
+        <h4>Do you need help or wanting to help?</h4>
+        <input type="checkbox" name="helper" value="assist" (click)="toggleHelp()"> Help me!<br>
+        <div *ngIf="help" class="help-input">
+          <input type="text" name="othermessage" placeholder="Message (optional)" [(ngModel)]="model.message"><br>
+        </div>
 
-<div class='pinmaker'>
-  <div class="pinmaker-header">
-    <h2>Create Pin</h2>
-    <h3>I want to offer:</h3>
-    <input type="checkbox" name="food" value="Food"> Food<br>
-    <input type="checkbox" name="water" value="Water"> Water<br>
-    <input type="checkbox" name="shelter" value="Shelter"> Shelter<br>
-    <input type="checkbox" name="other" value="Other"> Other<br>
-    <form>
-      <input type="text" name="othermessage" placeholder="Explain other items"><br>
-    </form>
-    <h3>Help me!</h3>
-    <form>
-      <input type="text" name="othermessage" placeholder="Message (optional)"><br>
-    </form>
-    <h3>Where are you?</h3>
-    <input type="radio" name="address" value="default-address">Default Address<br>
-    <input type="radio" name="address" value="different-address">Different Address<br>
+        <input type="checkbox" name="haver" value="provide" (click)="toggleHave()"> Offer amenities
+        <ul *ngIf="have" class="help-input">
+          <mat-checkbox [(ngModel)]="model.food">Food</mat-checkbox><br>
+          <input type="checkbox" name="water" value="Water" (click)="model.water = !model.water"> Water<br>
+          <input type="checkbox" name="shelter"> Shelter<br>
+          <input type="checkbox" name="other"> Other<br>
+          <input type="text" name="othermessage" placeholder="Explain other items" [(ngModel)]="model.message"><br>
+        </ul>
+        <br>
+        <input type="button" value="Create Pin" (click)="createHelp()" (click)="getCoords()">
+        <!-- <button mat-button color="primary" (click)="createHave()">Create Pin</button> -->
+      </form>
+    </div>
   </div>
 </div>
