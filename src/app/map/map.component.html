@@ -3,55 +3,86 @@
 <agm-map
   [latitude]="lat"
   [longitude]="lng"
-  (mapClick)="mapClicked($event)"
+  [zoom]="zoom"
 >
   <agm-marker
-    *ngFor="let m of markers;let i = index"
-    [latitude]="m.lat"
-    [longitude]="m.lng"
+    *ngFor="let m of helpMarkers;let i = index"
+    [latitude]="m.latitude"
+    [longitude]="m.longitude"
   >
     <agm-info-window>
-      <strong>{{m.message}}</strong>
+      <strong>Help</strong>
+      <br>
+      <i>{{m.message}}</i>
       <br>
       <i>Address:</i> {{m.address}}
+      <br>
+      <i>Created at:</i> {{m.createdAt}}
     </agm-info-window>
   </agm-marker>
+
+  <agm-marker
+  *ngFor="let p of haveMarkers;let i = index"
+  [latitude]="p.latitude"
+  [longitude]="p.longitude"
+  >
+    <agm-info-window>
+      <strong>Have</strong>
+      <br>
+      <i>Address:</i> {{p.address}}
+      <br>
+      <i>Food:</i> {{p.food}}
+      <br>
+      <i>Water:</i> {{p.water}}
+      <br>
+      <i>Shelter:</i> {{p.shelter}}
+      <br>
+      <i>Other:</i> {{p.other}}
+      <br>
+      <i>Created at:</i> {{p.createdAt}}
+    </agm-info-window>
+  </agm-marker>
+
 </agm-map>
 <div class="container">
   <div class="row">
     <div class="col-md-8 offset-md-2">
-      <form name="form" onSubmit="return false" (ngSubmit)="f.form.valid && createMarker()" #f="ngForm" novalidate>
+      <form name="form" onSubmit="return false" #f="ngForm" novalidate>
         <h2>Pin It Up</h2>
+
         <h3>Where are you?</h3>
-        <label>
-          <input type="radio" name="addressField" (click)="hideAddressField()">
-          Saved Address
-        </label><br>
-        <label>
-          <input type="radio" name="addressField" (click)="showAddressField()">
-          Other Address
-        </label><br>
+        <mat-radio-button class="addressField" (click)="hideAddressField()">Saved Address</mat-radio-button><br>
+
+        <mat-radio-button class="addressField" (click)="showAddressField()">Other Address</mat-radio-button>
+          <br>
         <div *ngIf="addressField" class="address-input">
-          <input type="text" name="other-address" placeholder="Enter Address Here" [(ngModel)]="model.address">
-          <!-- <input type="text" name="other-zip" placeholder="Zip Code"> -->
-        </div>
-        <h4>Do you need help or wanting to help?</h4>
-        <input type="checkbox" name="helper" value="assist" (click)="toggleHelp()"> Help me!<br>
-        <div *ngIf="help" class="help-input">
-          <input type="text" name="othermessage" placeholder="Message (optional)" [(ngModel)]="model.message"><br>
+          <mat-form-field>
+            <input matInput name="other-address" [(ngModel)]="model.address" placeholder="Address">
+          </mat-form-field>
         </div>
 
-        <input type="checkbox" name="haver" value="provide" (click)="toggleHave()"> Offer amenities
-        <ul *ngIf="have" class="help-input">
-          <mat-checkbox [(ngModel)]="model.food">Food</mat-checkbox><br>
-          <input type="checkbox" name="water" value="Water" (click)="model.water = !model.water"> Water<br>
-          <input type="checkbox" name="shelter"> Shelter<br>
-          <input type="checkbox" name="other"> Other<br>
-          <input type="text" name="othermessage" placeholder="Explain other items" [(ngModel)]="model.message"><br>
-        </ul>
-        <br>
-        <input type="button" value="Create Pin" (click)="createHelp()" (click)="getCoords()">
-        <!-- <button mat-button color="primary" (click)="createHave()">Create Pin</button> -->
+        <h4>Do you need help or wanting to help?</h4>
+        <mat-checkbox name="helper" (click)="toggleHelp()"> Help me!</mat-checkbox><br>
+        <div *ngIf="help" class="pin-input">
+          <mat-form-field>
+            <input matInput name="message" matInput #message maxlength="255" [(ngModel)]="model.message" placeholder="Message (Optional)">
+            <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
+          </mat-form-field>
+          <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
+        </div>
+
+        <mat-checkbox name="haver" (click)="toggleHave()"> Offer amenities</mat-checkbox>
+        <div *ngIf="have" class="pin-input">
+          <mat-checkbox name="food" (click)="toggleFood()">Food</mat-checkbox><br>
+          <mat-checkbox name="water" (click)="toggleWater()">Water</mat-checkbox><br>
+          <mat-checkbox name="shelter" (click)="toggleShelter()">Shelter</mat-checkbox><br>
+          <mat-checkbox name="other" (click)="toggleOther()">Other</mat-checkbox><br>
+          <mat-form-field>
+            <input matInput name="message-other" matInput #message maxlength="255" [(ngModel)]="model.message_other" placeholder="Other Ammenities">
+            <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
+          </mat-form-field>
+          <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
+        </div>
       </form>
     </div>
   </div>

@@ -1,6 +1,7 @@
 const config = require('../config')
 const express = require('express');
 const session = require('express-session');
+const fallback = require('express-history-api-fallback');
 const http = require('http');
 const port = process.env.port || 3000;
 const db = require('../models');
@@ -15,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
   secret: 'keyboard cat'
 }))
+app.use(bodyParser.json());
 
 app.post('/test', (req, res) => {
   // let number = '15042615621';
@@ -27,7 +29,34 @@ app.post('/test', (req, res) => {
     console.log(whatever[0], 'WHATEVER!!!!');
   });
   res.end();
+});
+
+
+app.post('/helpPin', (req, res) => {
+  let { message, address, lat, lng } = req.body.pin;
+  db.sequelize.query(`INSERT INTO help_pins (message, address, latitude, longitude) VALUES ('${message}', '${address}', '${lat}', '${lng}')`).then(() => {
+    res.end(); 
+  });
 }); 
+
+app.get('/getHelpPins', (req, res) => {
+  db.sequelize.query(`SELECT * FROM help_pins`).then(([pins]) => {
+    res.send(pins);
+  });
+});
+
+app.post('/havePin', (req, res) => {
+  let { address, lat, lng, food, water, shelter, other } = req.body.pin;
+  db.sequelize.query(`INSERT INTO have_pins (address, latitude, longitude, food, water, shelter, other) VALUES ('${address}', '${lat}', '${lng}', '${food}', '${water}','${shelter}','${other}')`).then(() => {
+    res.end(); 
+  });
+}); 
+
+app.get('/getHavePins', (req, res) => {
+  db.sequelize.query(`SELECT * FROM have_pins`).then(([pins]) => {
+    res.send(pins);
+  });
+});
 
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
@@ -198,9 +227,11 @@ app.post('/sms', (req, res) => {
       twiml.message("Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]")
     }
   }
-
+  
   res.writeHead(200, { 'Content-Type': 'text/xml' });
   res.end(twiml.toString());
-})
+});
+
+app.use(fallback('index.html', {root: './dist/browser'}));
 
 http.createServer(app).listen(port, () => console.log(`Express server listening on port ${port}!`));
