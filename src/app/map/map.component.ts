@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../maps.service';
-import { Marker } from '@agm/core/services/google-maps-types';
 
 @Component({
   selector: 'app-map',
@@ -10,10 +9,17 @@ import { Marker } from '@agm/core/services/google-maps-types';
 export class MapComponent implements OnInit {
 
   model: any = {};
+  message: string;
+  food: boolean;
+  water: boolean;
+  shelter: boolean;
+  other: boolean;
+  address: string;
+
   name: any;
   lat: any;
   lng: any;
-  address: boolean = false;
+  addressField: boolean = false;
   help: boolean;
   have: boolean;
   zoom: number = 10;
@@ -63,23 +69,42 @@ export class MapComponent implements OnInit {
   markerClicked(marker:any, index:number){
     console.log(`Marker: ${marker.name}, Index:${index}`)
   }
-  onSubmit() {
-    alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.model))
+  createHelp() {
+    const newHelpPin = {
+      message: this.model.message,
+      lat: this.model.lat,
+      lng: this.model.lng,
+      address: this.model.address,
+      help: true,
+    }
+    console.log(newHelpPin);
+    this.markers.push(newHelpPin);
+  }
+  createHave() {
+    const newHavePin = {
+      message: this.model.message,
+      food: false,
+      water: false,
+      shelter: false,
+      other: false,
+      message_other: this.model.message_other,
+      lat: this.model.lat,
+      lng: this.model.lng,
+      address: this.model.address,
+      help: false,
+    }
+    console.log(newHavePin);
   }
   showAddressField() {
-    this.address = true;
-    console.log(this.address);
+    this.addressField = true;
   }
   hideAddressField() {
-    this.address = false;
-    console.log(this.address);
+    this.addressField = false;
   }
   toggleHelp() {
     this.help = !this.help;
-    console.log(this.help);
   }
   toggleHave() {
     this.have = !this.have;
-    console.log(this.have);
   }
 }

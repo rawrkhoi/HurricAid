@@ -16,6 +16,9 @@ import { NavComponent } from './nav/nav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
 import { UiService } from './nav/ui/ui.service';
+import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatFormFieldModule, MatButtonModule, MatCheckboxModule, MatSelectModule, MatInputModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -35,6 +38,13 @@ import { UiService } from './nav/ui/ui.service';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    FormsModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`
     })
