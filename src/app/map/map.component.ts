@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../maps.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { keys } from '../../../config';
 
 @Component({
@@ -25,7 +25,6 @@ export class MapComponent implements OnInit {
   name: any;
   lat: any;
   lng: any;
-  
   markers: any = [
     {
       message: 'Baton Rouge',
@@ -46,6 +45,7 @@ export class MapComponent implements OnInit {
       this.lat = data.latitude;
       this.lng = data.longitude;
     })
+    // query all the pins from db and push to markers
   }
   mapClicked(event) {
     console.log(`Map clicked at latitude:${event.coords.lat} an longitude:${event.coords.lng}`)
@@ -65,9 +65,37 @@ export class MapComponent implements OnInit {
   createHelp() {
     this.message = this.model.message;
     this.address = this.model.address;
-    this.lat = this.model.lat;
-    this.lng = this.model.lng;
+    // this.lat = this.model.lat;
+    // this.lng = this.model.lng;
     this.help = true;
+
+    this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
+      { params: {
+        address: this.address,
+        key: keys.geocode,
+      }
+    })
+      .subscribe((response: any) => {
+        console.log(response.results);
+        const newHelpPin = {
+          message: this.model.message,
+          lat: response.results[0].geometry.location.lat,
+          lng: response.results[0].geometry.location.lng,
+          address: response.results[0].formatted_address,
+        }
+        this.markers.push(newHelpPin);
+        // insert the pin into the database
+        const headers = new HttpHeaders({
+          'Content-Type': 'application/json',
+        });
+        const options = {
+          headers,
+          withCredentials: true
+        };
+        this.http.post('/helpPin', { pin: newHelpPin }, options).subscribe((data) => {
+          console.log(data);
+        });
+      })
   }
   createHave() {
     const newHavePin = {
@@ -96,25 +124,29 @@ export class MapComponent implements OnInit {
   toggleHave() {
     this.have = !this.have;
   }
-  getCoords() {
-    this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
-      { params: {
-        address: this.address,
-        key: keys.geocode,
-      }
-    })
-      .subscribe((response: any) => {
-        console.log(response.results);
-        const newHelpPin = {
-          message: this.model.message,
-          lat: response.results[0].geometry.location.lat,
-          lng: response.results[0].geometry.location.lng,
-          address: response.results[0].formatted_address,
-        }
-        this.markers.push(newHelpPin);
-        console.log(newHelpPin);
-      })
-  }
+  // getCoords() {
+  //   this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
+  //     { params: {
+  //       address: this.address,
+  //       key: keys.geocode,
+  //     }
+  //   })
+  //     .subscribe((response: any) => {
+  //       console.log(response.results);
+  //       const newHelpPin = {
+  //         message: this.model.message,
+  //         lat: response.results[0].geometry.location.lat,
+  //         lng: response.results[0].geometry.location.lng,
+  //         address: response.results[0].formatted_address,
+  //       }
+  //       this.markers.push(newHelpPin);
+  //       console.log(newHelpPin);
+  //       // insert the pin into the database
+  //       this.http.post('/test', newHelpPin).subscribe((data) => {
+  //         console.log(data);
+  //       });
+  //     })
+  // }
   getAddress() {
     this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
       {

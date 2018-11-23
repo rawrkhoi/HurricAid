@@ -11,11 +11,12 @@ const app = express();
 
 app.use(express.static(`${__dirname}/../dist/browser`));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-app.post('/test', (req, res) => {
-  let first = 'Ethan';
-  db.sequelize.query(`INSERT INTO users (name_first) VALUES ('${first}')`);
-  res.end();
+app.post('/helpPin', (req, res) => {
+  let { message, address, lat, lng } = req.body.pin;
+  db.sequelize.query(`INSERT INTO help_pins (message, address, latitude, longitude) VALUES ('${message}', '${address}', '${lat}', '${lng}')`);
+  res.end(); 
 }); 
 
 app.post('/sms', (req, res) => {
