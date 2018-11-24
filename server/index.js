@@ -76,8 +76,10 @@ app.post('/sms', (req, res) => {
     } 
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
+    app.get(`https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyC9Mp1lWq6EtgUVZ7WewQvVjuxa2CliQmE`, (req, res) => {
+      res.send('REQUEST BODY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    });
     twiml.message('SOS marker created. You may now send a brief message with details (optional).')
-      // they send a message back. we add to db and we send one back to them
       db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
         if (num[0].length === 0){
           db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
