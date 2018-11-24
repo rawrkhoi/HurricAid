@@ -91,7 +91,7 @@ export class MapComponent implements OnInit {
             lng: response.results[0].geometry.location.lng,
             address: response.results[0].formatted_address,
           }
-          console.log('Help Pin works', newHelpPin)
+          console.log('Help Pin works', newHelpPin);
           // insert the pin into the database
           const headers = new HttpHeaders({
             'Content-Type': 'application/json',
