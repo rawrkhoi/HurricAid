@@ -34,14 +34,14 @@ app.post('/test', (req, res) => {
 
 app.post('/helpPin', (req, res) => {
   let { message, address, lat, lng } = req.body.pin;
-  db.sequelize.query(`INSERT INTO pins (address, message, latitude, longitude) VALUES ('${address}', '${message}', '${lat}', '${lng}')`).then(() => {
+  db.sequelize.query(`INSERT INTO pins (help, address, message, latitude, longitude) VALUES (true, '${address}', '${message}', '${lat}', '${lng}')`).then(() => {
     console.log('help pin inserted to database');
     res.end(); 
   });
 }); 
 
 app.get('/getHelpPins', (req, res) => {
-  db.sequelize.query(`SELECT * FROM help_pins`).then(([pins]) => {
+  db.sequelize.query(`SELECT * FROM pins where help = true`).then(([pins]) => {
     res.send(pins);
   });
 });
@@ -54,7 +54,7 @@ app.post('/havePin', (req, res) => {
 }); 
 
 app.get('/getHavePins', (req, res) => {
-  db.sequelize.query(`SELECT * FROM have_pins`).then(([pins]) => {
+  db.sequelize.query(`SELECT * FROM pins where have = true`).then(([pins]) => {
     res.send(pins);
   });
 });
