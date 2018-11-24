@@ -68,31 +68,69 @@ app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
   let textObj = {};
   const smsCount = req.session.counter || 0;
-  // req.session.command = '';
+  textObj.number = req.body.From.slice(1);
   
   // OPTIONS //
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
-    twiml.message("Try one of these commands: 'help@[address]', 'have@[address]', or 'need@[address]'");
-
+    return client.messages.create({
+      from: '15043020292',
+      to: textObj.number,
+      body: "Try one of these commands: \nHelp@[address], \nHave@[address], \nNeed@[address]",
+    })
+    
     // HELP //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
     req.session.command = 'help';
+    textObj.address = req.body.Body.slice(5);
     if (!req.session.counter){
       req.session.counter = smsCount;
     } 
-    textObj.number = req.body.From.slice(1);
-    textObj.address = req.body.Body.slice(5);
-    app.get(`https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyC9Mp1lWq6EtgUVZ7WewQvVjuxa2CliQmE`, (req, res) => {
-      res.send('REQUEST BODY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    });
-    twiml.message('SOS marker created. You may now send a brief message with details (optional).')
-      db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
-        if (num[0].length === 0){
-          db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
-        } 
-        db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
-      });
+    // GET GEOCODE
+    // app.get(`https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyC9Mp1lWq6EtgUVZ7WewQvVjuxa2CliQmE`, (req, res) => {
+    //   res.send('REQUEST BODY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    // });
+    return client.messages.create({
+      from: '15043020292',
+      to: textObj.number,
+      body: 'SOS marker created. You may now send a brief message with details (optional).',
+    }).then(() => {
+      return db.phone.findOne({
+        where: {
+          number: textObj.number
+        },
+        raw: true,
+      })
+    }).then((num) => {
+      if (!num) {
+        return db.phone.create({
+          number: textObj.number
+        });
+      }
+      // MAKE SURE THIS WORKS WHEN ETHAN DOES A PULL REQUEST WITH THE DATABASE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    }).then(() => db.pins.create({
+      help: true,
+      address: textObj.address,
+      id_phone: db.phone.findOne({
+        attributes: ['id'],
+        where: {
+          number: textObj.number
+        },
+        raw: true,
+      }),
+    }
+    // `INSERT INTO pins (help, address, id_phone) values (true, '${textObj.address}', (select id from phones where number='${textObj.number}'))`
+    ))
+      .then(() => {
       req.session.counter = smsCount + 1;
+    }).catch((e) => {
+      console.error(e);
+    })
+        // db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
+        //   if (num[0].length === 0){
+        //     db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
+        //   } 
+        //   db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
+        // });
 
     // HAVE //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
@@ -142,27 +180,18 @@ app.post('/sms', (req, res) => {
       req.session.counter = smsCount;
     }
     textObj.number = req.body.From.slice(1);
-    textObj.address = req.body.Body.slice(5);
+    textObj.address = req.body.Body.slice(4);
+    req.session.address = textObj.address;
     console.log(textObj);
-    twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
-    db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
-      if (num[0].length === 0) {
-        db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
-      }
-      db.sequelize.query(`select id from have_pins where id_phone=(
-        select id from phones where number='${textObj.number}'
-        ) and address='${textObj.address}'`).then((id) => {
-          console.log('id!!!!!!!!!!!!!!!', id);
-          if (id[0].length === 0) {
-            db.sequelize.query(`INSERT INTO have_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
-          } else {
-            console.log('THERE IS ALREADY AN ID');
-          }
-        })
-    });
-    req.session.counter = smsCount + 1;
+    return client.messages.create({
+      from: '15043020292',
+      to: '15042615620',
+      body: mappedPlaces,
+    })
+    // twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
+    // req.session.counter = smsCount + 1;
 
-
+    
     // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
   } else {
     let regexp = /[A-Z]/gi;
@@ -229,52 +258,84 @@ app.post('/sms', (req, res) => {
             raw: true,
           })
           if (split.includes('1')) {
-            findSupplies('food').then(() => {
+            findSupplies('food').then((places) => {
+              let mappedPlaces = places.map((place) => {
+                return place.address;
+              }).join(', ');
               return client.messages.create({
                 from: '15043020292',
                 to: '15042615620',
-                body: 'create using callback'
+                body: mappedPlaces,
               }).then((twilioResponse) => {
                 console.log('the message was sent!', twilioResponse);
               }).catch((err) => {
                 console.log(err, 'ERROR');
               })
             })
-            // let money = findSupplies('food').then((something) => {
-            //   return something;
-            // }).catch((err) => {console.log(err, 'ERROR')});
-            // twiml.message(`${money}`);
-              // findSupplies('food').then((entries) => {
-              //   // THIS LOGS
-              //   console.log(entries, 'THESE ARE THE ENTRIES');
-              //   // THIS LOGS
-              //   console.log(req.body, 'REQUEST body FOR TWIML MESSAGE')
-              //   // THIS MESSAGE DOES NOT SEND TO THE PHONE
-              //   twiml.message('test')
-              //   return entries.map((entry) => {
-              //     return entry.address;
-              //   })
-              // }).then((addr) => {
-              //   // THIS LOGS
-              //   console.log(addr);
-              //   // THIS MESSAGE DOES NOT SEND TO THE PHONE
-              //   twiml.message('did this work')
-              // })
             }
-            // if (split.includes('2')) {
-            //   findSupplies('water');
-            //   twiml.message();
-            // }
-            // if (split.includes('3')) {
-            //   findSupplies('shelter');
-            //   twiml.message();
-            // }
+          if (split.includes('2')) {
+            findSupplies('water').then((places) => {
+              let mappedPlaces = places.map((place) => {
+                return place.address;
+              }).join(', ');
+              return client.messages.create({
+                from: '15043020292',
+                to: '15042615620',
+                body: mappedPlaces,
+              }).then((twilioResponse) => {
+                console.log('the message was sent!', twilioResponse);
+              }).catch((err) => {
+                console.log(err, 'ERROR');
+              })
+            })
+          }
+            if (split.includes('3')) {
+              findSupplies('shelter').then((places) => {
+                let mappedPlaces = places.map((place) => {
+                  return place.address;
+                }).join(', ');
+                return client.messages.create({
+                  from: '15043020292',
+                  to: '15042615620',
+                  body: mappedPlaces,
+                }).then((twilioResponse) => {
+                  console.log('the message was sent!', twilioResponse);
+                }).catch((err) => {
+                  console.log(err, 'ERROR');
+                })
+              })
         }
       } else {
             db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = (select id from phones where number='${textObj.number}')`);
             twiml.message("Message added to marker.");
           }
           req.session.counter = smsCount + 1;
+      } else if (req.session.command === 'out'){  
+        if (!textObj.message.match(regexp)) {
+          let split = textObj.message.split('');
+          let findAddress = (address) => db.have_pins.findAll({
+            where: {
+              [address]: req.session.address,
+              id_phone: textObj.number = req.body.From.slice(1),
+            },
+            raw: true,
+          })
+          let findSupplies = (supply) => db.have_pins.findAll({
+            where: {
+              [supply]: true,
+            },
+            raw: true,
+          })
+          if (split.includes('1')) {
+            console.log(textObj.address);
+              findAddress(textObj.address);
+              // .then((twilioResponse) => {
+              //   console.log('the supply was removed', twilioResponse);
+              // }).catch((err) => {
+              //   console.log(err, 'ERROR');
+              // })
+          }
+        }
     } else {
       twiml.message("Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]")
     }
@@ -282,6 +343,7 @@ app.post('/sms', (req, res) => {
   
   res.writeHead(200, { 'Content-Type': 'text/xml' });
   res.end(twiml.toString());
+}
 });
 
 // for page refresh
