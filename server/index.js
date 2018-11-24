@@ -42,7 +42,7 @@ app.post('/helpPin', (req, res) => {
 app.get('/getHelpPins', (req, res) => {
   db.sequelize.query(`SELECT * FROM help_pins`).then(([pins]) => {
     res.send(pins);
-  });
+  });asdfasdf
 });
 
 app.post('/havePin', (req, res) => {
