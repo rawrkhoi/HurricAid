@@ -55,7 +55,7 @@ app.post('/havePin', (req, res) => {
 
 app.get('/getHavePins', (req, res) => {
   db.sequelize.query(`SELECT * FROM pins where have = true`).then(([pins]) => {
-    res.send(pins);
+    res.send(pins); 
   });
 });
 
