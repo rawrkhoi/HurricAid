@@ -1,26 +1,89 @@
-<h1>Map Working</h1>
+<h1 style="text-align: center">Map Markers</h1>
 
-<agm-map [latitude]="lat" [longitude]="lng">
-  <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+<agm-map
+  [latitude]="lat"
+  [longitude]="lng"
+  [zoom]="zoom"
+>
+  <agm-marker
+    *ngFor="let m of helpMarkers;let i = index"
+    [latitude]="m.latitude"
+    [longitude]="m.longitude"
+  >
+    <agm-info-window>
+      <strong>Help</strong>
+      <br>
+      <i>{{m.message}}</i>
+      <br>
+      <i>Address:</i> {{m.address}}
+      <br>
+      <i>Created on:</i> {{m.createdAt}}
+    </agm-info-window>
+  </agm-marker>
+
+  <agm-marker
+  *ngFor="let p of haveMarkers;let i = index"
+  [latitude]="p.latitude"
+  [longitude]="p.longitude"
+  >
+    <agm-info-window>
+      <strong>Have</strong>
+      <br>
+      <i>Address:</i> {{p.address}}
+      <br>
+      <i>Food:</i> {{p.food}}
+      <br>
+      <i>Water:</i> {{p.water}}
+      <br>
+      <i>Shelter:</i> {{p.shelter}}
+      <br>
+      <i>Other:</i> {{p.other}}
+      <br>
+      <i>Created at:</i> {{p.createdAt}}
+    </agm-info-window>
+  </agm-marker>
+
 </agm-map>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <form name="form" onSubmit="return false" #f="ngForm" novalidate>
+        <h2>Add A Pin</h2>
 
-<div class='pinmaker'>
-  <div class="pinmaker-header">
-    <h2>Create Pin</h2>
-    <h3>I want to offer:</h3>
-    <input type="checkbox" name="food" value="Food"> Food<br>
-    <input type="checkbox" name="water" value="Water"> Water<br>
-    <input type="checkbox" name="shelter" value="Shelter"> Shelter<br>
-    <input type="checkbox" name="other" value="Other"> Other<br>
-    <form>
-      <input type="text" name="othermessage" placeholder="Explain other items"><br>
-    </form>
-    <h3>Help me!</h3>
-    <form>
-      <input type="text" name="othermessage" placeholder="Message (optional)"><br>
-    </form>
-    <h3>Where are you?</h3>
-    <input type="radio" name="address" value="default-address">Default Address<br>
-    <input type="radio" name="address" value="different-address">Different Address<br>
+        <h3>Where are you?</h3>
+        <mat-radio-button class="addressField" (click)="hideAddressField()">Saved Address</mat-radio-button><br>
+
+        <mat-radio-button class="addressField" (click)="showAddressField()">Other Address</mat-radio-button>
+          <br>
+        <div *ngIf="addressField" class="address-input">
+          <mat-form-field>
+            <input matInput name="other-address" [(ngModel)]="model.address" placeholder="Address">
+          </mat-form-field>
+        </div>
+
+        <h4>Do you need help or wanting to help?</h4>
+        <mat-checkbox name="helper" (click)="toggleHelp()"> Help me!</mat-checkbox><br>
+        <div *ngIf="help" class="pin-input">
+          <mat-form-field>
+            <input matInput name="message" matInput #message maxlength="255" [(ngModel)]="model.message" placeholder="Message (Optional)">
+            <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
+          </mat-form-field>
+          <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
+        </div>
+
+        <mat-checkbox name="haver" (click)="toggleHave()"> Offer amenities</mat-checkbox>
+        <div *ngIf="have" class="pin-input">
+          <mat-checkbox name="food" (click)="toggleFood()">Food</mat-checkbox><br>
+          <mat-checkbox name="water" (click)="toggleWater()">Water</mat-checkbox><br>
+          <mat-checkbox name="shelter" (click)="toggleShelter()">Shelter</mat-checkbox><br>
+          <mat-checkbox name="other" (click)="toggleOther()">Other</mat-checkbox><br>
+          <mat-form-field>
+            <input matInput name="message-other" matInput #message maxlength="255" [(ngModel)]="model.message_other" placeholder="Other Ammenities">
+            <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
+          </mat-form-field>
+          <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

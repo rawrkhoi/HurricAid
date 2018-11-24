@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { keys } from '../../config';
 
 interface Location {
+  city: string;
   latitude: string;
   longitude: string;
 }

@@ -11,15 +11,25 @@ import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
 import { ProfileComponent } from './profile/profile.component';
 import { NewsComponent } from './news/news.component';
-import { PinsComponent } from './pins/pins.component';
 import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
-import { WeatherService } from './weather/services/weather/weather.service';
 import { UiService } from './nav/ui/ui.service';
 import { FormsModule } from '@angular/forms';
+<<<<<<< HEAD
 
+=======
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {
+  MatFormFieldModule,
+  MatButtonModule,
+  MatCheckboxModule,
+  MatSelectModule,
+  MatInputModule,
+  MatRadioModule,
+} from '@angular/material';
+>>>>>>> 842f5e887e551a9b6043b55d336fec33cf5da48a
 
 @NgModule({
   declarations: [
@@ -30,9 +40,12 @@ import { FormsModule } from '@angular/forms';
     MapComponent,
     ProfileComponent,
     NewsComponent,
-    PinsComponent,
     InfoComponent,
+<<<<<<< HEAD
     NavComponent, 
+=======
+    NavComponent,
+>>>>>>> 842f5e887e551a9b6043b55d336fec33cf5da48a
   ],
   imports:[
     CommonModule,
@@ -41,12 +54,21 @@ import { FormsModule } from '@angular/forms';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+<<<<<<< HEAD
+=======
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatRadioModule,
+>>>>>>> 842f5e887e551a9b6043b55d336fec33cf5da48a
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`
     })
   ],
   providers: [
-    WeatherService,
     UiService,
   ],
   bootstrap: [AppComponent]
