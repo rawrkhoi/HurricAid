@@ -58,6 +58,12 @@ app.get('/getHavePins', (req, res) => {
   });
 });
 
+
+app.post('/signup', (req, res) => {
+  // THIS MUST BE CHANGED. WHAT WE WANT IS FOR THE INFORMATION TO BE SENT TO THE DATABASE
+  console.log(req.body);
+});
+
 app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
   let textObj = {};
