@@ -137,13 +137,33 @@ app.post('/sms', (req, res) => {
 
     // OUT //
   } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
+    req.session.command = "out";
+    if (!req.session.counter) {
+      req.session.counter = smsCount;
+    }
     textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
     console.log(textObj);
     twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
-    // they let us know what they're out of and we remove from db
+    db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
+      if (num[0].length === 0) {
+        db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
+      }
+      db.sequelize.query(`select id from have_pins where id_phone=(
+        select id from phones where number='${textObj.number}'
+        ) and address='${textObj.address}'`).then((id) => {
+          console.log('id!!!!!!!!!!!!!!!', id);
+          if (id[0].length === 0) {
+            db.sequelize.query(`INSERT INTO have_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
+          } else {
+            console.log('THERE IS ALREADY AN ID');
+          }
+        })
+    });
+    req.session.counter = smsCount + 1;
 
-    // SECOND MESSAGES AND INCORRECT MESSAGE GOES HERE //
+
+    // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
   } else {
     let regexp = /[A-Z]/gi;
     let test;
@@ -192,7 +212,6 @@ app.post('/sms', (req, res) => {
           }) 
         } 
         else if (req.session.id !== undefined) {
-          console.log('TEST IS TRUE');
           db.sequelize.query(`UPDATE have_pins SET other = '${textObj.message}' from phones where phones.number = '${textObj.number}' and have_pins.id_phone = (select id from phones where number='${textObj.number}')`);
           // else if other is true on the have pins table for that phone number
           // update other to a new message
@@ -208,13 +227,39 @@ app.post('/sms', (req, res) => {
               [supply]: true,
             },
             raw: true,
-          });
-          if (split.includes('5')) {
-              findSupplies('food').then((entries) => {
-                console.log(entries, 'THESE ARE THE ENTRIES');
-                console.log(req.body, 'REQUEST body FOR TWIML MESSAGE')
-                twiml.message("YOU DID IT GIRL");
+          })
+          if (split.includes('1')) {
+            findSupplies('food').then(() => {
+              return client.messages.create({
+                from: '15043020292',
+                to: '15042615620',
+                body: 'create using callback'
+              }).then((twilioResponse) => {
+                console.log('the message was sent!', twilioResponse);
+              }).catch((err) => {
+                console.log(err, 'ERROR');
               })
+            })
+            // let money = findSupplies('food').then((something) => {
+            //   return something;
+            // }).catch((err) => {console.log(err, 'ERROR')});
+            // twiml.message(`${money}`);
+              // findSupplies('food').then((entries) => {
+              //   // THIS LOGS
+              //   console.log(entries, 'THESE ARE THE ENTRIES');
+              //   // THIS LOGS
+              //   console.log(req.body, 'REQUEST body FOR TWIML MESSAGE')
+              //   // THIS MESSAGE DOES NOT SEND TO THE PHONE
+              //   twiml.message('test')
+              //   return entries.map((entry) => {
+              //     return entry.address;
+              //   })
+              // }).then((addr) => {
+              //   // THIS LOGS
+              //   console.log(addr);
+              //   // THIS MESSAGE DOES NOT SEND TO THE PHONE
+              //   twiml.message('did this work')
+              // })
             }
             // if (split.includes('2')) {
             //   findSupplies('water');
@@ -226,7 +271,6 @@ app.post('/sms', (req, res) => {
             // }
         }
       } else {
-            console.log(textObj, 'SECOND MESSAGE oBJECT?????????')
             db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = (select id from phones where number='${textObj.number}')`);
             twiml.message("Message added to marker.");
           }
