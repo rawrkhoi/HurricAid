@@ -1,3 +1,42 @@
-<p>
-  login works!
-</p>
+<div class="container">
+  <form name="form" onSubmit="return false" (ngSubmit)="f.form.valid && signupUser()" #f="ngForm" novalidate>
+    <mat-form-field>
+      <input
+        matInput
+        name="email"
+        placeholder="Enter your email"
+        [(ngModel)]="model.email"
+        [ngClass]="{ 'is-invalid': f.submitted && email.invalid }"
+        color="accent"
+        required
+      >
+      <!-- <mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error> -->
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <input
+        matInput
+        name="password"
+        placeholder="Enter your password"
+        [(ngModel)]="model.password"
+        [ngClass]="{ 'is-invalid': f.submitted && createPassword.invalid }"
+        [type]="hide ? 'password' : 'text'"
+        required>
+      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <span matPrefix>+1 &nbsp;</span>
+      <input
+        type="tel"
+        matInput
+        name="phone"
+        placeholder="Enter your phone number"
+        [(ngModel)]="model.phone"
+        [ngClass]="{ 'is-invalid': f.submitted && addPhone.invalid }"
+        required
+      >
+      <mat-icon matSuffix>call</mat-icon>
+    </mat-form-field>
+  </form>
+</div>

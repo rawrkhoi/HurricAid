@@ -1,6 +1,100 @@
-<div class="col-md-6">
+<div class="container">
+  <form
+    name="form"
+    onSubmit="return false"
+    (ngSubmit)="f.form.valid && signupUser()"
+    #f="ngForm"
+    novalidate
+  >
+    <mat-form-field>
+      <input
+        matInput
+        name="firstName"
+        placeholder="First Name"
+        [(ngModel)]="model.firstName"
+        [ngClass]="{ 'is-invalid': f.submitted && firstName.invalid }"
+        required
+      >
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <input
+      matInput
+      name="lastName"
+      placeholder="Last Name"
+      [(ngModel)]="model.lastName"
+      [ngClass]="{ 'is-invalid': f.submitted && lastName.invalid }"
+      required
+    >
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <input
+        matInput
+        name="email"
+        placeholder="Enter your email"
+        [(ngModel)]="model.email"
+        [ngClass]="{ 'is-invalid': f.submitted && email.invalid }"
+        color="accent"
+        required
+      >
+      <!-- <mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error> -->
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <input
+        matInput
+        name="createPassword"
+        placeholder="Create password"
+        [(ngModel)]="model.createPassword"
+        [ngClass]="{ 'is-invalid': f.submitted && createPassword.invalid }"
+        [type]="hide ? 'password' : 'text'"
+        required>
+      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <span matPrefix>+1 &nbsp;</span>
+      <input
+        type="tel"
+        matInput
+        name="addPhone"
+        placeholder="Phone Number"
+        [(ngModel)]="model.addPhone"
+        [ngClass]="{ 'is-invalid': f.submitted && addPhone.invalid }"
+        required
+      >
+      <mat-icon matSuffix>call</mat-icon>
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <span matPrefix>+1 &nbsp;</span>
+      <input
+        type="tel"
+        matInput
+        name="emergencyContact"
+        placeholder="Emergency Number"
+        [(ngModel)]="model.emergencyContact"
+        [ngClass]="{ 'is-invalid': f.submitted && emergencyContact.invalid }"
+        required
+      >
+      <mat-icon matSuffix>call</mat-icon>
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <input
+        matInput
+        name="address"
+        placeholder="Address"
+        [(ngModel)]="model.address"
+        [ngClass]="{ 'is-invalid': f.submitted && city.invalid }"
+      >
+    </mat-form-field>
+  </form>
+</div>
+
+<!-- <div class="col-md-6">
   <form name="form" onSubmit="return false" (ngSubmit)="f.form.valid && signupUser()" #f="ngForm"  novalidate>
-    <!-- Signup form -->
     <label for="signup-form-group" class="signup-label">
       <strong>Sign Up!</strong>
       <hr width="75%">
@@ -80,5 +174,4 @@
     <button type="submit" id="signup-button" class="btn btn-primary" (click)="signupUser()">
       Sign Up
     </button>
-  <!-- </form> -->
-</div>
+</div> -->
