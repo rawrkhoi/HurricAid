@@ -71,7 +71,7 @@
 }
 
 .menu-header {
-  background: lightcoral;
+  background: lightskyblue;
   display: grid;
   grid-template-rows: 1fr 4fr;
   grid-template-columns: 1fr 4fr;
@@ -146,7 +146,7 @@
   align-items: center;
   transition: background-color 500ms linear;
   animation: fadein 1s ease-in-out 0ms 1;
-  background-color: lightcoral;
+  background-color: lightskyblue;
 }
 
 .main__header-dark {
