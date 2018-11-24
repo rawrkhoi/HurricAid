@@ -69,11 +69,7 @@ app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
   let textObj = {};
   const smsCount = req.session.counter || 0;
-<<<<<<< HEAD
   textObj.number = req.body.From.slice(1);
-=======
-  req.session.command = '';
->>>>>>> 4d5fea2b9d7625d904ebb424e1554765b760412a
   
   // OPTIONS //
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
