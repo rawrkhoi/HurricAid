@@ -1,42 +1,27 @@
 <div class="container">
-  <form name="form" onSubmit="return false" (ngSubmit)="f.form.valid && signupUser()" #f="ngForm" novalidate>
+  <form [formGroup]="loginForm">
     <mat-form-field>
       <input
         matInput
+        formControlName="email"
         name="email"
         placeholder="Enter your email"
-        [(ngModel)]="model.email"
-        [ngClass]="{ 'is-invalid': f.submitted && email.invalid }"
         color="accent"
         required
       >
-      <!-- <mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error> -->
     </mat-form-field>
   <br>
     <mat-form-field>
       <input
         matInput
+        formControlName="password"
         name="password"
         placeholder="Enter your password"
-        [(ngModel)]="model.password"
-        [ngClass]="{ 'is-invalid': f.submitted && createPassword.invalid }"
-        [type]="hide ? 'password' : 'text'"
+        [type]="hide ? 'text' : 'password'"
         required>
-      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
     </mat-form-field>
   <br>
-    <mat-form-field>
-      <span matPrefix>+1 &nbsp;</span>
-      <input
-        type="tel"
-        matInput
-        name="phone"
-        placeholder="Enter your phone number"
-        [(ngModel)]="model.phone"
-        [ngClass]="{ 'is-invalid': f.submitted && addPhone.invalid }"
-        required
-      >
-      <mat-icon matSuffix>call</mat-icon>
-    </mat-form-field>
+    <button mat-stroked-button color="primary" (click)="login()">Login</button>
   </form>
 </div>

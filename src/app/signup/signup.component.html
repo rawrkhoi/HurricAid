@@ -1,18 +1,11 @@
 <div class="container">
-  <form
-    name="form"
-    onSubmit="return false"
-    (ngSubmit)="f.form.valid && signupUser()"
-    #f="ngForm"
-    novalidate
-  >
+  <form [formGroup]="signUpForm">
     <mat-form-field>
       <input
         matInput
+        formControlName="firstName"
         name="firstName"
         placeholder="First Name"
-        [(ngModel)]="model.firstName"
-        [ngClass]="{ 'is-invalid': f.submitted && firstName.invalid }"
         required
       >
     </mat-form-field>
@@ -20,10 +13,9 @@
     <mat-form-field>
       <input
       matInput
+      formControlName="lastName"
       name="lastName"
       placeholder="Last Name"
-      [(ngModel)]="model.lastName"
-      [ngClass]="{ 'is-invalid': f.submitted && lastName.invalid }"
       required
     >
     </mat-form-field>
@@ -31,10 +23,9 @@
     <mat-form-field>
       <input
         matInput
+        formControlName="email"
         name="email"
         placeholder="Enter your email"
-        [(ngModel)]="model.email"
-        [ngClass]="{ 'is-invalid': f.submitted && email.invalid }"
         color="accent"
         required
       >
@@ -44,13 +35,22 @@
     <mat-form-field>
       <input
         matInput
-        name="createPassword"
+        formControlName="password"
+        name="password"
         placeholder="Create password"
-        [(ngModel)]="model.createPassword"
-        [ngClass]="{ 'is-invalid': f.submitted && createPassword.invalid }"
-        [type]="hide ? 'password' : 'text'"
+        [type]="hide ? 'text' : 'password'"
         required>
-      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <input
+        matInput
+        formControlName="cpassword"
+        name="cpassword"
+        placeholder="Confirm password"
+        [type]="hide ? 'text' : 'password'"
+        required>
     </mat-form-field>
   <br>
     <mat-form-field>
@@ -58,25 +58,11 @@
       <input
         type="tel"
         matInput
-        name="addPhone"
+        formControlName="phone"
+        name="phone"
         placeholder="Phone Number"
-        [(ngModel)]="model.addPhone"
-        [ngClass]="{ 'is-invalid': f.submitted && addPhone.invalid }"
         required
-      >
-      <mat-icon matSuffix>call</mat-icon>
-    </mat-form-field>
-  <br>
-    <mat-form-field>
-      <span matPrefix>+1 &nbsp;</span>
-      <input
-        type="tel"
-        matInput
-        name="emergencyContact"
-        placeholder="Emergency Number"
-        [(ngModel)]="model.emergencyContact"
-        [ngClass]="{ 'is-invalid': f.submitted && emergencyContact.invalid }"
-        required
+        minlength="10"
       >
       <mat-icon matSuffix>call</mat-icon>
     </mat-form-field>
@@ -84,12 +70,13 @@
     <mat-form-field>
       <input
         matInput
+        formControlName="address"
         name="address"
         placeholder="Address"
-        [(ngModel)]="model.address"
-        [ngClass]="{ 'is-invalid': f.submitted && city.invalid }"
       >
-    </mat-form-field>
+    </mat-form-field><br>
+    <button mat-stroked-button color="primary" (click)="signUp()">Sign Up</button>
+    <button mat-stroked-button color="accent" (click)="moveToLogin()">Login</button>
   </form>
 </div>
 

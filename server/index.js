@@ -1,5 +1,9 @@
 const config = require('../config')
+const createError = require('http-errors');
 const express = require('express');
+const path = require('path');
+// const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const session = require('express-session');
 const fallback = require('express-history-api-fallback');
 const http = require('http');
@@ -9,14 +13,30 @@ const twilio = require('twilio');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const bodyParser = require('body-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
+// const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const cors = require('cors');
 const app = express();
 
+app.use(cors({
+  origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
+  credentials: true
+}))
+// not sure if needed
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+// 
 app.use(express.static(`${__dirname}/../dist/browser`));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
   secret: 'keyboard cat'
 }))
 app.use(bodyParser.json());
+
+// route to routes js files
+// app.use('/', indexRouter);
+app.use('/users', usersRouter);
 
 app.post('/test', (req, res) => {
   // let number = '15042615621';
@@ -242,3 +262,5 @@ app.post('/sms', (req, res) => {
 app.use(fallback('index.html', {root: './dist/browser'}));
 
 http.createServer(app).listen(port, () => console.log(`Express server listening on port ${port}!`));
+
+module.exports = app;

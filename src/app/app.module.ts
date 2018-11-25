@@ -16,7 +16,8 @@ import { NavComponent } from './nav/nav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
 import { UiService } from './nav/ui/ui.service';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { UserService } from './user.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatFormFieldModule,
@@ -47,6 +48,7 @@ import {
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -61,6 +63,7 @@ import {
   ],
   providers: [
     UiService,
+    UserService,
   ],
   bootstrap: [AppComponent]
 })
