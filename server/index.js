@@ -4,11 +4,11 @@ const express = require('express');
 const path = require('path');
 // const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const db = require('../models');
 const session = require('express-session');
 const fallback = require('express-history-api-fallback');
 const http = require('http');
 const port = process.env.port || 3000;
-const db = require('../models');
 const twilio = require('twilio');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const bodyParser = require('body-parser');
@@ -54,13 +54,14 @@ app.post('/test', (req, res) => {
 
 app.post('/helpPin', (req, res) => {
   let { message, address, lat, lng } = req.body.pin;
-  db.sequelize.query(`INSERT INTO help_pins (message, address, latitude, longitude) VALUES ('${message}', '${address}', '${lat}', '${lng}')`).then(() => {
+  db.sequelize.query(`INSERT INTO pins (help, address, message, latitude, longitude) VALUES (true, '${address}', '${message}', '${lat}', '${lng}')`).then(() => {
+    console.log('help pin inserted to database');
     res.end(); 
   });
 }); 
 
 app.get('/getHelpPins', (req, res) => {
-  db.sequelize.query(`SELECT * FROM help_pins`).then(([pins]) => {
+  db.sequelize.query(`SELECT * FROM pins where help = true`).then(([pins]) => {
     res.send(pins);
   });
 });
@@ -73,8 +74,8 @@ app.post('/havePin', (req, res) => {
 }); 
 
 app.get('/getHavePins', (req, res) => {
-  db.sequelize.query(`SELECT * FROM have_pins`).then(([pins]) => {
-    res.send(pins);
+  db.sequelize.query(`SELECT * FROM pins where have = true`).then(([pins]) => {
+    res.send(pins); 
   });
 });
 
@@ -88,7 +89,7 @@ app.post('/sms', (req, res) => {
   const twiml = new MessagingResponse();
   let textObj = {};
   const smsCount = req.session.counter || 0;
-  // req.session.command = '';
+  req.session.command = '';
   
   // OPTIONS //
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
