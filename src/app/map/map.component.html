@@ -73,6 +73,13 @@
 
         <mat-checkbox name="haver" (click)="toggleHave()"> Offer amenities</mat-checkbox>
         <div *ngIf="have" class="pin-input">
+          <mat-form-field>
+            <mat-select placeholder="Ammenities" [(ngModel)]="test" name="test">
+              <mat-option *ngFor="let t of test">
+                {{t}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field><br>
           <mat-checkbox name="food" (click)="toggleFood()">Food</mat-checkbox><br>
           <mat-checkbox name="water" (click)="toggleWater()">Water</mat-checkbox><br>
           <mat-checkbox name="shelter" (click)="toggleShelter()">Shelter</mat-checkbox><br>

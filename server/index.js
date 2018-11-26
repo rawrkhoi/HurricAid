@@ -1,8 +1,9 @@
-const config = require('../config')
+const config = require('../config');
+// const routes = require('./routes');
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-// const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const db = require('../models');
 const session = require('express-session');
@@ -17,11 +18,30 @@ const client = new twilio(config.config.accountSid, config.config.authToken);
 const usersRouter = require('./routes/users');
 const cors = require('cors');
 const app = express();
+salty = 12;
 
 app.use(cors({
   origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
   credentials: true
 }))
+
+// passport
+const passport = require('passport');
+const passportConfig = require('./passport-config');
+app.use(session({
+  name: 'thesis.sid',
+  resave: 'false',
+  saveUninitialized: 'false',
+  secret: 'super secret shhhhh',
+  cookie: {
+    maxAge: 36000000,
+    httpOnly: false,
+    secure: false,
+  }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 // not sure if needed
 app.use(logger('dev'));
 app.use(express.json());
@@ -29,13 +49,34 @@ app.use(express.urlencoded({ extended: false }));
 // 
 app.use(express.static(`${__dirname}/../dist/browser`));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({
-  secret: 'keyboard cat'
-}))
+// app.use(cookieParser.JSONCookie());
 app.use(bodyParser.json());
 
+
+
+db.sequelize.sync()
+  .then(() => {
+    // remove this, only to test if bcrypt works
+    db.credential.find({
+      where: {email: 'admin@test'}
+    }).success(user => {
+      if (!user) {
+        db.credential.build({
+          email: 'admin@test',
+          password: 'admin'
+        }).save();
+      };
+    })
+    // ===========================================
+    http.createServer(app).listen(app.get('port'), function() {
+      console.log('Express is listening on port ' + app.get('port'));
+    })
+  })
+  .catch((err) => {
+    console.log(err);
+  })
 // route to routes js files
-// app.use('/', indexRouter);
+// app.get('/', routes.index);
 app.use('/users', usersRouter);
 
 app.post('/test', (req, res) => {

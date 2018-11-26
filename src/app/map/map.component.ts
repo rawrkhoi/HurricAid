@@ -28,6 +28,12 @@ export class MapComponent implements OnInit {
   lng: any;
   helpMarkers: any = [];
   haveMarkers: any = [];
+  tests: any = [
+    'food',
+    'water',
+    'shelter',
+    'wifi',
+  ];
 
   constructor(private map: MapsService, private http: HttpClient) { }
 
