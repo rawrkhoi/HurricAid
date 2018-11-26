@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
     if (!this.loginForm.valid) {
       console.log('Invalid'); return;
     }
-    this.userService.signUp(JSON.stringify(this.loginForm.value))
+    this.userService.login(JSON.stringify(this.loginForm.value))
       .subscribe(data => {
           console.log(data);
           this.router.navigate(['/map']);
