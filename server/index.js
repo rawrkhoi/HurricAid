@@ -18,44 +18,37 @@ app.use(session({
 }))
 app.use(bodyParser.json());
 
-app.post('/test', (req, res) => {
-  db.sequelize.query(`INSERT INTO supplies (food, water, shelter, other) VALUES (true, false, true, 'yoyoyo')`).then((supply) => {
-    db.supplies.find(supply.id).then((result) => {
-      console.log(result.dataValues.id);
-    });
-  });
-});
-
 app.post('/helpPin', (req, res) => {
   let { message, address, lat, lng } = req.body.pin;
-  db.sequelize.query(`INSERT INTO pins (help, address, message, latitude, longitude) VALUES (true, '${address}', '${message}', '${lat}', '${lng}')`).then(() => {
-    console.log('help pin inserted to database');
-    res.end(); 
-  });
+  db.pin.create({
+    help: true,
+    message: message,
+    address: address, 
+    latitude: lat,
+    longitude: lng,
+  }, (error) => {
+    console.log('error creating pin', error);
+    res.status(500).send(error);
+  }).then(() => {
+    db.pin.find({ where: { address: address } }).then((pin) => {
+      console.log('help pin created', pin.dataValues);
+      res.status(201).send(pin.dataValues);
+    }, (error) => {
+      console.log('error finding pin', error);
+      res.status(500).send(error);
+    }); 
+  }); 
 }); 
-
-app.get('/getHelpPins', (req, res) => {
-  db.sequelize.query(`SELECT * FROM pins where help = true`).then(([pins]) => {
-    res.send(pins);
-  });
-});
 
 app.post('/havePin', (req, res) => {
   let { address, lat, lng, food, water, shelter, other } = req.body.pin;
-  db.sequelize.query(`INSERT INTO supplies (food, water, shelter, other) VALUES ('${food}', '${water}', '${shelter}', '${other}')`).then((test) => {
-    console.log(test);
-  });
-  db.sequelize.query(`INSERT INTO pins (have, id_supplies, address, latitude, longitude) VALUES (true, '${id_supplies}',${address}', '${lat}', '${lng}')`).then(() => {
-    res.end(); 
-  });
+  // db.sequelize.query(`INSERT INTO supplies (food, water, shelter, other) VALUES ('${food}', '${water}', '${shelter}', '${other}')`).then((test) => {
+  //   console.log(test);
+  // });
+  // db.sequelize.query(`INSERT INTO pins (have, id_supplies, address, latitude, longitude) VALUES (true, '${id_supplies}',${address}', '${lat}', '${lng}')`).then(() => {
+  //   res.end(); 
+  // });
 }); 
-
-app.get('/getHavePins', (req, res) => {
-  db.sequelize.query(`SELECT * FROM pins where have = true`).then(([pins]) => {
-    res.send(pins); 
-  });
-});
-
 
 app.post('/signup', (req, res) => {
   // THIS MUST BE CHANGED. WHAT WE WANT IS FOR THE INFORMATION TO BE SENT TO THE DATABASE
