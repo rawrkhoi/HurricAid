@@ -19,6 +19,7 @@ app.use(session({
 app.use(bodyParser.json());
 
 app.post('/test', (req, res) => {
+<<<<<<< HEAD
   // let number = '15042615621';
   // db.sequelize.query(`SELECT number from phones where number='${number}'`).then((num) => {
   //   // console.log(num[0][0].number);
@@ -29,8 +30,14 @@ app.post('/test', (req, res) => {
   //   console.log(whatever[0], 'WHATEVER!!!!');
   // });
   // res.end();
+=======
+  db.sequelize.query(`INSERT INTO supplies (food, water, shelter, other) VALUES (true, false, true, 'yoyoyo')`).then((supply) => {
+    db.supplies.find(supply.id).then((result) => {
+      console.log(result.dataValues.id);
+    });
+  });
+>>>>>>> cc3c02d2ec7ad31509f85f00cce810d78dd418d5
 });
-
 
 app.post('/helpPin', (req, res) => {
   let { message, address, lat, lng } = req.body.pin;
@@ -48,7 +55,10 @@ app.get('/getHelpPins', (req, res) => {
 
 app.post('/havePin', (req, res) => {
   let { address, lat, lng, food, water, shelter, other } = req.body.pin;
-  db.sequelize.query(`INSERT INTO have_pins (address, latitude, longitude, food, water, shelter, other) VALUES ('${address}', '${lat}', '${lng}', '${food}', '${water}','${shelter}','${other}')`).then(() => {
+  db.sequelize.query(`INSERT INTO supplies (food, water, shelter, other) VALUES ('${food}', '${water}', '${shelter}', '${other}')`).then((test) => {
+    console.log(test);
+  });
+  db.sequelize.query(`INSERT INTO pins (have, id_supplies, address, latitude, longitude) VALUES (true, '${id_supplies}',${address}', '${lat}', '${lng}')`).then(() => {
     res.end(); 
   });
 }); 

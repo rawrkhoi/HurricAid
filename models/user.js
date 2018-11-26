@@ -5,7 +5,6 @@ module.exports = (sequelize, DataTypes) => {
     name_last: DataTypes.STRING,
     id_credential: DataTypes.INTEGER,
     id_phone: DataTypes.INTEGER,
-    id_location: DataTypes.INTEGER,
     url_photo: DataTypes.STRING
   }, {});
   user.associate = function(models) {
