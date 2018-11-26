@@ -6,7 +6,7 @@ const fallback = require('express-history-api-fallback');
 const http = require('http');
 const port = process.env.port || 3000;
 const twilio = require('twilio');
-const MessagingResponse = require('twilio').twiml.MessagingResponse;
+// const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const bodyParser = require('body-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
 const app = express();
@@ -24,11 +24,11 @@ app.post('/test', (req, res) => {
   //   // console.log(num[0][0].number);
   //   console.log(num[0].length);
   // });
-  db.sequelize.query(`SELECT other from have_pins where other = 'true' and id_phone = (select id from phones where number='15042615620')`).then((whatever) => {
-    // console.log(num[0][0].number);
-    console.log(whatever[0], 'WHATEVER!!!!');
-  });
-  res.end();
+  // db.sequelize.query(`SELECT other from have_pins where other = 'true' and id_phone = (select id from phones where number='15042615620')`).then((whatever) => {
+  //   // console.log(num[0][0].number);
+  //   console.log(whatever[0], 'WHATEVER!!!!');
+  // });
+  // res.end();
 });
 
 
@@ -66,10 +66,9 @@ app.post('/signup', (req, res) => {
 });
 
 app.post('/sms', (req, res) => {
-  const twiml = new MessagingResponse();
+  // const twiml = new MessagingResponse();
   let textObj = {};
   const smsCount = req.session.counter || 0;
-  textObj.number = req.body.From.slice(1);
   
   // OPTIONS //
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
@@ -107,23 +106,37 @@ app.post('/sms', (req, res) => {
           number: textObj.number
         });
       }
-      // MAKE SURE THIS WORKS WHEN ETHAN DOES A PULL REQUEST WITH THE DATABASE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    }).then(() => db.pins.create({
-      help: true,
-      address: textObj.address,
-      id_phone: db.phone.findOne({
-        attributes: ['id'],
-        where: {
-          number: textObj.number
-        },
-        raw: true,
-      }),
-    }
-    // `INSERT INTO pins (help, address, id_phone) values (true, '${textObj.address}', (select id from phones where number='${textObj.number}'))`
-    ))
-      .then(() => {
+      db.pin.create({
+        // `INSERT INTO pins (help, address, id_phone) values (true, '${textObj.address}', (select id from phones where number='${textObj.number}'))`
+        help: true,
+        address: textObj.address,
+        id_phone: db.phone.findOne({
+          attributes: ['id'],
+          where: {
+            number: textObj.number
+          },
+          raw: true,
+        }),
+      })
       req.session.counter = smsCount + 1;
-    }).catch((e) => {
+    })
+    // .then(() => db.pin.create({
+    //   // `INSERT INTO pins (help, address, id_phone) values (true, '${textObj.address}', (select id from phones where number='${textObj.number}'))`
+    //   help: true,
+    //   address: textObj.address,
+    //   id_phone: db.phone.findOne({
+    //     attributes: ['id'],
+    //     where: {
+    //       number: textObj.number
+    //     },
+    //     raw: true,
+    //   }),
+    // })
+    // )
+    // .then(() => {
+    //   req.session.counter = smsCount + 1;
+    // })
+    .catch((e) => {
       console.error(e);
     })
         // db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
@@ -139,10 +152,14 @@ app.post('/sms', (req, res) => {
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
-    textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
     req.session.address = textObj.address;
-    twiml.message('What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
+    // twiml.message('What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
+    return client.messages.create({
+      from: '15043020292',
+      to: textObj.number,
+      body: 'What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other',
+    })
     db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
       if (num[0].length === 0) {
         db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
@@ -166,12 +183,16 @@ app.post('/sms', (req, res) => {
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
-    textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(5);
     req.session.address = textObj.address;
-    twiml.message('What do you need? Text 1 for Food, 2 for Water, 3 for Shelter');
-    // send back a message with 3 closest places who have that
+    // twiml.message('What do you need? Text 1 for Food, 2 for Water, 3 for Shelter');
+    return client.messages.create({
+      from: '15043020292',
+      to: textObj.number,
+      body: 'What do you need? Text 1 for Food, 2 for Water, 3 for Shelter',
+    })
     req.session.counter = smsCount + 1;
+    // send back a message with 3 closest places who have that
 
 
     // OUT //
@@ -190,7 +211,7 @@ app.post('/sms', (req, res) => {
       body: mappedPlaces,
     })
     // twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
-    // req.session.counter = smsCount + 1;
+    req.session.counter = smsCount + 1;
 
     
     // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
@@ -199,7 +220,6 @@ app.post('/sms', (req, res) => {
     let test;
     if (req.session.counter > 0) {
       textObj.message = req.body.Body;
-      textObj.number = req.body.From.slice(1);
       let split = textObj.message.split('');
       if (req.session.command === 'have') {
         if (!textObj.message.match(regexp)) {
@@ -218,19 +238,39 @@ app.post('/sms', (req, res) => {
             })
             if (split.includes('1')){
               updateSupplies('food');
-              twiml.message("Added pin. To remove a pin, type out@[address]");
+              return client.messages.create({
+                from: '15043020292',
+                to: textObj.number,
+                body: 'Added pin. To remove a pin, type out@[address]',
+              })
+              // twiml.message("Added pin. To remove a pin, type out@[address]");
             } 
             if (split.includes('2')) {
               updateSupplies('water');
-              twiml.message("Added pin. To remove a pin, type out@[address]");
+              return client.messages.create({
+                from: '15043020292',
+                to: textObj.number,
+                body: 'Added pin. To remove a pin, type out@[address]',
+              })
+              // twiml.message("Added pin. To remove a pin, type out@[address]");
             } 
             if (split.includes('3')) {
               updateSupplies('shelter');
-              twiml.message("Added pin. To remove a pin, type out@[address]");
+              return client.messages.create({
+                from: '15043020292',
+                to: textObj.number,
+                body: 'Added pin. To remove a pin, type out@[address]',
+              })
+              // twiml.message("Added pin. To remove a pin, type out@[address]");
             } 
             if (split.includes('4')) {
               updateSupplies('other');
-              twiml.message("Ok, send message with what you want to offer");
+              return client.messages.create({
+                from: '15043020292',
+                to: textObj.number,
+                body: 'Added pin. To remove a pin, type out@[address]',
+              })
+              // twiml.message("Ok, send message with what you want to offer");
               // do a query with a .then that will match the id_phone for the phone number
               db.sequelize.query(`SELECT id from have_pins where other = 'true' and id_phone = (select id from phones where number='${textObj.number}')`).then(([pinNum]) => {
                 // console.log(num[0][0].number);
@@ -249,7 +289,6 @@ app.post('/sms', (req, res) => {
         } 
       } else if (req.session.command === 'need') {
         textObj.message = req.body.Body;
-        textObj.number = req.body.From.slice(1);
         let split = textObj.message.split('');
         if (!textObj.message.match(regexp)) {
           let findSupplies = (supply) =>  db.have_pins.findAll({
@@ -307,17 +346,15 @@ app.post('/sms', (req, res) => {
               })
         }
       } else {
-            db.sequelize.query(`UPDATE help_pins SET message = '${req.body.Body}' from phones where phones.number = '${textObj.number}' and help_pins.id_phone = (select id from phones where number='${textObj.number}')`);
-            twiml.message("Message added to marker.");
-          }
-          req.session.counter = smsCount + 1;
-      } else if (req.session.command === 'out'){  
+        console.log('this was done incorrectly');
+      }
+    } else if (req.session.command === 'out'){  
         if (!textObj.message.match(regexp)) {
           let split = textObj.message.split('');
           let findAddress = (address) => db.have_pins.findAll({
             where: {
               [address]: req.session.address,
-              id_phone: textObj.number = req.body.From.slice(1),
+              id_phone: textObj.number,
             },
             raw: true,
           })
@@ -337,13 +374,29 @@ app.post('/sms', (req, res) => {
               // })
           }
         }
-    } else {
-      twiml.message("Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]")
+    } else if (req.session.command === 'help') {
+      // THIS SHOULD BE ABOUT RIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      db.sequelize.query(`UPDATE pin SET message = '${req.body.Body}' from phone where phone.number = '${textObj.number}' and pins.id_phone = (select id from phone where number='${textObj.number} and pins.help = true')`);
+      return client.messages.create({
+        from: '15043020292',
+        to: textObj.number,
+        body: 'Message added to marker.',
+      })
+    }
+    else {
+        return client.messages.create({
+          from: '15043020292',
+          to: textObj.number,
+          body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]',
+        })
+      // twiml.message("Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]")
     }
   }
   
   res.writeHead(200, { 'Content-Type': 'text/xml' });
-  res.end(twiml.toString());
+  // res.end(twiml.toString());
+  res.end();
+
 }
 });
 
