@@ -19,24 +19,11 @@ app.use(session({
 app.use(bodyParser.json());
 
 app.post('/test', (req, res) => {
-<<<<<<< HEAD
-  // let number = '15042615621';
-  // db.sequelize.query(`SELECT number from phones where number='${number}'`).then((num) => {
-  //   // console.log(num[0][0].number);
-  //   console.log(num[0].length);
-  // });
-  // db.sequelize.query(`SELECT other from have_pins where other = 'true' and id_phone = (select id from phones where number='15042615620')`).then((whatever) => {
-  //   // console.log(num[0][0].number);
-  //   console.log(whatever[0], 'WHATEVER!!!!');
-  // });
-  // res.end();
-=======
   db.sequelize.query(`INSERT INTO supplies (food, water, shelter, other) VALUES (true, false, true, 'yoyoyo')`).then((supply) => {
     db.supplies.find(supply.id).then((result) => {
       console.log(result.dataValues.id);
     });
   });
->>>>>>> cc3c02d2ec7ad31509f85f00cce810d78dd418d5
 });
 
 app.post('/helpPin', (req, res) => {
@@ -92,6 +79,7 @@ app.post('/sms', (req, res) => {
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
     req.session.command = 'help';
     textObj.address = req.body.Body.slice(5);
+    textObj.number = req.body.From.slice(1);
     if (!req.session.counter){
       req.session.counter = smsCount;
     } 
@@ -99,62 +87,46 @@ app.post('/sms', (req, res) => {
     // app.get(`https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyC9Mp1lWq6EtgUVZ7WewQvVjuxa2CliQmE`, (req, res) => {
     //   res.send('REQUEST BODY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     // });
+
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
       body: 'SOS marker created. You may now send a brief message with details (optional).',
     }).then(() => {
-      return db.phone.findOne({
+      db.phone.findOne({
         where: {
           number: textObj.number
         },
         raw: true,
-      })
-    }).then((num) => {
-      if (!num) {
-        return db.phone.create({
-          number: textObj.number
-        });
-      }
-      db.pin.create({
-        // `INSERT INTO pins (help, address, id_phone) values (true, '${textObj.address}', (select id from phones where number='${textObj.number}'))`
-        help: true,
-        address: textObj.address,
-        id_phone: db.phone.findOne({
-          attributes: ['id'],
-          where: {
-            number: textObj.number
-          },
-          raw: true,
-        }),
-      })
+      }).then((num) => {
+          if (!num) {
+            db.phone.create({
+              number: textObj.number
+            }).then(() => {
+              db.phone.find({ where : { number: textObj.number } }).then((phone) => {
+                console.log(phone.dataValues.id, 'PHONE ID MF');
+                db.location.create({
+                  address: textObj.address
+                }).then(() => {
+                  db.location.find({ where: { address: textObj.address } }).then((loc) => {
+                    console.log(loc.dataValues.id, 'LOC ID MF');
+                    db.pin.create({
+                      id_location: loc.dataValues.id,
+                      help: true,
+                      id_phone: phone.dataValues.id,
+                    });
+                  })
+                })
+              })
+            });
+          }
+        })
+    }).then(() => {
       req.session.counter = smsCount + 1;
     })
-    // .then(() => db.pin.create({
-    //   // `INSERT INTO pins (help, address, id_phone) values (true, '${textObj.address}', (select id from phones where number='${textObj.number}'))`
-    //   help: true,
-    //   address: textObj.address,
-    //   id_phone: db.phone.findOne({
-    //     attributes: ['id'],
-    //     where: {
-    //       number: textObj.number
-    //     },
-    //     raw: true,
-    //   }),
-    // })
-    // )
-    // .then(() => {
-    //   req.session.counter = smsCount + 1;
-    // })
     .catch((e) => {
       console.error(e);
     })
-        // db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
-        //   if (num[0].length === 0){
-        //     db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
-        //   } 
-        //   db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
-        // });
 
     // HAVE //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
@@ -211,7 +183,6 @@ app.post('/sms', (req, res) => {
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
-    textObj.number = req.body.From.slice(1);
     textObj.address = req.body.Body.slice(4);
     req.session.address = textObj.address;
     console.log(textObj);
