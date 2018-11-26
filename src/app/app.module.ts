@@ -25,6 +25,7 @@ import {
   MatSelectModule,
   MatInputModule,
   MatRadioModule,
+  MatDialogModule,
 } from '@angular/material';
 
 @NgModule({
@@ -53,6 +54,7 @@ import {
     MatSelectModule,
     MatInputModule,
     MatRadioModule,
+    MatDialogModule,
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`
     })

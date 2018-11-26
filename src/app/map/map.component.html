@@ -49,38 +49,46 @@
     <div class="col-md-8 offset-md-2">
       <form name="form" onSubmit="return false" #f="ngForm" novalidate>
         <h2>Add A Pin</h2>
-
         <h3>Where are you?</h3>
-        <mat-radio-button class="addressField" (click)="hideAddressField()">Saved Address</mat-radio-button><br>
-
-        <mat-radio-button class="addressField" (click)="showAddressField()">Other Address</mat-radio-button>
-          <br>
-        <div *ngIf="addressField" class="address-input">
+        <div class="address-input">
           <mat-form-field>
-            <input matInput name="other-address" [(ngModel)]="model.address" placeholder="Address">
+            <input matInput name="address" [(ngModel)]="model.address" placeholder="Address">
           </mat-form-field>
         </div>
 
         <h4>Do you need help or wanting to help?</h4>
-        <mat-checkbox name="helper" (click)="toggleHelp()"> Help me!</mat-checkbox><br>
+        <mat-radio-button class="marker" (click)="toggleHelp()"> Help me!</mat-radio-button><br>
         <div *ngIf="help" class="pin-input">
           <mat-form-field>
             <input matInput name="message" matInput #message maxlength="255" [(ngModel)]="model.message" placeholder="Message (Optional)">
             <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
           </mat-form-field>
+          <br>
           <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
         </div>
 
-        <mat-checkbox name="haver" (click)="toggleHave()"> Offer amenities</mat-checkbox>
+        <mat-radio-button class="marker" (click)="toggleHave()"> Offer amenities</mat-radio-button>
         <div *ngIf="have" class="pin-input">
-          <mat-checkbox name="food" (click)="toggleFood()">Food</mat-checkbox><br>
-          <mat-checkbox name="water" (click)="toggleWater()">Water</mat-checkbox><br>
-          <mat-checkbox name="shelter" (click)="toggleShelter()">Shelter</mat-checkbox><br>
-          <mat-checkbox name="other" (click)="toggleOther()">Other</mat-checkbox><br>
-          <mat-form-field>
-            <input matInput name="message-other" matInput #message maxlength="255" [(ngModel)]="model.message_other" placeholder="Other Ammenities">
-            <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
-          </mat-form-field>
+          <div class="supply-info">
+            <mat-form-field>
+              <!-- <mat-select placeholder="Select">
+                <mat-option
+                  value="option"
+                  *ngFor="let o of supplyOptions;let i = index"
+                >
+                  {{o.type}}
+                </mat-option>
+              </mat-select> -->
+              <mat-select placeholder="Supplies" multiple>
+                <mat-option *ngFor="let supply of supplyOptions;let i = index" [value]="supply">{{supply.type}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <br>
+            <mat-form-field hintLabel="Beer, Pet Food, Wifi">
+              <input matInput name="description_supply" [(ngModel)]="model.description_supply" placeholder="Supply Description (Optional)">
+              <br>
+            </mat-form-field>
+          </div>
           <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
         </div>
       </form>
