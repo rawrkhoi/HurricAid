@@ -19,18 +19,50 @@ app.use(session({
 app.use(bodyParser.json());
 
 app.post('/test', (req, res) => {
-  db.sequelize.query(`INSERT INTO supplies (food, water, shelter, other) VALUES (true, false, true, 'yoyoyo')`).then((supply) => {
-    db.supplies.find(supply.id).then((result) => {
-      console.log(result.dataValues.id);
-    });
-  });
+  // db.location.create({
+  //   address: '544 Elmeer Avenue',
+  //   latitude: '30',
+  //   longitude: '-90'
+  // }).then(() => {
+  //   db.location.find({ where: { address: '544 Elmeer Avenue'} }).then((loc) => {
+  //     console.log(loc.dataValues.id);
+  //     db.pin.create({
+  //       help: true,
+  //       id_location: loc.dataValues.id,
+  //       message: 'halp'
+  //     });
+  //   });
+  // });
 });
 
 app.post('/helpPin', (req, res) => {
   let { message, address, lat, lng } = req.body.pin;
-  db.sequelize.query(`INSERT INTO pins (help, address, message, latitude, longitude) VALUES (true, '${address}', '${message}', '${lat}', '${lng}')`).then(() => {
-    console.log('help pin inserted to database');
-    res.end(); 
+  db.location.create({
+    address: address,
+    latitude: lat,
+    longitude: lng,
+  }).then(() => {
+    db.location.find({ where: { address: address } }).then((loc) => {
+      db.pin.create({
+        help: true,
+        id_location: loc.dataValues.id,
+        message: message,
+      }).then(() => {
+        db.pin.find({ where : { id_location: loc.dataValues.id } }).then((pin) => {
+          console.log('help pin created ',pin.dataValues);
+          res.status(201).send(pin);
+        }, (error) => {
+          console.log('error finding pin: ', error);
+          res.status(500).send(error);
+        });
+      });
+    }, (error) => {
+      console.log('error finding location: ', error);
+      res.status(500).send(error);
+    });
+  }, (error) => {
+    console.log('error creating location: ', error);
+    res.status(500).send(error);
   });
 }); 
 
