@@ -3,10 +3,9 @@ module.exports = (sequelize, DataTypes) => {
   const pin = sequelize.define('pin', {
     help: DataTypes.BOOLEAN,
     have: DataTypes.BOOLEAN,
-    id_supplies: DataTypes.INTEGER,
-    address: DataTypes.STRING,
+    message: DataTypes.STRING,
     id_phone: DataTypes.INTEGER,
-    message: DataTypes.STRING
+    id_location: DataTypes.INTEGER
   }, {});
   pin.associate = function(models) {
     // associations can be defined here

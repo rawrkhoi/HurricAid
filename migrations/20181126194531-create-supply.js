@@ -8,17 +8,18 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      food: {
-        type: Sequelize.BOOLEAN
-      },
-      water: {
-        type: Sequelize.BOOLEAN
-      },
-      shelter: {
-        type: Sequelize.BOOLEAN
-      },
-      other: {
+      type: {
         type: Sequelize.STRING
+      },
+      createdAt: {
+        allowNull: false,
+        defaultValue: new Date(),
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        defaultValue: new Date(),
+        type: Sequelize.DATE
       }
     });
   },
