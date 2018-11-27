@@ -9,6 +9,9 @@ const twilio = require('twilio');
 // const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const bodyParser = require('body-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
+const googleMapsClient = require('@google/maps').createClient({
+  key: config.keys.geocode,
+})
 const app = express();
 
 app.use(express.static(`${__dirname}/../dist/browser`));
@@ -130,25 +133,49 @@ app.post('/sms', (req, res) => {
             number: textObj.number
           }).then(() => {
             db.phone.find({ where: { number: textObj.number } }).then((phone) => {
-              db.pin.create({
-                help: true,
-                id_phone: phone.dataValues.id,
-                address: textObj.address,
-                // latitude: ,
-                // longitude: ,
-              })
+              googleMapsClient.geocode({
+                address: textObj.address
+              }, (err, response) => {
+                if (err){
+                  console.log(err);
+                } else {
+                  const resultObj = response.json.results[0];
+                  const latitude = resultObj.geometry.location.lat;
+                  const longitude = resultObj.geometry.location.lng;
+                  db.pin.create({
+                    help: true,
+                    id_phone: phone.dataValues.id,
+                    address: textObj.address,
+                    latitude: latitude,
+                    longitude: longitude,
+                  })
+                }
+              });
             })
           })
         } else {
           db.phone.find({ where: { number: textObj.number } }).then((phone) => {
-            db.pin.create({
-              help: true,
-              address: textObj.address,
-              // latitude: ,
-              // longitude: ,
-              id_phone: phone.dataValues.id,
-            })
-          })
+            googleMapsClient.geocode({
+                address: textObj.address
+              }, (err, response) => {
+                if (err){
+                  console.log(err);
+                } else {
+                  const resultObj = response.json.results[0];
+                  const latitude = resultObj.geometry.location.lat;
+                  const longitude = resultObj.geometry.location.lng;
+                  db.pin.create({
+                    help: true,
+                    id_phone: phone.dataValues.id,
+                    address: textObj.address,
+                    latitude: latitude,
+                    longitude: longitude,
+                  })
+                }
+              });
+          }, (error) => {
+            console.log(error);
+          });
         }
       })
     }).then(() => {
@@ -180,7 +207,7 @@ app.post('/sms', (req, res) => {
         },
         raw: true,
       })
-    }).then((num) => {
+    .then((num) => {
       if (!num) {
         db.phone.create({
           number: textObj.number
@@ -205,7 +232,8 @@ app.post('/sms', (req, res) => {
               // longitude: ,
             })
           })}
-    }).then(() => {
+        })
+      }).then(() => {
       req.session.counter = smsCount + 1;
       console.log(req.session, 'REQUEST SESSION, LOOK FOR COMMAND AND COUNTER');
       res.send('done');
@@ -274,23 +302,20 @@ app.post('/sms', (req, res) => {
     if (req.session.counter > 0) {
       
       textObj.message = req.body.Body;
-      let split = textObj.message.split(' ');
+      let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
         if (split.includes('food')){
           db.supply.findOne({
             attributes: ['id'],
             where: {
-              type: 'food',
+              type: 'Food',
             }
           }).then((supplyId) => {
-            if (!supplyId){
-              
-            }
-          })
-          .then((supplyId) => {
-            db.supply_info.create({
-              id_supply: supplyId,
-              id_pin: ,
+            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }}).then((pinId) => {
+              db.supply_info.create({
+                id_supply: supplyId.dataValues.id,
+                id_pin: pinId.dataValues.id,
+              })
             })
           })
         }
