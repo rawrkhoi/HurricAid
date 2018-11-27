@@ -16,7 +16,7 @@ import { NavComponent } from './nav/nav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
 import { UiService } from './nav/ui/ui.service';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatFormFieldModule,
@@ -55,6 +55,7 @@ import {
     MatInputModule,
     MatRadioModule,
     MatDialogModule,
+    ReactiveFormsModule,
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`
     })

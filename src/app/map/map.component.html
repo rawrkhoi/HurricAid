@@ -6,43 +6,24 @@
   [zoom]="zoom"
 >
   <agm-marker
-    *ngFor="let m of helpMarkers;let i = index"
+    *ngFor="let m of markers;let i = index"
     [latitude]="m.latitude"
     [longitude]="m.longitude"
   >
     <agm-info-window>
-      <strong>Help</strong>
+      <div *ngIf="m.have">
+        <strong>Have</strong>
+      </div>
+      <div *ngIf="m.help">
+        <strong>Help</strong>
+      </div>
+      {{m.message}}
       <br>
-      <i>{{m.message}}</i>
+      <i>Address: </i> {{m.address}}
       <br>
-      <i>Address:</i> {{m.address}}
-      <br>
-      <i>Created on:</i> {{m.createdAt}}
+      <i>Created: </i> {{m.createdAt}}
     </agm-info-window>
   </agm-marker>
-
-  <agm-marker
-  *ngFor="let p of haveMarkers;let i = index"
-  [latitude]="p.latitude"
-  [longitude]="p.longitude"
-  >
-    <agm-info-window>
-      <strong>Have</strong>
-      <br>
-      <i>Address:</i> {{p.address}}
-      <br>
-      <i>Food:</i> {{p.food}}
-      <br>
-      <i>Water:</i> {{p.water}}
-      <br>
-      <i>Shelter:</i> {{p.shelter}}
-      <br>
-      <i>Other:</i> {{p.other}}
-      <br>
-      <i>Created at:</i> {{p.createdAt}}
-    </agm-info-window>
-  </agm-marker>
-
 </agm-map>
 <div class="container">
   <div class="row">
@@ -55,7 +36,8 @@
             <input matInput name="address" [(ngModel)]="model.address" placeholder="Address">
           </mat-form-field>
         </div>
-
+      </form>
+      <form [formGroup]="supply" (ngSubmit)="submit()">
         <h4>Do you need help or wanting to help?</h4>
         <mat-radio-button class="marker" (click)="toggleHelp()"> Help me!</mat-radio-button><br>
         <div *ngIf="help" class="pin-input">
@@ -71,21 +53,15 @@
         <div *ngIf="have" class="pin-input">
           <div class="supply-info">
             <mat-form-field>
-              <!-- <mat-select placeholder="Select">
-                <mat-option
-                  value="option"
-                  *ngFor="let o of supplyOptions;let i = index"
-                >
-                  {{o.type}}
-                </mat-option>
-              </mat-select> -->
               <mat-select placeholder="Supplies" multiple>
-                <mat-option *ngFor="let supply of supplyOptions;let i = index" [value]="supply">{{supply.type}}</mat-option>
+                <label formArrayName="supplyOptions" *ngFor="let supp of supply.controls.supplyOptions.controls;let i = index">
+                <mat-option [formControlName]="i">{{supp[i].type}}</mat-option>
+                </label>
               </mat-select>
             </mat-form-field>
             <br>
-            <mat-form-field hintLabel="Beer, Pet Food, Wifi">
-              <input matInput name="description_supply" [(ngModel)]="model.description_supply" placeholder="Supply Description (Optional)">
+            <mat-form-field hintLabel="At least one supply must be selected">
+              <input matInput name="description_supply" [(ngModel)]="model.message" [ngModelOptions]="{standalone: true}" placeholder="Supply Description (Optional)">
               <br>
             </mat-form-field>
           </div>
