@@ -20,54 +20,63 @@ app.use(bodyParser.json());
 
 app.post('/addPin', (req, res) => {
   let { help, have, message, address, lat, lng, supply } = req.body.pin;
-  console.log(supply);
-  // if (have === true) {
-  //   db.pin.create({
-  //     help: help,
-  //     have: have,
-  //     message: message,
-  //     address: address, 
-  //     latitude: lat,
-  //     longitude: lng,
-  //   }, (error) => {
-  //     console.log('error creating pin', error);
-  //     res.status(500).send(error);
-  //   }).then(() => {
-  //     db.pin.find({ where: { address: address } }).then((pin) => {
-  //       console.log('help pin created', pin.dataValues);
-  //       res.status(201).send(pin.dataValues);
-  //     }, (error) => {
-  //       console.log('error finding pin', error);
-  //       res.status(500).send(error);
-  //     }); 
-  //   }); 
-  // }
-  // if (help === true){
-  //   db.pin.create({
-  //     help: help,
-  //     have: have,
-  //     message: message,
-  //     address: address, 
-  //     latitude: lat,
-  //     longitude: lng,
-  //   }, (error) => {
-  //     console.log('error creating pin', error);
-  //     res.status(500).send(error);
-  //   }).then(() => {
-  //     db.pin.find({ where: { address: address } }).then((pin) => {
-  //       console.log('help pin created', pin.dataValues);
-  //       res.status(201).send(pin.dataValues);
-  //     }, (error) => {
-  //       console.log('error finding pin', error);
-  //       res.status(500).send(error);
-  //     }); 
-  //   });
-  // }
+  if (have === true) {
+    db.pin.create({
+      help: help,
+      have: have,
+      message: message,
+      address: address, 
+      latitude: lat,
+      longitude: lng,
+    }, (error) => {
+      console.log('error creating pin', error);
+      res.status(500).send(error);
+    }).then(() => {
+      db.pin.find({ where: { address: address } }).then((pin) => {
+        let pinId = pin.dataValues.id;
+        supply.forEach((sup) => {
+          db.supply_info.create({
+            id_supply: sup,
+            id_pin: pinId,
+          }, (error) => {
+            console.log('error creating supply info', error);
+            res.status(500).send(error);
+          });
+          console.log('have pin created', pin.dataValues);
+          res.status(201).send(pin.dataValues);
+        });
+      }, (error) => {
+        console.log('error finding pin', error);
+        res.status(500).send(error);
+      }); 
+    }); 
+  }
+  if (help === true){
+    db.pin.create({
+      help: help,
+      have: have,
+      message: message,
+      address: address, 
+      latitude: lat,
+      longitude: lng,
+    }, (error) => {
+      console.log('error creating pin', error);
+      res.status(500).send(error);
+    }).then(() => {
+      db.pin.find({ where: { address: address } }).then((pin) => {
+        console.log('help pin created', pin.dataValues);
+        res.status(201).send(pin.dataValues);
+      }, (error) => {
+        console.log('error finding pin', error);
+        res.status(500).send(error);
+      }); 
+    });
+  }
 }); 
 
 app.get('/getPins', (req, res) => {
   db.pin.findAll().then((pins) => {
-    res.status(201).send(pins);
+    res.status(200).send(pins);
   }, (error) => {
     console.log('error finding all pins', error);
     res.status(500).send(error);
