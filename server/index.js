@@ -83,6 +83,7 @@ app.post('/sms', (req, res) => {
     if (!req.session.counter){
       req.session.counter = smsCount;
     } 
+    // req.session.counter = smsCount + 1;
     // GET GEOCODE
     // app.get(`https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyC9Mp1lWq6EtgUVZ7WewQvVjuxa2CliQmE`, (req, res) => {
     //   res.send('REQUEST BODY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
@@ -99,30 +100,41 @@ app.post('/sms', (req, res) => {
         },
         raw: true,
       }).then((num) => {
-          if (!num) {
-            db.phone.create({
-              number: textObj.number
-            }).then(() => {
-              db.phone.find({ where : { number: textObj.number } }).then((phone) => {
-                console.log(phone.dataValues.id, 'PHONE ID MF');
-                db.location.create({
-                  address: textObj.address
-                }).then(() => {
-                  db.location.find({ where: { address: textObj.address } }).then((loc) => {
-                    console.log(loc.dataValues.id, 'LOC ID MF');
-                    db.pin.create({
-                      id_location: loc.dataValues.id,
-                      help: true,
-                      id_phone: phone.dataValues.id,
-                    });
-                  })
-                })
+        if (!num) {
+          db.phone.create({
+            number: textObj.number
+          }).then(() => {
+            db.phone.find({ where: { number: textObj.number } }).then((phone) => {
+              console.log(phone, 'THIS IS THE PHONE')
+              db.pin.create({
+                help: true,
+                address: textObj.address,
+                // latitude: ,
+                // longitude: ,
+                id_phone: phone.dataValues.id,
+              }).then(() => {
+                req.session.counter = smsCount + 1;
+
               })
-            });
-          }
-        })
+            })
+          })
+        } else {
+          db.phone.find({ where: { number: textObj.number } }).then((phone) => {
+            console.log(phone, 'THIS IS THE PHONE')
+            db.pin.create({
+              help: true,
+              address: textObj.address,
+              // latitude: ,
+              // longitude: ,
+              id_phone: phone.dataValues.id,
+            }).then(() => {
+              req.session.counter = smsCount + 1;
+            })
+          })
+        }
+      })
     }).then(() => {
-      req.session.counter = smsCount + 1;
+      console.log(req.session, 'REQUEST SESSION, LOOK FOR command AND COUNTER');
     })
     .catch((e) => {
       console.error(e);
@@ -199,7 +211,9 @@ app.post('/sms', (req, res) => {
   } else {
     let regexp = /[A-Z]/gi;
     let test;
+    console.log(req.session, 'MADE IT HERE', 'check for counter');
     if (req.session.counter > 0) {
+      console.log('session is GREATER THAN ZERO!!!!');
       textObj.message = req.body.Body;
       let split = textObj.message.split('');
       if (req.session.command === 'have') {
@@ -219,7 +233,7 @@ app.post('/sms', (req, res) => {
             })
             if (split.includes('1')){
               updateSupplies('food');
-              return client.messages.create({
+              client.messages.create({
                 from: '15043020292',
                 to: textObj.number,
                 body: 'Added pin. To remove a pin, type out@[address]',
@@ -228,7 +242,7 @@ app.post('/sms', (req, res) => {
             } 
             if (split.includes('2')) {
               updateSupplies('water');
-              return client.messages.create({
+              client.messages.create({
                 from: '15043020292',
                 to: textObj.number,
                 body: 'Added pin. To remove a pin, type out@[address]',
@@ -237,7 +251,7 @@ app.post('/sms', (req, res) => {
             } 
             if (split.includes('3')) {
               updateSupplies('shelter');
-              return client.messages.create({
+              client.messages.create({
                 from: '15043020292',
                 to: textObj.number,
                 body: 'Added pin. To remove a pin, type out@[address]',
@@ -268,7 +282,7 @@ app.post('/sms', (req, res) => {
           // update other to a new message
           test = false;
         } 
-      } else if (req.session.command === 'need') {
+      } else if (req.session.command === 'need'){
         textObj.message = req.body.Body;
         let split = textObj.message.split('');
         if (!textObj.message.match(regexp)) {
@@ -329,7 +343,7 @@ app.post('/sms', (req, res) => {
       } else {
         console.log('this was done incorrectly');
       }
-    } else if (req.session.command === 'out'){  
+      } else if (req.session.command === 'out'){  
         if (!textObj.message.match(regexp)) {
           let split = textObj.message.split('');
           let findAddress = (address) => db.have_pins.findAll({
@@ -355,9 +369,9 @@ app.post('/sms', (req, res) => {
               // })
           }
         }
-    } else if (req.session.command === 'help') {
-      // THIS SHOULD BE ABOUT RIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      db.sequelize.query(`UPDATE pin SET message = '${req.body.Body}' from phone where phone.number = '${textObj.number}' and pins.id_phone = (select id from phone where number='${textObj.number} and pins.help = true')`);
+      } else if (req.session.command === 'help'){
+      console.log("HELP!! THIS IS THE SESSION\'S COMMAND");
+      db.sequelize.query(`UPDATE pin SET message = '${req.body.Body}' from phone where phone.number = '${textObj.number}' and pin.id_phone = (select id from phone where number='${textObj.number}) and pin.help = true'`);
       return client.messages.create({
         from: '15043020292',
         to: textObj.number,
