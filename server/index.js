@@ -199,7 +199,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other',
+      body: 'What would you like to offer? Text Food, Water, or Shelter and details',
     }).then(() => {
       db.phone.findOne({
         where: {
@@ -213,24 +213,46 @@ app.post('/sms', (req, res) => {
           number: textObj.number
         }).then(() => {
           db.phone.find({ where: { number: textObj.number } }).then((phone) => {
-            db.pin.create({
-              have: true,
-              id_phone: phone.dataValues.id,
-              address: textObj.address,
-              // latitude: ,
-              // longitude: ,
-            })
+            googleMapsClient.geocode({
+              address: textObj.address
+            }, (err, response) => {
+              if (err) {
+                console.log(err);
+              } else {
+                const resultObj = response.json.results[0];
+                const latitude = resultObj.geometry.location.lat;
+                const longitude = resultObj.geometry.location.lng;
+                db.pin.create({
+                  have: true,
+                  id_phone: phone.dataValues.id,
+                  address: textObj.address,
+                  latitude: latitude,
+                  longitude: longitude,
+                })
+              }
+            }); 
           })
         })
       } else {
           db.phone.find({ where: { number: textObj.number } }).then((phone) => {
-            db.pin.create({
-              have: true,
-              id_phone: phone.dataValues.id,
-              address: textObj.address,
-              // latitude: ,
-              // longitude: ,
-            })
+            googleMapsClient.geocode({
+              address: textObj.address
+            }, (err, response) => {
+              if (err) {
+                console.log(err);
+              } else {
+                const resultObj = response.json.results[0];
+                const latitude = resultObj.geometry.location.lat;
+                const longitude = resultObj.geometry.location.lng;
+                db.pin.create({
+                  have: true,
+                  id_phone: phone.dataValues.id,
+                  address: textObj.address,
+                  latitude: latitude,
+                  longitude: longitude,
+                })
+              }
+            }); 
           })}
         })
       }).then(() => {
@@ -240,23 +262,6 @@ app.post('/sms', (req, res) => {
     }).catch((err) => {
       console.error(err);
     })
-    // twiml.message('What would you like to offer? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
-    db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
-      if (num[0].length === 0) {
-        db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
-      }
-      db.sequelize.query(`select id from have_pins where id_phone=(
-        select id from phones where number='${textObj.number}'
-        ) and address='${textObj.address}'`).then((id) => {
-        console.log('id!!!!!!!!!!!!!!!', id);
-        if (id[0].length === 0){
-          db.sequelize.query(`INSERT INTO have_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
-        } else {
-          console.log('THERE IS ALREADY AN ID');
-        }
-      })
-    });
-    req.session.counter = smsCount + 1;
 
     // NEED //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
@@ -296,11 +301,8 @@ app.post('/sms', (req, res) => {
     
     // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
   } else {
-    // let regexp = /[A-Z]/gi;
-    // let test;
     console.log(req.session, 'MADE IT HERE', 'check for counter');
     if (req.session.counter > 0) {
-      
       textObj.message = req.body.Body;
       let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
@@ -316,74 +318,41 @@ app.post('/sms', (req, res) => {
                 id_supply: supplyId.dataValues.id,
                 id_pin: pinId.dataValues.id,
               })
+            }).then(() => {
+              db.pin.update({ message: req.body.Body },
+                {where: {
+                    have: true,
+                    address: req.session.address
+                  }
+                }
+              )
             })
           })
         }
-        // if (!textObj.message.match(regexp)) {
-        //   db.phone.findOne({
-        //     where: {
-        //       number: textObj.number,
-        //     },
-        //     raw: true,
-        //   }).then((phone) => {
-        //     const phoneId = phone.id;
-        //     const updateSupplies = (supply) => db.have_pins.update({ [supply]: true }, {
-        //       where: {
-        //         id_phone: phoneId,
-        //         address: req.session.address,
-        //       }
-        //     })
-        //     if (split.includes('1')){
-        //       updateSupplies('food');
-        //       client.messages.create({
-        //         from: '15043020292',
-        //         to: textObj.number,
-        //         body: 'Added pin. To remove a pin, type out@[address]',
-        //       })
-        //       // twiml.message("Added pin. To remove a pin, type out@[address]");
-        //     } 
-        //     if (split.includes('2')) {
-        //       updateSupplies('water');
-        //       client.messages.create({
-        //         from: '15043020292',
-        //         to: textObj.number,
-        //         body: 'Added pin. To remove a pin, type out@[address]',
-        //       })
-        //       // twiml.message("Added pin. To remove a pin, type out@[address]");
-        //     } 
-        //     if (split.includes('3')) {
-        //       updateSupplies('shelter');
-        //       client.messages.create({
-        //         from: '15043020292',
-        //         to: textObj.number,
-        //         body: 'Added pin. To remove a pin, type out@[address]',
-        //       })
-        //       // twiml.message("Added pin. To remove a pin, type out@[address]");
-        //     } 
-        //     if (split.includes('4')) {
-        //       updateSupplies('other');
-        //       return client.messages.create({
-        //         from: '15043020292',
-        //         to: textObj.number,
-        //         body: 'Added pin. To remove a pin, type out@[address]',
-        //       })
-        //       // twiml.message("Ok, send message with what you want to offer");
-        //       // do a query with a .then that will match the id_phone for the phone number
-        //       db.sequelize.query(`SELECT id from have_pins where other = 'true' and id_phone = (select id from phones where number='${textObj.number}')`).then(([pinNum]) => {
-        //         // console.log(num[0][0].number);
-        //         // console.log(pinNum[0].id, 'PIN ID MF');
-        //         test=pinNum[0].id;
-        //         req.session.id = test;
-        //       });
-        //     }
-        //   }) 
-        // } 
-        // else if (req.session.id !== undefined) {
-        //   db.sequelize.query(`UPDATE have_pins SET other = '${textObj.message}' from phones where phones.number = '${textObj.number}' and have_pins.id_phone = (select id from phones where number='${textObj.number}')`);
-        //   // else if other is true on the have pins table for that phone number
-        //   // update other to a new message
-        //   test = false;
-        // } 
+        if (split.includes('water')) {
+          db.supply.findOne({
+            attributes: ['id'],
+            where: {
+              type: 'Water',
+            }
+          }).then((supplyId) => {
+            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address } }).then((pinId) => {
+              db.supply_info.create({
+                id_supply: supplyId.dataValues.id,
+                id_pin: pinId.dataValues.id,
+              })
+            }).then(() => {
+              db.pin.update({ message: req.body.Body },
+                {
+                  where: {
+                    have: true,
+                    address: req.session.address
+                  }
+                }
+              )
+            })
+          })
+        }
       } else if (req.session.command === 'need'){
         textObj.message = req.body.Body;
         let split = textObj.message.split('');
@@ -498,10 +467,7 @@ app.post('/sms', (req, res) => {
             res.end();
           }).catch((e) => {
             console.error(e);
-          })
-        // and phone.id = pin.id_phone !!!!!!
-      // db.sequelize.query(`UPDATE pin SET message = '${req.body.Body}' from phone where phone.number = '${textObj.number}' and pin.id_phone = (select id from phone where number='${textObj.number}') and pin.help = true`);
-    }
+          })}
     else {
         return client.messages.create({
           from: '15043020292',
