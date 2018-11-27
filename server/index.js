@@ -19,7 +19,7 @@ app.use(session({
 app.use(bodyParser.json());
 
 app.post('/addPin', (req, res) => {
-  let { help, have, message, address, lat, lng, description } = req.body.pin;
+  let { help, have, message, address, lat, lng } = req.body.pin;
   if (have === true) {
     db.pin.create({
       help: help,
