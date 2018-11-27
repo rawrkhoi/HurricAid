@@ -28,7 +28,7 @@ app.post('/addPin', (req, res) => {
     latitude: lat,
     longitude: lng,
   }, (error) => {
-    console.log('error creating pin', error);
+    console.log('error creating pin: ', error);
     res.status(500).send(error);
   }).then(() => {
     db.pin.find({ where: { address: address }, raw:true }).then((pin) => {
@@ -38,7 +38,7 @@ app.post('/addPin', (req, res) => {
             id_supply: sup,
             id_pin: pin.id,
           }, (error) => {
-            console.log('error creating supply info', error);
+            console.log('error adding supply info: ', error);
             res.status(500).send(error);
           });
         });
@@ -46,7 +46,7 @@ app.post('/addPin', (req, res) => {
       console.log('pin created', pin);
       res.status(201).send(pin);
     }, (error) => {
-      console.log('error finding pin', error);
+      console.log('error finding pin: ', error);
       res.status(500).send(error);
     }); 
   }); 
@@ -56,7 +56,7 @@ app.get('/getPins', (req, res) => {
   db.pin.findAll().then((pins) => {
     res.status(200).send(pins);
   }, (error) => {
-    console.log('error finding all pins', error);
+    console.log('error finding all pins: ', error);
     res.status(500).send(error);
   });
 });
@@ -65,7 +65,7 @@ app.get('/getSupplies', (req, res) => {
   db.supply.findAll().then((supplies) => {
     res.status(200).send(supplies);
   }, (error) => {
-    console.log('error finding supplies: ', error);
+    console.log('error finding all supplies: ', error);
     res.status(500).send(error);
   });
 });
