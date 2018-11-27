@@ -20,8 +20,14 @@ module.exports = {
       id_phone: {
         type: Sequelize.INTEGER
       },
-      id_location: {
-        type: Sequelize.INTEGER
+      address: {
+        type: Sequelize.STRING
+      },
+      latitude: {
+        type: Sequelize.STRING
+      },
+      longitude: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
