@@ -37,7 +37,7 @@
           </mat-form-field>
         </div>
       </form>
-      <form [formGroup]="supply" (ngSubmit)="submit()">
+      <form>
         <h4>Do you need help or wanting to help?</h4>
         <mat-radio-button class="marker" (click)="toggleHelp()"> Help me!</mat-radio-button><br>
         <div *ngIf="help" class="pin-input">
@@ -54,8 +54,8 @@
           <div class="supply-info">
             <mat-form-field>
               <mat-select placeholder="Supplies" multiple>
-                <label formArrayName="supplyOptions" *ngFor="let supp of supply.controls.supplyOptions.controls;let i = index">
-                <mat-option [formControlName]="i">{{supp[i].type}}</mat-option>
+                <label *ngFor="let supply of supplyOptions">
+                <mat-option (click)="supply.value=!supply.value">{{supply.type}}</mat-option>
                 </label>
               </mat-select>
             </mat-form-field>

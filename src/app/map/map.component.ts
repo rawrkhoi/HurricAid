@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../maps.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { FormControl, FormBuilder, FormGroup, FormArray, ValidatorFn  } from '@angular/forms';
 import { keys } from '../../../config';
 import * as moment from 'moment';
 
@@ -11,7 +10,6 @@ import * as moment from 'moment';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-  supply: FormGroup;
   zoom: number = 8;
   model: any = {};
   
@@ -22,19 +20,11 @@ export class MapComponent implements OnInit {
   address: string;
   lat: any;
   lng: any;
+  suppliesToSend: any = [];
   markers: any = [];
-  supplyOptions: any[] = [
-    // {id: 1, type: 'food',},
-    // {id: 2, type: 'water',}
-  ];
+  supplyOptions: any[] = [];
 
-  constructor(private map: MapsService, private http: HttpClient, private formBuilder: FormBuilder) {
-    const controls = this.supplyOptions.map(c => new FormControl(false));
-    console.log(controls);
-    // controls[0].setValue(true); // Set the first checkbox to true (checked)
-    this.supply = this.formBuilder.group({
-      supplyOptions: new FormArray(controls)
-    });
+  constructor(private map: MapsService, private http: HttpClient) {
   }
 
   ngOnInit() {
@@ -44,6 +34,9 @@ export class MapComponent implements OnInit {
       this.lng = data.longitude;
     });
     this.http.get('/getSupplies').subscribe((supply: any) => {
+      supply.map((sup) => {
+        sup.value = false;
+      })
       this.supplyOptions = supply;
     });
     // query all the pins from db and push to markers
@@ -65,6 +58,12 @@ export class MapComponent implements OnInit {
     });
   }
   setMsgAddress() {
+    const supplyTypes = [];
+    for (let i = 0; i < this.supplyOptions.length; i++) {
+      if (this.supplyOptions[i].value === true) {
+        supplyTypes.push(this.supplyOptions[i].id);
+      }
+    }
     this.message = this.model.message;
     this.address = this.model.address;
     this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
@@ -75,7 +74,6 @@ export class MapComponent implements OnInit {
         }
       })
       .subscribe((response: any) => {
-        console.log(response.results);
         const newPin = {
           help: this.help,
           have: this.have,
@@ -83,8 +81,8 @@ export class MapComponent implements OnInit {
           lat: response.results[0].geometry.location.lat,
           lng: response.results[0].geometry.location.lng,
           address: response.results[0].formatted_address,
+          supply: supplyTypes,
         }
-        console.log('Pin works', newPin);
         // insert the pin into the database
         const headers = new HttpHeaders({
           'Content-Type': 'application/json',
@@ -105,13 +103,6 @@ export class MapComponent implements OnInit {
   toggleHave() {
     this.have = true;
     this.help = false;
-  }
-  submit() {
-    const selectedSupplyIds = this.supply.value.supplyOptions
-      .map((v, i) => v ? this.supplyOptions[i].id : null)
-      .filter(v => v !== null);
-
-    console.log(selectedSupplyIds);
   }
   getAddress() {
     this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
