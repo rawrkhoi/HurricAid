@@ -6,81 +6,65 @@
   [zoom]="zoom"
 >
   <agm-marker
-    *ngFor="let m of helpMarkers;let i = index"
+    *ngFor="let m of markers;let i = index"
     [latitude]="m.latitude"
     [longitude]="m.longitude"
   >
     <agm-info-window>
-      <strong>Help</strong>
+      <div *ngIf="m.have">
+        <strong>Have</strong>
+      </div>
+      <div *ngIf="m.help">
+        <strong>Help</strong>
+      </div>
+      {{m.message}}
       <br>
-      <i>{{m.message}}</i>
+      <i>Address: </i> {{m.address}}
       <br>
-      <i>Address:</i> {{m.address}}
-      <br>
-      <i>Created on:</i> {{m.createdAt}}
+      <i>Created: </i> {{m.createdAt}}
     </agm-info-window>
   </agm-marker>
-
-  <agm-marker
-  *ngFor="let p of haveMarkers;let i = index"
-  [latitude]="p.latitude"
-  [longitude]="p.longitude"
-  >
-    <agm-info-window>
-      <strong>Have</strong>
-      <br>
-      <i>Address:</i> {{p.address}}
-      <br>
-      <i>Food:</i> {{p.food}}
-      <br>
-      <i>Water:</i> {{p.water}}
-      <br>
-      <i>Shelter:</i> {{p.shelter}}
-      <br>
-      <i>Other:</i> {{p.other}}
-      <br>
-      <i>Created at:</i> {{p.createdAt}}
-    </agm-info-window>
-  </agm-marker>
-
 </agm-map>
 <div class="container">
   <div class="row">
     <div class="col-md-8 offset-md-2">
       <form name="form" onSubmit="return false" #f="ngForm" novalidate>
         <h2>Add A Pin</h2>
-
         <h3>Where are you?</h3>
-        <mat-radio-button class="addressField" (click)="hideAddressField()">Saved Address</mat-radio-button><br>
-
-        <mat-radio-button class="addressField" (click)="showAddressField()">Other Address</mat-radio-button>
-          <br>
-        <div *ngIf="addressField" class="address-input">
+        <div class="address-input">
           <mat-form-field>
-            <input matInput name="other-address" [(ngModel)]="model.address" placeholder="Address">
+            <input matInput name="address" [(ngModel)]="model.address" placeholder="Address">
           </mat-form-field>
         </div>
-
+      </form>
+      <form>
         <h4>Do you need help or wanting to help?</h4>
-        <mat-checkbox name="helper" (click)="toggleHelp()"> Help me!</mat-checkbox><br>
+        <mat-radio-button class="marker" (click)="toggleHelp()"> Help me!</mat-radio-button><br>
         <div *ngIf="help" class="pin-input">
           <mat-form-field>
             <input matInput name="message" matInput #message maxlength="255" [(ngModel)]="model.message" placeholder="Message (Optional)">
             <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
           </mat-form-field>
+          <br>
           <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
         </div>
 
-        <mat-checkbox name="haver" (click)="toggleHave()"> Offer amenities</mat-checkbox>
+        <mat-radio-button class="marker" (click)="toggleHave()"> Offer amenities</mat-radio-button>
         <div *ngIf="have" class="pin-input">
-          <mat-checkbox name="food" (click)="toggleFood()">Food</mat-checkbox><br>
-          <mat-checkbox name="water" (click)="toggleWater()">Water</mat-checkbox><br>
-          <mat-checkbox name="shelter" (click)="toggleShelter()">Shelter</mat-checkbox><br>
-          <mat-checkbox name="other" (click)="toggleOther()">Other</mat-checkbox><br>
-          <mat-form-field>
-            <input matInput name="message-other" matInput #message maxlength="255" [(ngModel)]="model.message_other" placeholder="Other Ammenities">
-            <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
-          </mat-form-field>
+          <div class="supply-info">
+            <mat-form-field>
+              <mat-select placeholder="Supplies" multiple>
+                <label *ngFor="let supply of supplyOptions">
+                <mat-option (click)="supply.value=!supply.value">{{supply.type}}</mat-option>
+                </label>
+              </mat-select>
+            </mat-form-field>
+            <br>
+            <mat-form-field hintLabel="At least one supply must be selected">
+              <input matInput name="description_supply" [(ngModel)]="model.message" [ngModelOptions]="{standalone: true}" placeholder="Supply Description (Optional)">
+              <br>
+            </mat-form-field>
+          </div>
           <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
         </div>
       </form>
