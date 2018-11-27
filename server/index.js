@@ -31,21 +31,20 @@ app.post('/addPin', (req, res) => {
     console.log('error creating pin', error);
     res.status(500).send(error);
   }).then(() => {
-    db.pin.find({ where: { address: address } }).then((pin) => {
-      if (pin.dataValues.have === true){
-        let pinId = pin.dataValues.id;
+    db.pin.find({ where: { address: address }, raw:true }).then((pin) => {
+      if (pin.have === true){
         supply.forEach((sup) => {
           db.supply_info.create({
             id_supply: sup,
-            id_pin: pinId,
+            id_pin: pin.id,
           }, (error) => {
             console.log('error creating supply info', error);
             res.status(500).send(error);
           });
         });
       }
-      console.log('pin created', pin.dataValues);
-      res.status(201).send(pin.dataValues);
+      console.log('pin created', pin);
+      res.status(201).send(pin);
     }, (error) => {
       console.log('error finding pin', error);
       res.status(500).send(error);
