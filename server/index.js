@@ -112,10 +112,6 @@ app.post('/sms', (req, res) => {
     if (!req.session.counter){
       req.session.counter = smsCount;
     } 
-    // GET GEOCODE
-    // app.get(`https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyC9Mp1lWq6EtgUVZ7WewQvVjuxa2CliQmE`, (req, res) => {
-    //   res.send('REQUEST BODY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    // });
 
     return client.messages.create({
       from: '15043020292',
@@ -266,20 +262,20 @@ app.post('/sms', (req, res) => {
     // NEED //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
     req.session.command = "need";
+    textObj.address = req.body.Body.slice(5);
+    req.session.address = textObj.address;
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
-    textObj.address = req.body.Body.slice(5);
-    req.session.address = textObj.address;
-    // twiml.message('What do you need? Text 1 for Food, 2 for Water, 3 for Shelter');
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What do you need? Text 1 for Food, 2 for Water, 3 for Shelter',
+      body: 'What do you need? Text Food, Water, or Shelter',
+    }).then(() => {
+      req.session.counter = smsCount + 1;
+    }).then(() => {
+      res.send('done');
     })
-    req.session.counter = smsCount + 1;
-    // send back a message with 3 closest places who have that
-
 
     // OUT //
   } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
@@ -299,9 +295,8 @@ app.post('/sms', (req, res) => {
     req.session.counter = smsCount + 1;
 
     
-    // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
   } else {
-    console.log(req.session, 'MADE IT HERE', 'check for counter');
+    // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
     if (req.session.counter > 0) {
       textObj.message = req.body.Body;
       let split = textObj.message.toLowerCase().split(' ');
@@ -326,8 +321,16 @@ app.post('/sms', (req, res) => {
                   }
                 }
               )
+              }).then(() => {
+                return client.messages.create({
+                  from: '15043020292',
+                  to: textObj.number,
+                  body: 'Thank you! Your offering has been added to the map.',
+                })
+              }).catch((err) => {
+                console.error(err);
+              })
             })
-          })
         }
         if (split.includes('water')) {
           db.supply.findOne({
@@ -350,70 +353,138 @@ app.post('/sms', (req, res) => {
                   }
                 }
               )
+              }).then(() => {
+                return client.messages.create({
+                  from: '15043020292',
+                  to: textObj.number,
+                  body: 'Thank you! Your offering has been added to the map.',
+                })
+              }).catch((err) => {
+                console.error(err);
+              })
+          })
+        } else if (split.includes('shelter')) {
+          db.supply.findOne({
+            attributes: ['id'],
+            where: {
+              type: 'Shelter',
+            }
+          }).then((supplyId) => {
+            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address } }).then((pinId) => {
+              db.supply_info.create({
+                id_supply: supplyId.dataValues.id,
+                id_pin: pinId.dataValues.id,
+              })
+            }).then(() => {
+              db.pin.update({ message: req.body.Body },
+                {
+                  where: {
+                    have: true,
+                    address: req.session.address
+                  }
+                }
+              )
+            }).then(() => {
+              return client.messages.create({
+                from: '15043020292',
+                to: textObj.number,
+                body: 'Thank you! Your offering has been added to the map.',
+              })
+            }).catch((err) => {
+              console.error(err);
             })
           })
         }
       } else if (req.session.command === 'need'){
-        textObj.message = req.body.Body;
-        let split = textObj.message.split('');
-        if (!textObj.message.match(regexp)) {
-          let findSupplies = (supply) =>  db.have_pins.findAll({
+        if (split.includes('food')){
+          let addressString = '';
+          let pushTo = (val) => {
+            return addressString = addressString + ' * ' + val;
+          }
+          db.supply_info.findAll({
+            attributes: ['id_pin'],
             where: {
-              [supply]: true,
+              id_supply: 2,
             },
             raw: true,
-          })
-          if (split.includes('1')) {
-            findSupplies('food').then((places) => {
-              let mappedPlaces = places.map((place) => {
-                return place.address;
-              }).join(', ');
-              return client.messages.create({
-                from: '15043020292',
-                to: '15042615620',
-                body: mappedPlaces,
-              }).then((twilioResponse) => {
-                console.log('the message was sent!', twilioResponse);
-              }).catch((err) => {
-                console.log(err, 'ERROR');
+          }).then((pinIdArray) => {
+            pinIdArray.map((pinId) => {
+              db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
+                pushTo(pin.address);
               })
             })
-            }
-          if (split.includes('2')) {
-            findSupplies('water').then((places) => {
-              let mappedPlaces = places.map((place) => {
-                return place.address;
-              }).join(', ');
-              return client.messages.create({
-                from: '15043020292',
-                to: '15042615620',
-                body: mappedPlaces,
-              }).then((twilioResponse) => {
-                console.log('the message was sent!', twilioResponse);
-              }).catch((err) => {
-                console.log(err, 'ERROR');
-              })
-            })
-          }
-            if (split.includes('3')) {
-              findSupplies('shelter').then((places) => {
-                let mappedPlaces = places.map((place) => {
-                  return place.address;
-                }).join(', ');
+          }).then(() => {
+            setTimeout(() => {
                 return client.messages.create({
                   from: '15043020292',
-                  to: '15042615620',
-                  body: mappedPlaces,
-                }).then((twilioResponse) => {
-                  console.log('the message was sent!', twilioResponse);
-                }).catch((err) => {
-                  console.log(err, 'ERROR');
+                  to: textObj.number,
+                  body: addressString,
                 })
-              })
+              }, 1000);
+            })
+            
+        } else if (split.includes('water')){
+
         }
-      } else {
-        console.log('this was done incorrectly');
-      }
+
+      //   if (!textObj.message.match(regexp)) {
+      //     let findSupplies = (supply) =>  db.have_pins.findAll({
+      //       where: {
+      //         [supply]: true,
+      //       },
+      //       raw: true,
+      //     })
+      //     if (split.includes('1')) {
+      //       findSupplies('food').then((places) => {
+      //         let mappedPlaces = places.map((place) => {
+      //           return place.address;
+      //         }).join(', ');
+      //         return client.messages.create({
+      //           from: '15043020292',
+      //           to: '15042615620',
+      //           body: mappedPlaces,
+      //         }).then((twilioResponse) => {
+      //           console.log('the message was sent!', twilioResponse);
+      //         }).catch((err) => {
+      //           console.log(err, 'ERROR');
+      //         })
+      //       })
+      //       }
+      //     if (split.includes('2')) {
+      //       findSupplies('water').then((places) => {
+      //         let mappedPlaces = places.map((place) => {
+      //           return place.address;
+      //         }).join(', ');
+      //         return client.messages.create({
+      //           from: '15043020292',
+      //           to: '15042615620',
+      //           body: mappedPlaces,
+      //         }).then((twilioResponse) => {
+      //           console.log('the message was sent!', twilioResponse);
+      //         }).catch((err) => {
+      //           console.log(err, 'ERROR');
+      //         })
+      //       })
+      //     }
+      //       if (split.includes('3')) {
+      //         findSupplies('shelter').then((places) => {
+      //           let mappedPlaces = places.map((place) => {
+      //             return place.address;
+      //           }).join(', ');
+      //           return client.messages.create({
+      //             from: '15043020292',
+      //             to: '15042615620',
+      //             body: mappedPlaces,
+      //           }).then((twilioResponse) => {
+      //             console.log('the message was sent!', twilioResponse);
+      //           }).catch((err) => {
+      //             console.log(err, 'ERROR');
+      //           })
+      //         })
+      //   }
+      // } else {
+      //   console.log('this was done incorrectly');
+      // }
       } else if (req.session.command === 'out'){  
         if (!textObj.message.match(regexp)) {
           let split = textObj.message.split('');
