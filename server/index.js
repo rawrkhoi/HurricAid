@@ -1,4 +1,6 @@
 const config = require('../config')
+const passport = require('passport');
+const bcrypt = require('bcrypt');
 const express = require('express');
 const db = require('../models');
 const session = require('express-session');
@@ -8,15 +10,130 @@ const port = process.env.port || 3000;
 const twilio = require('twilio');
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
 const app = express();
 
 app.use(express.static(`${__dirname}/../dist/browser`));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({
-  secret: 'keyboard cat'
-}))
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser())
+
+// PassPort=============================
+const LocalStrategy = require('passport-local').Strategy;
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static('dist/browser'))
+
+// Setup================================
+passport.use(new LocalStrategy(function (email, password, done) {
+  console.log('LocalStrategy is hitting', email, password);
+  db.credential.findOne({ where: { email: email }, raw: true }, (error) => {
+    console.log('error finding credential', error);
+  }).then((cred) => {
+    if (!cred) {
+      return done(null, false, {
+        message: 'Incorrect email.'
+      });
+    } else if (bcrypt.compareSync(password, cred.password) === false) {
+      console.log('password: ', password, 'cred_password: ', cred.password)
+      return done(null, false, {
+        message: 'Incorrect password.'
+      });
+    } else {
+      return done(null, cred);
+    }
+  });
+}));
+
+passport.serializeUser((function (cred, done) {
+  done(null, cred.id);
+}));
+
+passport.deserializeUser((function (id, done) {
+  db.credential.findOne({ where: { id: id }, raw:true }, (error) => {
+    console.log(error);
+  }).then((cred) => {
+    done(null, cred);
+  }).catch((error) => {
+    done(error, false);
+  }); 
+}));
+
+// Session Setup============================
+app.use(session({
+  secret: 'supersecretsesh',
+  resave: true,
+  saveUninitialized: true,
+  username: null,
+  cookie: {
+    path: '/',
+  },
+}));
+
+// SignUp=======================================Works
+app.post('/signup', (req, res) => {
+  const { firstName, lastName, email, password, phone } = req.body;
+  var generateHash = function (password) {
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+  };
+  var cryptPassword = generateHash(req.body.password);
+  db.credential.create({
+    email: email,
+    password: cryptPassword
+  }, error => {
+    console.log('Create credential error: ', error);
+    res.status(500).send(error);
+  })
+  .then(() => {
+    db.phone.create({
+      number: phone
+    }, error => {
+      console.log('Create phone error: ', error);
+      res.status(500).send(error);
+    })
+    .then(() => {
+      db.credential.findOne({ where: { email: email }, raw: true },
+        error => {
+          console.log('Find email error: ', error);
+          res.status(500).send(error);
+        })
+      .then(cred => {
+        db.phone.findOne({ where: { number: phone }, raw: true },
+          error => {
+            console.log('Find phone error: ', error);
+            res.status(500).send(error);
+          })
+        .then(ph => {
+          db.user.create({
+            name_first: firstName,
+            name_last: lastName,
+            id_credential: cred.id,
+            id_phone: ph.id,
+          },
+            error => {
+              console.log('Create user error: ', error);
+              res.status(500).send(error);
+            })
+          .then(() => {
+            db.user.findOne({ where: { id_credential: cred.id }, raw: true },
+              error => {
+                console.log('Find user error: ', error);
+                res.status(500).send(error);
+              })
+            .then(user => {
+              console.log('User created', user);
+              res.status(201).send(user);
+            })
+          })
+        })
+      })
+    })
+  })
+})
+
+// =====================================
 
 app.post('/addPin', (req, res) => {
   let { help, have, message, address, lat, lng, description } = req.body.pin;
@@ -80,11 +197,6 @@ app.get('/getSupplies', (req, res) => {
     console.log('error finding supplies: ', error);
     res.status(500).send(error);
   });
-});
-
-app.post('/signup', (req, res) => {
-  // THIS MUST BE CHANGED. WHAT WE WANT IS FOR THE INFORMATION TO BE SENT TO THE DATABASE
-  console.log(req.body);
 });
 
 app.post('/sms', (req, res) => {

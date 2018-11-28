@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
-import { UserService } from '../user.service';
+import { UserService } from '../service/user.service';
 
 @Component({
   selector: 'app-signup',
@@ -21,7 +20,6 @@ export class SignupComponent implements OnInit {
   });
 
   constructor(
-    private http: HttpClient,
     private router: Router,
     private userService: UserService,
     private formBuilder: FormBuilder,
@@ -33,7 +31,6 @@ export class SignupComponent implements OnInit {
       lastName: '',
       email: '',
       password: '',
-      cpassword: '',
       phone: '',
     })
   }
@@ -42,7 +39,7 @@ export class SignupComponent implements OnInit {
   }
   signUp() {
     this.signupSuccess = true;
-    this.userService.addUser(this.signUpForm.value).subscribe((data) => {
+    this.userService.signUp(this.signUpForm.value).subscribe((data) => {
       console.log(data, 'service');
     })
   }
