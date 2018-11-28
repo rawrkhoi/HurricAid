@@ -301,11 +301,11 @@ app.post('/sms', (req, res) => {
       textObj.message = req.body.Body;
       let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
-        if (split.includes('food')){
+        if (split.includes('water')){
           db.supply.findOne({
             attributes: ['id'],
             where: {
-              type: 'Food',
+              type: 'Water',
             }
           }).then((supplyId) => {
             db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }}).then((pinId) => {
@@ -332,11 +332,11 @@ app.post('/sms', (req, res) => {
               })
             })
         }
-        if (split.includes('water')) {
+        if (split.includes('food')) {
           db.supply.findOne({
             attributes: ['id'],
             where: {
-              type: 'Water',
+              type: 'Food',
             }
           }).then((supplyId) => {
             db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address } }).then((pinId) => {
