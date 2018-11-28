@@ -102,7 +102,7 @@ app.post('/sms', (req, res) => {
       from: '15043020292',
       to: textObj.number,
       body: "Try one of these commands: \nHelp@[address], \nHave@[address], \nNeed@[address]",
-    })
+    }).catch(err => console.error(err))
     
     // HELP //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
@@ -138,10 +138,11 @@ app.post('/sms', (req, res) => {
                   const resultObj = response.json.results[0];
                   const latitude = resultObj.geometry.location.lat;
                   const longitude = resultObj.geometry.location.lng;
+                  const formatAddress = resultObj.formatted_address;
                   db.pin.create({
                     help: true,
                     id_phone: phone.dataValues.id,
-                    address: textObj.address,
+                    address: formatAddress,
                     latitude: latitude,
                     longitude: longitude,
                   })
@@ -178,10 +179,7 @@ app.post('/sms', (req, res) => {
       req.session.counter = smsCount + 1;
       console.log(req.session, 'REQUEST SESSION, LOOK FOR command AND COUNTER');
       res.send('done');
-    })
-    .catch((e) => {
-      console.error(e);
-    })
+      }).catch(err => console.error(err))
 
     // HAVE //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
@@ -202,8 +200,7 @@ app.post('/sms', (req, res) => {
           number: textObj.number
         },
         raw: true,
-      })
-    .then((num) => {
+      }).then((num) => {
       if (!num) {
         db.phone.create({
           number: textObj.number
@@ -218,10 +215,11 @@ app.post('/sms', (req, res) => {
                 const resultObj = response.json.results[0];
                 const latitude = resultObj.geometry.location.lat;
                 const longitude = resultObj.geometry.location.lng;
+                const formatAddress = resultObj.formatted_address;
                 db.pin.create({
                   have: true,
                   id_phone: phone.dataValues.id,
-                  address: textObj.address,
+                  address: formatAddress,
                   latitude: latitude,
                   longitude: longitude,
                 })
@@ -240,10 +238,11 @@ app.post('/sms', (req, res) => {
                 const resultObj = response.json.results[0];
                 const latitude = resultObj.geometry.location.lat;
                 const longitude = resultObj.geometry.location.lng;
+                const formatAddress = resultObj.formatted_address;
                 db.pin.create({
                   have: true,
                   id_phone: phone.dataValues.id,
-                  address: textObj.address,
+                  address: formatAddress,
                   latitude: latitude,
                   longitude: longitude,
                 })
@@ -255,15 +254,26 @@ app.post('/sms', (req, res) => {
       req.session.counter = smsCount + 1;
       console.log(req.session, 'REQUEST SESSION, LOOK FOR COMMAND AND COUNTER');
       res.send('done');
-    }).catch((err) => {
-      console.error(err);
-    })
+    }).catch(err => console.error(err))
 
     // NEED //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
     req.session.command = "need";
     textObj.address = req.body.Body.slice(5);
-    req.session.address = textObj.address;
+    let formatAddress;
+    // geocode address to get a google formatted address
+    googleMapsClient.geocode({
+      address: textObj.address
+    }, (err, response) => {
+      if (err) {
+        console.log(err);
+      } else {
+        const resultObj = response.json.results[0];
+        formatAddress = resultObj.formatted_address;
+      }
+    });
+    req.session.address = formatAddress;
+
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
@@ -271,29 +281,42 @@ app.post('/sms', (req, res) => {
       from: '15043020292',
       to: textObj.number,
       body: 'What do you need? Text Food, Water, or Shelter',
-    }).then(() => {
+    })
+    .then(() => {
       req.session.counter = smsCount + 1;
     }).then(() => {
       res.send('done');
-    })
+      }).catch(err => console.error(err))
 
     // OUT //
   } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
     req.session.command = "out";
+    textObj.address = req.body.Body.slice(4);
+    let formatAddress;
+    // geocode the address to get a google formatted address
+    googleMapsClient.geocode({
+      address: textObj.address
+    }, (err, response) => {
+      if (err) {
+        console.log(err);
+      } else {
+        const resultObj = response.json.results[0];
+        formatAddress = resultObj.formatted_address;
+      }
+    });
+    req.session.address = formatAddress;
+
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
-    textObj.address = req.body.Body.slice(4);
-    req.session.address = textObj.address;
-    console.log(textObj);
     return client.messages.create({
       from: '15043020292',
       to: '15042615620',
-      body: mappedPlaces,
-    })
-    // twiml.message('What are you out of? Text 1 for Food, 2 for Water, 3 for Shelter, 4 for Other');
-    req.session.counter = smsCount + 1;
-
+      body: 'What are you out of? Text Food, Water, or Shelter',
+    }).then(() => {
+      req.session.counter = smsCount + 1;
+      res.send('done');
+    }).catch(err => console.log(err))
     
   } else {
     // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
@@ -325,7 +348,7 @@ app.post('/sms', (req, res) => {
                 return client.messages.create({
                   from: '15043020292',
                   to: textObj.number,
-                  body: 'Thank you! Your offering has been added to the map.',
+                  body: 'Thank you! Your offering has been added to the map. Please let us know when you run out.',
                 })
               }).catch((err) => {
                 console.error(err);
@@ -357,7 +380,7 @@ app.post('/sms', (req, res) => {
                 return client.messages.create({
                   from: '15043020292',
                   to: textObj.number,
-                  body: 'Thank you! Your offering has been added to the map.',
+                  body: 'Thank you! Your offering has been added to the map. Please let us know when you run out.',
                 })
               }).catch((err) => {
                 console.error(err);
@@ -480,31 +503,40 @@ app.post('/sms', (req, res) => {
         }
 
       } else if (req.session.command === 'out'){  
-        if (!textObj.message.match(regexp)) {
-          let split = textObj.message.split('');
-          let findAddress = (address) => db.have_pins.findAll({
-            where: {
-              [address]: req.session.address,
-              id_phone: textObj.number,
-            },
-            raw: true,
-          })
-          let findSupplies = (supply) => db.have_pins.findAll({
-            where: {
-              [supply]: true,
-            },
-            raw: true,
-          })
-          if (split.includes('1')) {
-            console.log(textObj.address);
-              findAddress(textObj.address);
-              // .then((twilioResponse) => {
-              //   console.log('the supply was removed', twilioResponse);
-              // }).catch((err) => {
-              //   console.log(err, 'ERROR');
-              // })
+          let split = textObj.message.toLowerCase().split(' ');
+          if (split.includes('water')){
+            db.phone.findOne({
+              attributes: ['id'],
+              where: {
+                number: textObj.number,
+              },
+              raw: true,
+            }).then((phone) => {
+              db.pin.findOne({
+                attributes: ['id'],
+                where: {
+                  id_phone: phone.id,
+                  address: req.session.address,
+                },
+                raw: true,
+              }).then((pin) => {
+                db.supply_info.destroy({
+                  where: {
+                    id_pin: pin.id,
+                    id_supply: 1,
+                  }
+                })
+                }).then(() => {
+                  return client.messages.create({
+                    from: '15043020292',
+                    to: textObj.number,
+                    body: 'Thank you. Your offering has been removed to the map.',
+                  })
+                }).catch(err => console.error(err))
+              })
           }
-        }
+          
+          
       } else if (req.session.command === 'help'){
           db.phone.findOne({
             attributes: ['id'],
@@ -538,9 +570,8 @@ app.post('/sms', (req, res) => {
           from: '15043020292',
           to: textObj.number,
           body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]',
-        })
-      // twiml.message("Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]")
-    }
+        }).catch(err => console.error(err))
+      }
   }
   
   res.writeHead(200, { 'Content-Type': 'text/xml' });
