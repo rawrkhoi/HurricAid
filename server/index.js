@@ -70,6 +70,11 @@ app.get('/getSupplies', (req, res) => {
   });
 });
 
+app.post('/signup', (req, res) => {
+  // THIS MUST BE CHANGED. WHAT WE WANT IS FOR THE INFORMATION TO BE SENT TO THE DATABASE
+  console.log(req.body);
+});
+
 // for page refresh
 app.use(fallback('index.html', {root: './dist/browser'}));
 
