@@ -640,14 +640,13 @@ app.post('/sms', (req, res) => {
           }).catch((e) => {
             console.error(e);
           })}
-    else {
-        return client.messages.create({
-          from: '15043020292',
-          to: textObj.number,
-          body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]',
-        }).catch(err => console.error(err))
-      }
-  }
+    } else {
+      return client.messages.create({
+        from: '15043020292',
+        to: textObj.number,
+        body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]',
+      }).catch(err => console.error(err))
+    }
   
   res.writeHead(200, { 'Content-Type': 'text/xml' });
   res.end();
