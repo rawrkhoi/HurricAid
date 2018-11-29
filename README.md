@@ -1,27 +1,28 @@
-# Emergency
+# HurricAid
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.5.
+> Hub for giving and receiving aid during hurricanes.
 
-## Development server
+## HurriCain-Harvey
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+  - __Development Team Members__: Deja, Ethan, Josh
 
-## Code scaffolding
+## Usage
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+> Users can either log in to the web application and set up Help or Have pins bases on their current situation. If internet connection is poor, then 
+> users may text the specific number to control the setting up of pins on the map.
 
-## Build
+## Requirements
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+- Node.js
+- Angular 7
+- Sequelize
 
-## Running unit tests
+## Development
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Installing Dependencies
 
-## Running end-to-end tests
+From within the root directory:
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+```sh
+npm install
+```
