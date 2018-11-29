@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { SignupComponent } from '../signup/signup.component';
 import { LoginComponent } from '../login/login.component';
+import { ProfileComponent } from '../profile/profile.component';
 import { Router } from '@angular/router';
 
 export interface DialogData {
@@ -25,21 +26,20 @@ export class SplashComponent implements OnInit {
   }
   loginBox(): void {
     const dialogRef = this.dialog.open(LoginComponent, {
-      width: '500px',
+      width: '400px',
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
+    dialogRef.afterClosed().subscribe();
   }
   signUpBox(): void {
     const dialogRef = this.dialog.open(SignupComponent, {
-      width: '500px',
+      width: '400px',
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-    });
+    dialogRef.afterClosed().subscribe();
   }
-
+  info() {
+    const dialogRef = this.dialog.open(ProfileComponent, {
+      width: '300px',
+    });
+    dialogRef.afterClosed().subscribe();
+  }
 }
