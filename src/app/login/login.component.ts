@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { AuthService } from '../service/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -7,9 +10,30 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginComponent implements OnInit {
 
-  constructor() { }
+  loggedIn: boolean = false;
+  model: any = {};
+
+  constructor(private http: HttpClient, private router: Router, private authService: AuthService) { }
 
   ngOnInit() {
   }
-
+  moveToMap() {
+    this.router.navigate(['/map']);
+  }
+  @Output() logEvent = new EventEmitter<boolean>();
+  sendlog() {
+    this.loggedIn = true;
+    this.logEvent.emit(this.loggedIn);
+  }
+  login() {
+    this.http.post("/login", { email: this.model.email, password: this.model.password })
+    .subscribe((data) => {
+      if (data === true) {
+        this.authService.login(true);
+        this.router.navigateByUrl('/map');
+      } else {
+        this.router.navigateByUrl('/login');
+      }
+    });
+  }
 }

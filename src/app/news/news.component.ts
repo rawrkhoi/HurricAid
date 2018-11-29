@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MapsService } from '../maps.service';
+import { MapsService } from '../service/maps.service';
 import { keys } from 'config';
 
 

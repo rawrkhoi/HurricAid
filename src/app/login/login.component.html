@@ -1,3 +1,27 @@
-<p>
-  login works!
-</p>
+<div class="container">
+  <form name="form" #f="ngForm">
+    <mat-form-field>
+      <input
+        matInput
+        name="email"
+        [(ngModel)]="model.email"
+        placeholder="Enter your email"
+        color="accent"
+        required
+      >
+    </mat-form-field>
+  <br>
+    <mat-form-field>
+      <input
+        matInput
+        name="password"
+        [(ngModel)]="model.password"
+        placeholder="Enter your password"
+        [type]="hide ? 'text' : 'password'"
+        required>
+      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
+    </mat-form-field>
+  <br>
+    <button mat-stroked-button color="primary" (click)="login()">Login</button>
+  </form>
+</div>
