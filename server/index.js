@@ -1,4 +1,4 @@
-const config = require('../config')
+const config = require('../config');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const express = require('express');
@@ -43,18 +43,20 @@ app.use(express.static('dist/browser'))
 
 // Setup================================
 passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password'}, (email, password, done) => {
-  db.sequelize.query(`SELECT * FROM credentials WHERE email = '${email}'`)
+  db.credential.findOne({ where: { email: email }, raw:true }, (error) => {
+    console.log(error);
+  })
   .then((cred) => {
     if (!cred) {
       return done(null, false, {
         message: 'Incorrect email.'
       });
-    } else if (bcrypt.compareSync(password, cred[0][0].password) === 'false') {
+    } else if (bcrypt.compareSync(password, cred.password) === false) {
       return done(null, false, {
         message: 'Incorrect password.'
       });
     } else {
-      return done(null, cred[0][0]);
+      return done(null, cred);
     }
   });
 }));
@@ -128,9 +130,7 @@ app.post('/signup', (req, res) => {
 // Login========================================
 app.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, cred) => {
-    if(err){
-      return next(err);
-    }
+    if(err){ return next(err); }
     if(!cred){
       res.writeHead(401, {
         'Content-Type': 'application/json'
@@ -151,56 +151,48 @@ app.post('/login', (req, res, next) => {
 // =====================================
 
 app.post('/addPin', (req, res) => {
-  let { help, have, message, address, lat, lng, description } = req.body.pin;
-  if (have === true) {
-    db.pin.create({
-      help: help,
-      have: have,
-      message: message,
-      address: address,
-      latitude: lat,
-      longitude: lng,
-    }, (error) => {
-      console.log('error creating pin', error);
-      res.status(500).send(error);
-    }).then(() => {
-      db.pin.find({ where: { address: address } }).then((pin) => {
-        console.log('help pin created', pin.dataValues);
-        res.status(201).send(pin.dataValues);
-      }, (error) => {
-        console.log('error finding pin', error);
+  let { help, have, message, address, lat, lng, supply } = req.body.pin;
+  db.pin.create({
+    help: help,
+    have: have,
+    message: message,
+    address: address, 
+    latitude: lat,
+    longitude: lng,
+  }, (error) => {
+    console.log('error creating pin: ', error);
+    res.status(500).send(error);
+  }).then(() => {
+    db.pin.findOne({ where: { address: address }, raw:true }, 
+      (error) => {
+        console.log('error finding pin: ', error);
         res.status(500).send(error);
-      });
-    });
-  }
-  if (help === true) {
-    db.pin.create({
-      help: help,
-      have: have,
-      message: message,
-      address: address,
-      latitude: lat,
-      longitude: lng,
+      }).then((pin) => {
+      if (pin.have === true){
+        supply.forEach((sup) => {
+          db.supply_info.create({
+            id_supply: sup,
+            id_pin: pin.id,
+          }, (error) => {
+            console.log('error adding supply info: ', error);
+            res.status(500).send(error);
+          });
+        });
+      }
+      console.log('pin created', pin);
+      res.status(201).send(pin);
     }, (error) => {
-      console.log('error creating pin', error);
+      console.log('error finding pin: ', error);
       res.status(500).send(error);
-    }).then(() => {
-      db.pin.find({ where: { address: address } }).then((pin) => {
-        console.log('help pin created', pin.dataValues);
-        res.status(201).send(pin.dataValues);
-      }, (error) => {
-        console.log('error finding pin', error);
-        res.status(500).send(error);
-      });
-    });
-  }
-});
+    }); 
+  }); 
+}); 
 
 app.get('/getPins', (req, res) => {
   db.pin.findAll().then((pins) => {
-    res.status(201).send(pins);
+    res.status(200).send(pins);
   }, (error) => {
-    console.log('error finding all pins', error);
+    console.log('error finding all pins: ', error);
     res.status(500).send(error);
   });
 });
@@ -209,7 +201,7 @@ app.get('/getSupplies', (req, res) => {
   db.supply.findAll().then((supplies) => {
     res.status(200).send(supplies);
   }, (error) => {
-    console.log('error finding supplies: ', error);
+    console.log('error finding all supplies: ', error);
     res.status(500).send(error);
   });
 });
