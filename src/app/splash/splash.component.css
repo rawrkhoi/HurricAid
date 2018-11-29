@@ -1,0 +1,24 @@
+#name{
+  padding-top: 50px;
+  color: blue;
+  fill: "#432c85";
+  font-family: "SegoeUI-Semibold,Segoe UI";
+  font-size: "100";
+  font-weight: "600";
+}
+img { 
+    width: 25%; 
+}
+.locate {
+  padding-top: 50px;
+}
+.locate button{
+  padding: 1px 50px;
+}
+.auth{
+  padding-top: 20px;
+}
+.auth button {
+  margin-right: 8px;
+  margin-left: 8px;
+}
