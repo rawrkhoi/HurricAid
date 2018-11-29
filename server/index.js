@@ -41,7 +41,6 @@ app.use(express.static('dist/browser'))
 passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password'}, (email, password, done) => {
   db.sequelize.query(`SELECT * FROM credentials WHERE email = '${email}'`)
   .then((cred) => {
-    console.log(cred[0][0], 'LOCALSTRATEGY CREDDD');
     if (!cred) {
       return done(null, false, {
         message: 'Incorrect email.'
@@ -73,7 +72,6 @@ passport.deserializeUser((function (id, done) {
 // SignUp=======================================Works
 app.post('/signup', (req, res) => {
   const { firstName, lastName, email, password, phone } = req.body;
-  console.log(req.body);
   var generateHash = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
   };
@@ -126,7 +124,6 @@ app.post('/signup', (req, res) => {
 // Login========================================
 app.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, cred) => {
-    console.log(cred, 'CRED MFFFF');
     if(err){
       return next(err);
     }
