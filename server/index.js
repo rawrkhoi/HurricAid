@@ -11,6 +11,7 @@ const bodyParser = require('body-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
 const googleMapsClient = require('@google/maps').createClient({
   key: config.keys.geocode,
+  Promise: Promise
 })
 const app = express();
 
@@ -91,10 +92,11 @@ app.post('/signup', (req, res) => {
 });
 
 app.post('/sms', (req, res) => {
-  // const twiml = new MessagingResponse();
   let textObj = {};
   const smsCount = req.session.counter || 0;
   textObj.number = req.body.From.slice(1);
+  // let formatAddress;
+  // req.session.address = formatAddress;
   
   // OPTIONS //
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
@@ -108,172 +110,114 @@ app.post('/sms', (req, res) => {
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
     req.session.command = 'help';
     textObj.address = req.body.Body.slice(5);
-    req.session.address = textObj.address;
     if (!req.session.counter){
       req.session.counter = smsCount;
     } 
-
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
       body: 'SOS marker created. You may now send a brief message with details (optional).',
     }).then(() => {
-      db.phone.findOne({
+      return db.phone.findOne({
         where: {
           number: textObj.number
         },
         raw: true,
-      }).then((num) => {
-        if (!num) {
-          db.phone.create({
-            number: textObj.number
-          }).then(() => {
-            db.phone.find({ where: { number: textObj.number } }).then((phone) => {
-              googleMapsClient.geocode({
-                address: textObj.address
-              }, (err, response) => {
-                if (err){
-                  console.log(err);
-                } else {
-                  const resultObj = response.json.results[0];
-                  const latitude = resultObj.geometry.location.lat;
-                  const longitude = resultObj.geometry.location.lng;
-                  const formatAddress = resultObj.formatted_address;
-                  db.pin.create({
-                    help: true,
-                    id_phone: phone.dataValues.id,
-                    address: formatAddress,
-                    latitude: latitude,
-                    longitude: longitude,
-                  })
-                }
-              });
-            })
-          })
-        } else {
-          db.phone.find({ where: { number: textObj.number } }).then((phone) => {
-            googleMapsClient.geocode({
-                address: textObj.address
-              }, (err, response) => {
-                if (err){
-                  console.log(err);
-                } else {
-                  const resultObj = response.json.results[0];
-                  const latitude = resultObj.geometry.location.lat;
-                  const longitude = resultObj.geometry.location.lng;
-                  db.pin.create({
-                    help: true,
-                    id_phone: phone.dataValues.id,
-                    address: textObj.address,
-                    latitude: latitude,
-                    longitude: longitude,
-                  })
-                }
-              });
-          }, (error) => {
-            console.log(error);
-          });
-        }
+      })
+    }).then((num) => {
+      if (!num) {
+        return db.phone.create({
+          number: textObj.number
+        });
+      }
+    }).then(() => {
+      return db.phone.find({ where: { number: textObj.number } });
+    }).then((phone) => {
+      return googleMapsClient.geocode({
+        address: textObj.address
+      }).asPromise().then((response) => {
+        return {
+          response,
+          phone,
+        };
+      });
+    }).then(({ response, phone }) => {
+      const resultObj = response.json.results[0];
+      const latitude = resultObj.geometry.location.lat;
+      const longitude = resultObj.geometry.location.lng;
+      const formatAddress = resultObj.formatted_address;
+      req.session.address = formatAddress;
+      return db.pin.create({
+        help: true,
+        id_phone: phone.dataValues.id,
+        address: formatAddress,
+        latitude: latitude,
+        longitude: longitude,
       })
     }).then(() => {
       req.session.counter = smsCount + 1;
       console.log(req.session, 'REQUEST SESSION, LOOK FOR command AND COUNTER');
       res.send('done');
-      }).catch(err => console.error(err))
-
+    }).catch(err => console.error(err))
     // HAVE //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
     req.session.command = 'have';
     textObj.address = req.body.Body.slice(5);
-    req.session.address = textObj.address;
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
-    
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
       body: 'What would you like to offer? Text Food, Water, or Shelter and details',
     }).then(() => {
-      db.phone.findOne({
+      return db.phone.findOne({
         where: {
           number: textObj.number
         },
         raw: true,
-      }).then((num) => {
+      })
+    }).then((num) => {
       if (!num) {
-        db.phone.create({
+        return db.phone.create({
           number: textObj.number
-        }).then(() => {
-          db.phone.find({ where: { number: textObj.number } }).then((phone) => {
-            googleMapsClient.geocode({
-              address: textObj.address
-            }, (err, response) => {
-              if (err) {
-                console.log(err);
-              } else {
-                const resultObj = response.json.results[0];
-                const latitude = resultObj.geometry.location.lat;
-                const longitude = resultObj.geometry.location.lng;
-                const formatAddress = resultObj.formatted_address;
-                db.pin.create({
-                  have: true,
-                  id_phone: phone.dataValues.id,
-                  address: formatAddress,
-                  latitude: latitude,
-                  longitude: longitude,
-                })
-              }
-            }); 
-          })
-        })
-      } else {
-          db.phone.find({ where: { number: textObj.number } }).then((phone) => {
-            googleMapsClient.geocode({
-              address: textObj.address
-            }, (err, response) => {
-              if (err) {
-                console.log(err);
-              } else {
-                const resultObj = response.json.results[0];
-                const latitude = resultObj.geometry.location.lat;
-                const longitude = resultObj.geometry.location.lng;
-                const formatAddress = resultObj.formatted_address;
-                db.pin.create({
-                  have: true,
-                  id_phone: phone.dataValues.id,
-                  address: formatAddress,
-                  latitude: latitude,
-                  longitude: longitude,
-                })
-              }
-            }); 
-          })}
-        })
-      }).then(() => {
+        });
+      }
+    }).then(() => {
+      return db.phone.find({ where: { number: textObj.number } });
+    }).then((phone) => {
+      return googleMapsClient.geocode({
+        address: textObj.address
+        }).asPromise().then((response) => {
+          return {
+            response,
+            phone,
+          };
+        });
+    }).then(({ response, phone }) => {
+      const resultObj = response.json.results[0];
+      const latitude = resultObj.geometry.location.lat;
+      const longitude = resultObj.geometry.location.lng;
+      const formatAddress = resultObj.formatted_address;
+      req.session.address = formatAddress;
+      return db.pin.create({
+        have: true,
+        id_phone: phone.dataValues.id,
+        address: formatAddress,
+        latitude: latitude,
+        longitude: longitude,
+      }) 
+    }).then(() => {
       req.session.counter = smsCount + 1;
       console.log(req.session, 'REQUEST SESSION, LOOK FOR COMMAND AND COUNTER');
       res.send('done');
     }).catch(err => console.error(err))
+    
 
     // NEED //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
     req.session.command = "need";
     textObj.address = req.body.Body.slice(5);
-    let formatAddress;
-    // geocode address to get a google formatted address
-    googleMapsClient.geocode({
-      address: textObj.address
-    }, (err, response) => {
-      if (err) {
-        console.log(err);
-      } else {
-        const resultObj = response.json.results[0];
-        formatAddress = resultObj.formatted_address;
-      }
-    });
-    req.session.address = formatAddress;
-
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
@@ -281,12 +225,20 @@ app.post('/sms', (req, res) => {
       from: '15043020292',
       to: textObj.number,
       body: 'What do you need? Text Food, Water, or Shelter',
-    })
-    .then(() => {
-      req.session.counter = smsCount + 1;
     }).then(() => {
+      return googleMapsClient.geocode({
+        address: textObj.address
+      }).asPromise().then((response) => {
+        return response
+      })
+    }).then((response) => {
+      const resultObj = response.json.results[0];
+      formatAddress = resultObj.formatted_address;
+      req.session.address = formatAddress;
+    }).then(() => {
+      req.session.counter = smsCount + 1;
       res.send('done');
-      }).catch(err => console.error(err))
+    }).catch(err => console.error(err))
 
     // OUT //
   } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
@@ -553,6 +505,7 @@ app.post('/sms', (req, res) => {
                 address: req.session.address
               }}
             )
+            console.log(req.session);
           }).then(() => {
             return client.messages.create({
               from: '15043020292',
