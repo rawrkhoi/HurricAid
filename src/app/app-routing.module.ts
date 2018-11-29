@@ -17,7 +17,7 @@ const routes: Routes = [
   { path: 'news', component: NewsComponent },
   { path: 'info', component: InfoComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'splash', component: SplashComponent },
+  { path: '', component: SplashComponent },
 ];
 
 @NgModule({
