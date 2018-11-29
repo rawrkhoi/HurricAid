@@ -31,7 +31,11 @@ app.post('/addPin', (req, res) => {
     console.log('error creating pin: ', error);
     res.status(500).send(error);
   }).then(() => {
-    db.pin.findOne({ where: { address: address }, raw:true }).then((pin) => {
+    db.pin.findOne({ where: { address: address }, raw:true }, 
+      (error) => {
+        console.log('error finding pin: ', error);
+        res.status(500).send(error);
+      }).then((pin) => {
       if (pin.have === true){
         supply.forEach((sup) => {
           db.supply_info.create({
@@ -71,8 +75,49 @@ app.get('/getSupplies', (req, res) => {
 });
 
 app.post('/signup', (req, res) => {
-  // THIS MUST BE CHANGED. WHAT WE WANT IS FOR THE INFORMATION TO BE SENT TO THE DATABASE
-  console.log(req.body);
+  const { firstName, lastName, email, password, phone } = req.body;
+  db.credential.create({
+    email: email,
+    password: password,
+  }, (error) => {
+    console.log('error creating credential: ', error);
+    res.status(500).send(error);
+  }).then(() => {
+    db.phone.create({
+      number: phone
+    }, (error) => {
+      console.log('error creating phone: ', error);
+      res.status(500).send(error);
+    }).then(() => {
+      db.phone.findOne({ where: { number: phone }, raw:true }, (error) => {
+        console.log('error finding phone: ', error);
+        res.status(500).send(error);
+      }).then((ph) => {
+        db.credential.findOne({ where: { email: email }, raw:true }, (error) => {
+          console.log('error finding credential: ', error);
+          res.status(500).send(error);
+        }).then((cred) => {
+          db.user.create({
+            name_first: firstName,
+            name_last: lastName,
+            id_credential: cred.id,
+            id_phone: ph.id,
+          }, (error) => {
+            console.log('error creating user: ', error);
+            res.status(500).send(error);
+          }).then(() => {
+            db.user.findOne({ where: { id_credential: cred.id }, raw:true}, (error) => {
+              console.log('error finding user: ', error);
+              res.status(500).send(error);
+            }).then((user) => {
+              console.log('user created: ', user);
+              res.status(201).send(user);
+            });
+          }); 
+        });
+      });
+    }); 
+  }); 
 });
 
 // for page refresh
