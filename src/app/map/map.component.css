@@ -5,3 +5,8 @@ agm-map{
 .pin-input {
   margin: 0 15px;
 }
+
+.container {
+  margin: 10px;
+  text-align: left;
+}

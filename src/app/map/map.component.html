@@ -1,5 +1,5 @@
-<h1 style="text-align: center">Map Markers</h1>
-
+<h1 style="text-align: center"><u>Map Markers</u></h1>
+<hr>
 <agm-map
   [latitude]="lat"
   [longitude]="lng"
@@ -22,7 +22,7 @@
         <br>
         <i>Created: </i> {{m.createdAt}}
         <br>
-        <button mat-flat-button color="warn">Remove Pin</button>
+        <!-- <button mat-flat-button color="warn">Remove Pin</button> -->
       </agm-info-window>
     </agm-marker>
 
@@ -42,16 +42,17 @@
         <br>
         <i>Created: </i> {{m.createdAt}}
         <br>
-        <button mat-flat-button color="warn">Remove Pin</button>
+        <!-- <button mat-flat-button color="warn">Remove Pin</button> -->
       </agm-info-window>
     </agm-marker>
   </div>
 </agm-map>
+<hr>
 <div class="container">
   <div class="row">
     <div class="col-md-8 offset-md-2">
       <form name="form" onSubmit="return false" #f="ngForm" novalidate>
-        <h2>Add A Pin</h2>
+        <h2><u>Add Pin</u></h2>
         <h3>Where are you?</h3>
         <div class="address-input">
           <mat-form-field>
