@@ -271,6 +271,7 @@ app.post('/sms', (req, res) => {
       console.log(req.session, 'REQUEST SESSION, LOOK FOR command AND COUNTER');
       res.send('done');
     }).catch(err => console.error(err))
+
     // HAVE //
   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
     req.session.command = 'have';
@@ -400,48 +401,50 @@ app.post('/sms', (req, res) => {
       textObj.message = req.body.Body;
       let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
-        if (split.includes('water')){
+        if (split.includes('water')) {
           db.supply.findOne({
             attributes: ['id'],
             where: {
               type: 'Water',
-            }
+            },
+            raw: true
           }).then((supplyId) => {
-            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }}).then((pinId) => {
+            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pinId) => {
               db.supply_info.create({
-                id_supply: supplyId.dataValues.id,
-                id_pin: pinId.dataValues.id,
+                id_supply: supplyId.id,
+                id_pin: pinId.id,
               })
             }).then(() => {
               db.pin.update({ message: req.body.Body },
-                {where: {
+                {
+                  where: {
                     have: true,
                     address: req.session.address
                   }
-                }
-              )
-              }).then(() => {
-                return client.messages.create({
-                  from: '15043020292',
-                  to: textObj.number,
-                  body: 'Thank you! Your offering has been added to the map. Please let us know when you run out.',
                 })
-              }).catch((err) => {
-                console.error(err);
+            }).then(() => {
+              return client.messages.create({
+                from: '15043020292',
+                to: textObj.number,
+                body: 'Thank you! Your offering has been added to the map.',
               })
+            }).catch((err) => {
+              console.error(err);
             })
+          })
         }
         if (split.includes('food')) {
           db.supply.findOne({
             attributes: ['id'],
             where: {
               type: 'Food',
-            }
+            },
+            raw: true
           }).then((supplyId) => {
-            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address } }).then((pinId) => {
+            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pinId) => {
               db.supply_info.create({
-                id_supply: supplyId.dataValues.id,
-                id_pin: pinId.dataValues.id,
+                id_supply: supplyId.id,
+                id_pin: pinId.id,
               })
             }).then(() => {
               db.pin.update({ message: req.body.Body },
@@ -450,39 +453,36 @@ app.post('/sms', (req, res) => {
                     have: true,
                     address: req.session.address
                   }
-                }
-              )
-              }).then(() => {
-                return client.messages.create({
-                  from: '15043020292',
-                  to: textObj.number,
-                  body: 'Thank you! Your offering has been added to the map. Please let us know when you run out.',
                 })
-              }).catch((err) => {
-                console.error(err);
+            }).then(() => {
+              return client.messages.create({
+                from: '15043020292',
+                to: textObj.number,
+                body: 'Thank you! Your offering has been added to the map.',
               })
+            }).catch((err) => {
+              console.error(err);
+            })
           })
         } else if (split.includes('shelter')) {
           db.supply.findOne({
             attributes: ['id'],
             where: {
               type: 'Shelter',
-            }
+            },
+            raw: true
           }).then((supplyId) => {
-            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address } }).then((pinId) => {
+            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pinId) => {
               db.supply_info.create({
-                id_supply: supplyId.dataValues.id,
-                id_pin: pinId.dataValues.id,
+                id_supply: supplyId.id,
+                id_pin: pinId.id,
               })
             }).then(() => {
               db.pin.update({ message: req.body.Body },
-                {
-                  where: {
+                {where: {
                     have: true,
                     address: req.session.address
-                  }
-                }
-              )
+                  }})
             }).then(() => {
               return client.messages.create({
                 from: '15043020292',
@@ -621,8 +621,7 @@ app.post('/sms', (req, res) => {
             },
             raw: true,
           }).then((phoneId) => {
-            db.pin.update(
-              {message: req.body.Body},
+            db.pin.update({message: req.body.Body},
               {where: {
                 id_phone: phoneId.id,
                 help: true,
