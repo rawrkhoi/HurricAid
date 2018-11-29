@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     id_phone: DataTypes.INTEGER,
     address: DataTypes.STRING,
     latitude: DataTypes.STRING,
-    longitude: DataTypes.STRING,
+    longitude: DataTypes.STRING
   }, {});
   pin.associate = function(models) {
     // associations can be defined here
