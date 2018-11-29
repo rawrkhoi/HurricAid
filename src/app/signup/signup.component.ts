@@ -15,7 +15,7 @@ export class SignupComponent implements OnInit {
     firstName: new FormControl(null, [Validators.required]),
     lastName: new FormControl(null, [Validators.required]),
     email: new FormControl(null, [Validators.required, Validators.email]),
-    pwd: new FormControl(null, [Validators.required]),
+    password: new FormControl(null, [Validators.required]),
     phone: new FormControl(null, [Validators.required]),
   });
 
@@ -30,7 +30,7 @@ export class SignupComponent implements OnInit {
       firstName: '',
       lastName: '',
       email: '',
-      pwd: '',
+      password: '',
       phone: '',
     })
   }

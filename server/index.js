@@ -38,28 +38,27 @@ app.use(passport.session());
 app.use(express.static('dist/browser'))
 
 // Setup================================
-passport.use(new LocalStrategy(function (email, password, done) {
-  db.credential.findOne({ where: { email: email }, raw: true }, (error) => {
-    console.log('error finding credential', error);
-  }).then((cred) => {
-    console.log(cred, 'LOCALSTRATEGY CREDDD')
+passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password'}, (email, password, done) => {
+  db.sequelize.query(`SELECT * FROM credentials WHERE email = '${email}'`)
+  .then((cred) => {
+    console.log(cred[0][0], 'LOCALSTRATEGY CREDDD');
     if (!cred) {
       return done(null, false, {
         message: 'Incorrect email.'
       });
-    } else if (bcrypt.compareSync(password, cred.password) === 'false') {
+    } else if (bcrypt.compareSync(password, cred[0][0].password) === 'false') {
       return done(null, false, {
         message: 'Incorrect password.'
       });
     } else {
-      return done(null, cred);
+      return done(null, cred[0][0]);
     }
   });
 }));
 
-passport.serializeUser((function (cred, done) {
-  done(null, cred);
-}));
+passport.serializeUser((cred, done) => {
+  done(null, cred.id);
+});
 
 passport.deserializeUser((function (id, done) {
   db.credential.findOne({ where: { id: id }, raw:true }, (error) => {
@@ -73,12 +72,12 @@ passport.deserializeUser((function (id, done) {
 
 // SignUp=======================================Works
 app.post('/signup', (req, res) => {
-  const { firstName, lastName, email, pwd, phone } = req.body;
+  const { firstName, lastName, email, password, phone } = req.body;
   console.log(req.body);
   var generateHash = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
   };
-  var cryptPassword = generateHash(pwd);
+  var cryptPassword = generateHash(password);
   db.credential.create({
     email: email,
     password: cryptPassword,
@@ -136,14 +135,14 @@ app.post('/login', (req, res, next) => {
         'Content-Type': 'application/json'
       });
     }
-    req.logIn({ session: false }, (err) => {
+    req.logIn(cred, (err) => {
       if(err){
         return next(err);
       }
       return req.session.regenerate(() =>{
         req.session.cred = cred.email;
         req.session.credId = cred.id;
-        res.send();
+        res.send('true');
       })
     })
   })(req, res, next);
