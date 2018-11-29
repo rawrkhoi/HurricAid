@@ -13,6 +13,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { NewsComponent } from './news/news.component';
 import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
+import { SplashComponent } from './splash/splash.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
 import { UiService } from './nav/ui/ui.service';
@@ -40,6 +41,7 @@ import {
     NewsComponent,
     InfoComponent,
     NavComponent,
+    SplashComponent,
   ],
   imports: [
     CommonModule,

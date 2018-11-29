@@ -1,5 +1,2 @@
-<app-nav></app-nav>
-
-<!-- <section>
-  <router-outlet></router-outlet>
-</section> -->
+<app-nav *ngIf="isLoggedIn$ | async; else splash"></app-nav>
+<app-splash #splash></app-splash>
