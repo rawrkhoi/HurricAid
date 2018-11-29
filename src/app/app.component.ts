@@ -8,6 +8,7 @@ import { Component , OnInit, Inject, PLATFORM_ID} from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  login: boolean = false;
   title = 'emergency';
 
     public ngOnInit(): void {
@@ -22,4 +23,8 @@ export class AppComponent implements OnInit {
 
 
   constructor(@Inject(PLATFORM_ID) private platformId: any, @Inject(DOCUMENT) private document: any) {}
+
+  logged() {
+    this.login = true;
+  }
 }

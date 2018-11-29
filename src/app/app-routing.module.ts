@@ -7,6 +7,7 @@ import { NewsComponent } from './news/news.component'
 import { WeatherComponent } from './weather/weather.component'
 import { InfoComponent } from './info/info.component'
 import { ProfileComponent } from './profile/profile.component'
+import { SplashComponent } from './splash/splash.component'
 
 const routes: Routes = [
   { path: 'signup', component: SignupComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'news', component: NewsComponent },
   { path: 'info', component: InfoComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: '', component: SplashComponent },
 ];
 
 @NgModule({
