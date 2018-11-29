@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MapsService } from '../maps.service';
+import { MapsService } from '../service/maps.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { keys } from '../../../config';
 import * as moment from 'moment';

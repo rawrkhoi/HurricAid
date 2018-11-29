@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { keys } from '../../config';
+import { keys } from '../../../config';
 
 interface Location {
   city: string;

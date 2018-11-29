@@ -26,6 +26,7 @@ import {
   MatInputModule,
   MatRadioModule,
   MatDialogModule,
+  MatIconModule,
 } from '@angular/material';
 
 @NgModule({
@@ -40,7 +41,7 @@ import {
     InfoComponent,
     NavComponent,
   ],
-  imports:[
+  imports: [
     CommonModule,
     NgtUniversalModule,
     BrowserModule,
@@ -55,6 +56,7 @@ import {
     MatInputModule,
     MatRadioModule,
     MatDialogModule,
+    MatIconModule,
     ReactiveFormsModule,
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`

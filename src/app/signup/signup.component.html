@@ -1,85 +1,57 @@
-<div class="col-md-6">
-    <form name="form" onSubmit="return false" (ngSubmit)="f.form.valid && signupUser()" #f="ngForm"  novalidate>
-      <!-- Signup form -->
-      <label for="signup-form-group" class="signup-label">
-        <strong>Sign Up!</strong>
-        <hr width="75%">
-      </label>
-      <div class="signup-form-group">
-        <label for="firstName">First Name</label>
-        <input type="text" class="form-control" id="firstName" placeholder="John" name="firstName" [(ngModel)]="model.firstName" #firstName="ngModel" [ngClass]="{ 'is-invalid': f.submitted && firstName.invalid }" required/>
-        <div *ngIf="f.submitted && firstName.invalid" class="invalid-feedback">
-          <div *ngIf="firstName.errors.required">First Name is required</div>
-        </div>
-      </div>
-      <div class="signup-form-group">
-        <label for="lastName">Last Name</label>
-        <input type="text" class="form-control" id="lastName" placeholder="Doe" name="lastName" [(ngModel)]="model.lastName" #lastName="ngModel" [ngClass]="{ 'is-invalid': f.submitted && lastName.invalid }" required/>
-        <div *ngIf="f.submitted && lastName.invalid" class="invalid-feedback">
-          <div *ngIf="lastName.errors.required">Last Name is required</div>
-      </div>
-      <div class="signup-form-group">
-        <label for="email">Email</label>
-        <input type="email" class="form-control" id="email" placeholder="johndoe@gmail.com" name="email" [(ngModel)]="model.email" #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.invalid }" required email/>
-        <div *ngIf="f.submitted && email.invalid" class="invalid-feedback">
-          <div *ngIf="email.errors.required">Email must be a valid Email address</div>
-      </div>
-      <div class="signup-form-group">
-        <label for="createPassword">Create Password</label>
-        <input type="password" class="form-control" id="createPassword" name="createPassword" [(ngModel)]="model.createPassword" #createPassword="ngModel" [ngClass]="{ 'is-invalid': f.submitted && createPassword.invalid }" required minlength="6"/>
-        <div *ngIf="f.submitted && createPassword.invalid" class="invalid-feedback">
-          <div *ngIf="createPassword.errors.required">Password is required</div>
-          <div *ngIf="createPassword.errors.minlength">Password must be at least 6 characters</div>
-      </div>
-      <div class="signup-form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" [(ngModel)]="model.confirmPassword" #confirmPassword="ngModel" [ngClass]="{ 'is-invalid': f.submitted && confirmPassword.invalid }" required/>
-        <div *ngIf="f.submitted && confirmPassword.invalid" class="invalid-feedback">
-          <div *ngIf="confirmPassword.errors.required">Confirm Password is required</div>
-          <div *ngIf="confirmPassword.errors.mustMatch">Passwords must match</div>
-        </div>
-      </div>
-      <div class="signup-form-group">
-        <label for="phone">Add Phone Number</label>
-        <input type="tel" class="form-control" id="addPhone" placeholder="(555)555-5555" name="addPhone" [(ngModel)]="model.addPhone" #addPhone="ngModel" [ngClass]="{ 'is-invalid': f.submitted && addPhone.invalid }" required minlength="10"/>
-        <div *ngIf="f.submitted && addPhone.invalid" class="invalid-feedback">
-          <div *ngIf="addPhone.errors.minlength">Phone number must be 10 numbers long</div>
-      </div>
-      <div class="signup-form-group">
-        <label for="emergencyContact">Emergency Contact</label>
-        <input type="tel" class="form-control" id="emergencyContact" placeholder="(555)555-5555" name="emergencyContact" [(ngModel)]="model.emergencyContact" #emergencyContact="ngModel" [ngClass]="{ 'is-invalid': f.submitted && emergencyContact.invalid }" required emergency contact/>
-        <div *ngIf="f.submitted && emergencyContact.invalid" class="invalid-feedback">
-          <div *ngIf="emergencyContact.errors.required">Emergency Contact required</div>
-      </div>
-      <div class="signup-form-group">
-        <label for="profImg">Add Photo</label>
-        <input type="text" class="form-control" id="profImg" placeholder="https://pbs.twimg.com/image.jpg" name="profImg" [(ngModel)]="model.profImg" #profImg="ngModel" [ngClass]="{ 'is-invalid': f.submitted && profImg.invalid }"/>
-      </div>
-      <div class="signup-form-group">
-        <label for="city">City</label>
-        <input type="text" class="form-control" id="city" placeholder="New Orleans" name="city" [(ngModel)]="model.city" #city="ngModel" [ngClass]="{ 'is-invalid': f.submitted && city.invalid }" required />
-        <div *ngIf="f.submitted && city.invalid" class="invalid-feedback">
-          <div *ngIf="city.errors.required">Enter your city!</div>
-      </div>
-      <div class="signup-form-group">
-        <label for="state">State</label>
-        <input type="text" class="form-control" id="state" placeholder="Louisiana" name="state" [(ngModel)]="model.state" #state="ngModel" [ngClass]="{ 'is-invalid': f.submitted && state.invalid }" required />
-        <div *ngIf="f.submitted && state.invalid" class="invalid-feedback">
-          <div *ngIf="state.errors.required">Enter your state!</div>
-      </div>
-      <div class="signup-form-group">
-        <label for="zip">Zip Code</label>
-        <input type="text" class="form-control" id="zip" placeholder="70122" name="zip" [(ngModel)]="model.zip" #zip="ngModel" [ngClass]="{ 'is-invalid': f.submitted && zip.invalid }" required/>
-        <div *ngIf="f.submitted && zip.invalid" class="invalid-feedback">
-          <div *ngIf="zip.errors.required">Enter your zip!</div>
-      </div>
-      <div class="form-group">
-      </div>
-      <div class="checkbox">
-      </div>
-      <button type="submit" id="signup-button" class="btn btn-primary" (click)="signupUser()">
-        Sign Up
-      </button>
-    <!-- </form> -->
-  </div>
-  
+<div class="container">
+  <form [formGroup]="signUpForm">
+    <mat-form-field class="form-group">
+      <input
+        matInput
+        formControlName="firstName"
+        name="firstName"
+        placeholder="First Name"
+        required
+      >
+    </mat-form-field>
+  <br>
+    <mat-form-field class="form-group">
+      <input
+      matInput
+      formControlName="lastName"
+      placeholder="Last Name"
+      required
+    >
+    </mat-form-field>
+  <br>
+    <mat-form-field class="form-group">
+      <input
+        matInput
+        formControlName="email"
+        placeholder="Enter your email"
+        color="accent"
+        required
+      >
+    </mat-form-field>
+  <br>
+    <mat-form-field class="form-group">
+      <input
+        matInput
+        formControlName="password"
+        placeholder="Create password"
+        [type]="hide ? 'text' : 'password'"
+        required>
+      <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
+    </mat-form-field>
+  <br>
+    <mat-form-field class="form-group">
+      <span matPrefix>+1 &nbsp;</span>
+      <input
+        type="tel"
+        matInput
+        formControlName="phone"
+        placeholder="Phone Number"
+        required
+        minlength="10"
+      >
+      <mat-icon matSuffix>call</mat-icon>
+    </mat-form-field>
+  <br>
+    <button mat-stroked-button color="primary" (click)="signUp()" (click)="moveToLogin()">Sign Up</button>
+  </form>
+</div>
