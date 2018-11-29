@@ -2,6 +2,7 @@ const config = require('../config')
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const express = require('express');
+const LocalStrategy = require('passport-local').Strategy;
 const db = require('../models');
 const session = require('express-session');
 const fallback = require('express-history-api-fallback');
@@ -20,7 +21,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser())
 
 // PassPort=============================
-const LocalStrategy = require('passport-local').Strategy;
+
+// Session Setup============================
+app.use(session({
+  secret: 'supersecretsesh',
+  saveUninitialized: true,
+  resave: true,
+  email: null,
+  cookie: {
+    path: '/',
+  },
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -28,16 +39,15 @@ app.use(express.static('dist/browser'))
 
 // Setup================================
 passport.use(new LocalStrategy(function (email, password, done) {
-  console.log('LocalStrategy is hitting', email, password);
   db.credential.findOne({ where: { email: email }, raw: true }, (error) => {
     console.log('error finding credential', error);
   }).then((cred) => {
+    console.log(cred, 'LOCALSTRATEGY CREDDD')
     if (!cred) {
       return done(null, false, {
         message: 'Incorrect email.'
       });
-    } else if (bcrypt.compareSync(password, cred.password) === false) {
-      console.log('password: ', password, 'cred_password: ', cred.password)
+    } else if (bcrypt.compareSync(password, cred.password) === 'false') {
       return done(null, false, {
         message: 'Incorrect password.'
       });
@@ -48,7 +58,7 @@ passport.use(new LocalStrategy(function (email, password, done) {
 }));
 
 passport.serializeUser((function (cred, done) {
-  done(null, cred.id);
+  done(null, cred);
 }));
 
 passport.deserializeUser((function (id, done) {
@@ -61,78 +71,83 @@ passport.deserializeUser((function (id, done) {
   }); 
 }));
 
-// Session Setup============================
-app.use(session({
-  secret: 'supersecretsesh',
-  resave: true,
-  saveUninitialized: true,
-  username: null,
-  cookie: {
-    path: '/',
-  },
-}));
-
 // SignUp=======================================Works
 app.post('/signup', (req, res) => {
-  const { firstName, lastName, email, password, phone } = req.body;
+  const { firstName, lastName, email, pwd, phone } = req.body;
+  console.log(req.body);
   var generateHash = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
   };
-  var cryptPassword = generateHash(req.body.password);
+  var cryptPassword = generateHash(pwd);
   db.credential.create({
     email: email,
-    password: cryptPassword
-  }, error => {
-    console.log('Create credential error: ', error);
+    password: cryptPassword,
+  }, (error) => {
+    console.log('error creating credential: ', error);
     res.status(500).send(error);
-  })
-  .then(() => {
+  }).then(() => {
     db.phone.create({
       number: phone
-    }, error => {
-      console.log('Create phone error: ', error);
+    }, (error) => {
+      console.log('error creating phone: ', error);
       res.status(500).send(error);
-    })
-    .then(() => {
-      db.credential.findOne({ where: { email: email }, raw: true },
-        error => {
-          console.log('Find email error: ', error);
+    }).then(() => {
+      db.phone.findOne({ where: { number: phone }, raw: true }, (error) => {
+        console.log('error finding phone: ', error);
+        res.status(500).send(error);
+      }).then((ph) => {
+        db.credential.findOne({ where: { email: email }, raw: true }, (error) => {
+          console.log('error finding credential: ', error);
           res.status(500).send(error);
-        })
-      .then(cred => {
-        db.phone.findOne({ where: { number: phone }, raw: true },
-          error => {
-            console.log('Find phone error: ', error);
-            res.status(500).send(error);
-          })
-        .then(ph => {
+        }).then((cred) => {
           db.user.create({
             name_first: firstName,
             name_last: lastName,
             id_credential: cred.id,
             id_phone: ph.id,
-          },
-            error => {
-              console.log('Create user error: ', error);
+          }, (error) => {
+            console.log('error creating user: ', error);
+            res.status(500).send(error);
+          }).then(() => {
+            db.user.findOne({ where: { id_credential: cred.id }, raw: true }, (error) => {
+              console.log('error finding user: ', error);
               res.status(500).send(error);
-            })
-          .then(() => {
-            db.user.findOne({ where: { id_credential: cred.id }, raw: true },
-              error => {
-                console.log('Find user error: ', error);
-                res.status(500).send(error);
-              })
-            .then(user => {
-              console.log('User created', user);
+            }).then((user) => {
+              console.log('user created: ', user);
               res.status(201).send(user);
-            })
-          })
-        })
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
+
+// Login========================================
+app.post('/login', (req, res, next) => {
+  passport.authenticate('local', (err, cred) => {
+    console.log(cred, 'CRED MFFFF');
+    if(err){
+      return next(err);
+    }
+    if(!cred){
+      res.writeHead(401, {
+        'Content-Type': 'application/json'
+      });
+    }
+    req.logIn({ session: false }, (err) => {
+      if(err){
+        return next(err);
+      }
+      return req.session.regenerate(() =>{
+        req.session.cred = cred.email;
+        req.session.credId = cred.id;
+        res.send();
       })
     })
-  })
-})
-
+  })(req, res, next);
+});
 // =====================================
 
 app.post('/addPin', (req, res) => {
