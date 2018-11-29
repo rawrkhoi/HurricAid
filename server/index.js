@@ -95,9 +95,6 @@ app.post('/sms', (req, res) => {
   let textObj = {};
   const smsCount = req.session.counter || 0;
   textObj.number = req.body.From.slice(1);
-  // let formatAddress;
-  // req.session.address = formatAddress;
-  
   // OPTIONS //
   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
     return client.messages.create({
@@ -244,31 +241,43 @@ app.post('/sms', (req, res) => {
   } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
     req.session.command = "out";
     textObj.address = req.body.Body.slice(4);
-    let formatAddress;
-    // geocode the address to get a google formatted address
-    googleMapsClient.geocode({
-      address: textObj.address
-    }, (err, response) => {
-      if (err) {
-        console.log(err);
-      } else {
-        const resultObj = response.json.results[0];
-        formatAddress = resultObj.formatted_address;
-      }
-    });
-    req.session.address = formatAddress;
-
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
     return client.messages.create({
       from: '15043020292',
-      to: '15042615620',
+      to: textObj.number,
       body: 'What are you out of? Text Food, Water, or Shelter',
+    }).then(() => {
+      return db.phone.find({ where: { number: textObj.number } });
+    }).then((phone) => {
+      return googleMapsClient.geocode({
+        address: textObj.address
+      }).asPromise().then((response) => {
+        const resultObj = response.json.results[0];
+        formatAddress = resultObj.formatted_address;
+        req.session.address = formatAddress;
+      });
     }).then(() => {
       req.session.counter = smsCount + 1;
       res.send('done');
-    }).catch(err => console.log(err))
+    }).catch(err => console.error(err));
+    // googleMapsClient.geocode({
+    //   address: textObj.address
+    // }, (err, response) => {
+    //   if (err) {
+    //     console.log(err);
+    //   } else {
+    //     const resultObj = response.json.results[0];
+    //     formatAddress = resultObj.formatted_address;
+    //   }
+    // });
+    // req.session.address = formatAddress;
+
+    // .then(() => {
+    //   req.session.counter = smsCount + 1;
+    //   res.send('done');
+    // }).catch(err => console.log(err))
     
   } else {
     // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
