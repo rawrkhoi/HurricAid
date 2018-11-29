@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UiService } from './ui/ui.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-nav',
@@ -10,8 +11,11 @@ export class NavComponent implements OnInit {
   showMenu = false;
   darkModeActive: boolean;
 
-  constructor(public ui: UiService) {
-    
+  userEmail: string;
+  name: string;
+
+  constructor(public ui: UiService, private http: HttpClient) {
+
   }
 
   ngOnInit() {
@@ -22,6 +26,15 @@ export class NavComponent implements OnInit {
 
   toggleMenu() {
     this.showMenu = !this.showMenu;
+    this.http.get('/getInfo').subscribe((info: any) => {
+      if (!info){
+        this.userEmail = 'Please Log In';
+        this.name = '';
+      } else {
+        this.userEmail = info.email;
+        this.name = info.usr.name_first;
+      }
+    });
   }
 
   modeToggleSwitch() {

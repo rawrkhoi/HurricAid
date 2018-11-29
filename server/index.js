@@ -41,8 +41,7 @@ app.use(express.static('dist/browser'))
 passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password'}, (email, password, done) => {
   db.credential.findOne({ where: { email: email }, raw:true }, (error) => {
     console.log(error);
-  })
-  .then((cred) => {
+  }).then((cred) => {
     if (!cred) {
       return done(null, false, {
         message: 'Incorrect email.'
@@ -187,8 +186,8 @@ app.post('/addPin', (req, res) => {
 app.get('/getPins', (req, res) => {
   db.pin.findAll().then((pins) => {
     res.status(200).send(pins);
-  }, (error) => {
-    console.log('error finding all pins: ', error);
+  }).catch((error) => {
+    console.log('error finding pins: ', error);
     res.status(500).send(error);
   });
 });
@@ -196,11 +195,31 @@ app.get('/getPins', (req, res) => {
 app.get('/getSupplies', (req, res) => {
   db.supply.findAll().then((supplies) => {
     res.status(200).send(supplies);
-  }, (error) => {
-    console.log('error finding all supplies: ', error);
+  }).catch((error) => {
+    console.log('error finding supplies: ', error);
     res.status(500).send(error);
   });
 });
+
+app.get('/getInfo', (req, res) => {
+  let credEmail = req.session.cred;
+  let credId = req.session.credId;
+
+  if (req.session.cred){
+    db.user.findOne({ where: { id_credential: credId }, raw:true }, (error) => {
+      console.log('error finding user: ', error);
+      res.status(500).send(error);
+    }).then((user) => {
+      let info = {
+        usr: user,
+        email: credEmail
+      }
+      res.status(200).send(info);
+    });
+  } else {
+    res.send();
+  }
+}); 
 
 // app.post('/sms', (req, res) => {
 //   const twiml = new MessagingResponse();
