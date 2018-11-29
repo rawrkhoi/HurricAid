@@ -5,25 +5,43 @@
   [longitude]="lng"
   [zoom]="zoom"
 >
-  <agm-marker
-    *ngFor="let m of markers;let i = index"
-    [latitude]="m.latitude"
-    [longitude]="m.longitude"
-  >
-    <agm-info-window>
-      <div *ngIf="m.have">
-        <strong>Have</strong>
-      </div>
-      <div *ngIf="m.help">
-        <strong>Help</strong>
-      </div>
-      {{m.message}}
-      <br>
-      <i>Address: </i> {{m.address}}
-      <br>
-      <i>Created: </i> {{m.createdAt}}
-    </agm-info-window>
-  </agm-marker>
+  <div *ngFor="let m of markers;let i = index">
+    <agm-marker
+      *ngIf="m.help"
+      [latitude]="m.latitude"
+      [longitude]="m.longitude"
+      [iconUrl]="helpUrl"
+    >
+      <agm-info-window>
+        <div>
+          <strong>Help</strong>
+        </div>
+        {{m.message}}
+        <br>
+        <i>Address: </i> {{m.address}}
+        <br>
+        <i>Created: </i> {{m.createdAt}}
+      </agm-info-window>
+    </agm-marker>
+
+    <agm-marker
+      *ngIf="m.have"
+      [latitude]="m.latitude"
+      [longitude]="m.longitude"
+      [iconUrl]="haveUrl"
+    >
+      <agm-info-window>
+        <div>
+          <strong>Have</strong>
+        </div>
+        {{m.message}}
+        <br>
+        <i>Address: </i> {{m.address}}
+        <br>
+        <i>Created: </i> {{m.createdAt}}
+      </agm-info-window>
+    </agm-marker>
+  </div>
 </agm-map>
 <div class="container">
   <div class="row">

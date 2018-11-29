@@ -22,6 +22,10 @@ export class MapComponent implements OnInit {
   lng: any;
   suppliesToSend: any = [];
   markers: any = [];
+
+  haveUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|4286f4';
+  helpUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000';
+
   supplyOptions: any[] = [];
 
   constructor(private map: MapsService, private http: HttpClient) {
