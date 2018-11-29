@@ -1,4 +1,4 @@
-const config = require('../config')
+const config = require('../config');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const express = require('express');
@@ -39,18 +39,20 @@ app.use(express.static('dist/browser'))
 
 // Setup================================
 passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password'}, (email, password, done) => {
-  db.sequelize.query(`SELECT * FROM credentials WHERE email = '${email}'`)
+  db.credential.findOne({ where: { email: email }, raw:true }, (error) => {
+    console.log(error);
+  })
   .then((cred) => {
     if (!cred) {
       return done(null, false, {
         message: 'Incorrect email.'
       });
-    } else if (bcrypt.compareSync(password, cred[0][0].password) === 'false') {
+    } else if (bcrypt.compareSync(password, cred.password) === false) {
       return done(null, false, {
         message: 'Incorrect password.'
       });
     } else {
-      return done(null, cred[0][0]);
+      return done(null, cred);
     }
   });
 }));
@@ -124,9 +126,7 @@ app.post('/signup', (req, res) => {
 // Login========================================
 app.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, cred) => {
-    if(err){
-      return next(err);
-    }
+    if(err){ return next(err); }
     if(!cred){
       res.writeHead(401, {
         'Content-Type': 'application/json'
