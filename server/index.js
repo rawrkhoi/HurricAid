@@ -285,9 +285,7 @@ app.post('/sms', (req, res) => {
       body: 'What would you like to offer? Text Food, Water, or Shelter and details',
     }).then(() => {
       return db.phone.findOne({
-        where: {
-          number: textObj.number
-        },
+        where: { number: textObj.number },
         raw: true,
       })
     }).then((num) => {
@@ -365,7 +363,7 @@ app.post('/sms', (req, res) => {
       to: textObj.number,
       body: 'What are you out of? Text Food, Water, or Shelter',
     }).then(() => {
-      return db.phone.find({ where: { number: textObj.number } });
+      return db.phone.findOne({ where: { number: textObj.number }, raw: true});
     }).then((phone) => {
       return googleMapsClient.geocode({
         address: textObj.address
@@ -581,32 +579,33 @@ app.post('/sms', (req, res) => {
       } else if (req.session.command === 'out'){  
           let split = textObj.message.toLowerCase().split(' ');
           if (split.includes('water')){
-            db.phone.findOne({
+            db.supply.findOne({
               attributes: ['id'],
               where: {
-                number: textObj.number,
+                type: "Water",
               },
               raw: true,
-            }).then((phone) => {
-              db.pin.findOne({
-                attributes: ['id'],
-                where: {
-                  id_phone: phone.id,
-                  address: req.session.address,
-                },
-                raw: true,
-              }).then((pin) => {
+            }).then((supplyId) => {
+              db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pin) => {
                 db.supply_info.destroy({
                   where: {
                     id_pin: pin.id,
-                    id_supply: 1,
+                    id_supply: supplyId.id,
                   }
+                }).then(() => {
+                  db.pin.destroy({
+                    where: {
+                      have: true,
+                      address: req.session.address,
+                      id: pin.id,
+                    }
+                  })
                 })
                 }).then(() => {
                   return client.messages.create({
                     from: '15043020292',
                     to: textObj.number,
-                    body: 'Thank you. Your offering has been removed to the map.',
+                    body: 'Thank you. Your offering has been removed from the map.',
                   })
                 }).catch(err => console.error(err))
               })
