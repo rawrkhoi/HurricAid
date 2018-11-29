@@ -1,6 +1,6 @@
 <div class="container">
   <form [formGroup]="signUpForm">
-    <mat-form-field>
+    <mat-form-field class="form-group">
       <input
         matInput
         formControlName="firstName"
@@ -10,55 +10,41 @@
       >
     </mat-form-field>
   <br>
-    <mat-form-field>
+    <mat-form-field class="form-group">
       <input
       matInput
       formControlName="lastName"
-      name="lastName"
       placeholder="Last Name"
       required
     >
     </mat-form-field>
   <br>
-    <mat-form-field>
+    <mat-form-field class="form-group">
       <input
         matInput
         formControlName="email"
-        name="email"
         placeholder="Enter your email"
         color="accent"
         required
       >
     </mat-form-field>
   <br>
-    <mat-form-field>
+    <mat-form-field class="form-group">
       <input
         matInput
         formControlName="password"
-        name="password"
         placeholder="Create password"
         [type]="hide ? 'text' : 'password'"
         required>
       <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility' : 'visibility_off'}}</mat-icon>
     </mat-form-field>
   <br>
-    <mat-form-field>
-      <input
-        matInput
-        formControlName="cpassword"
-        name="cpassword"
-        placeholder="Confirm password"
-        [type]="hide ? 'text' : 'password'"
-        required>
-    </mat-form-field>
-  <br>
-    <mat-form-field>
+    <mat-form-field class="form-group">
       <span matPrefix>+1 &nbsp;</span>
       <input
         type="tel"
         matInput
         formControlName="phone"
-        name="phone"
         placeholder="Phone Number"
         required
         minlength="10"
@@ -66,7 +52,6 @@
       <mat-icon matSuffix>call</mat-icon>
     </mat-form-field>
   <br>
-    <button mat-stroked-button color="primary" (click)="signUp()">Sign Up</button>
-    <button mat-stroked-button color="accent" (click)="moveToLogin()">Login</button>
+    <button mat-stroked-button color="primary" (click)="signUp()" (click)="moveToLogin()">Sign Up</button>
   </form>
 </div>

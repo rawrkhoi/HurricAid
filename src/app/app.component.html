@@ -1,7 +1,2 @@
-<div *ngIf="!login">
-  <!-- <app-login></app-login> -->
-  <button mat-stroked-button color="primary" (click)="logged()">Login</button>
-</div>
-<div *ngIf="login">
-  <app-nav></app-nav>
-</div>
+<app-nav *ngIf="isLoggedIn$ | async; else splash"></app-nav>
+<app-splash #splash></app-splash>
