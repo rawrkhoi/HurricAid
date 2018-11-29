@@ -18,7 +18,7 @@ const app = express();
 app.use(express.static(`${__dirname}/../dist/browser`));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser())
+app.use(cookieParser());
 
 // PassPort=============================
 
@@ -35,7 +35,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static('dist/browser'))
+app.use(express.static('dist/browser'));
 
 // Setup================================
 passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password'}, (email, password, done) => {
@@ -220,36 +220,6 @@ app.get('/getInfo', (req, res) => {
     res.send();
   }
 }); 
-
-// app.post('/sms', (req, res) => {
-//   const twiml = new MessagingResponse();
-//   let textObj = {};
-//   const smsCount = req.session.counter || 0;
-//   req.session.command = '';
-  
-//   // OPTIONS //
-//   if (req.body.Body.slice(0, 7).toLowerCase() === 'options') {
-//     twiml.message("Try one of these commands: 'help@[address]', 'have@[address]', or 'need@[address]'");
-
-//     // HELP //
-//   } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
-//     req.session.command = 'help';
-//     if (!req.session.counter){
-//       req.session.counter = smsCount;
-//     } 
-//     textObj.number = req.body.From.slice(1);
-//     textObj.address = req.body.Body.slice(5);
-//     twiml.message('SOS marker created. You may now send a brief message with details (optional).')
-//       // they send a message back. we add to db and we send one back to them
-//       db.sequelize.query(`SELECT number from phones where number='${textObj.number}'`).then((num) => {
-//         if (num[0].length === 0){
-//           db.sequelize.query(`INSERT INTO phones (number) values ('${textObj.number}')`);
-//         } 
-//         db.sequelize.query(`INSERT INTO help_pins (id_phone, address) values ((select id from phones where number='${textObj.number}'), '${textObj.address}')`);
-//       });
-//     }); 
-//   }); 
-// });
 
 // for page refresh
 app.use(fallback('index.html', {root: './dist/browser'}));
