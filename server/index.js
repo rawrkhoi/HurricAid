@@ -382,11 +382,11 @@ app.post('/sms', (req, res) => {
       textObj.message = req.body.Body;
       let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
-        if (split.includes('water')) {
+        let addHaves = (supply) => {
           return db.supply.findOne({
             attributes: ['id'],
             where: {
-              type: 'Water',
+              type: supply,
             },
             raw: true
           }).then((supplyId) => {
@@ -396,10 +396,11 @@ app.post('/sms', (req, res) => {
                 id_pin: pinId.id,
               }).then(() => {
                 return db.pin.update({ message: req.body.Body },
-                  {where: {
-                    id: `${pinId.id}`,
-                    have: true,
-                    address: req.session.address,
+                  {
+                    where: {
+                      id: `${pinId.id}`,
+                      have: true,
+                      address: req.session.address,
                     }
                   })
               })
@@ -413,92 +414,43 @@ app.post('/sms', (req, res) => {
               console.error(err);
             })
           })
+        }
+        if (split.includes('water')) {
+          addHaves('Water');
         }
         if (split.includes('food')) {
-          return db.supply.findOne({
-            attributes: ['id'],
-            where: {
-              type: 'Food',
-            },
-            raw: true
-          }).then((supplyId) => {
-            return db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pinId) => {
-              return db.supply_info.create({
-                id_supply: supplyId.id,
-                id_pin: pinId.id,
-              }).then(() => {
-                return db.pin.update({ message: req.body.Body },
-                  {
-                    where: {
-                      id: `${pinId.id}`,
-                      have: true,
-                      address: req.session.address,
-                    }
-                  })
-              })
-            }).then(() => {
-              return client.messages.create({
-                from: '15043020292',
-                to: textObj.number,
-                body: 'Thank you! Your offering has been added to the map.',
-              })
-            }).catch((err) => {
-              console.error(err);
-            })
-          })
-        } else if (split.includes('shelter')) {
-          return db.supply.findOne({
-            attributes: ['id'],
-            where: {
-              type: 'Shelter',
-            },
-            raw: true
-          }).then((supplyId) => {
-            return db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pinId) => {
-              return db.supply_info.create({
-                id_supply: supplyId.id,
-                id_pin: pinId.id,
-              }).then(() => {
-                return db.pin.update({ message: req.body.Body },
-                  {
-                    where: {
-                      id: `${pinId.id}`,
-                      have: true,
-                      address: req.session.address,
-                    }
-                  })
-              })
-            }).then(() => {
-              return client.messages.create({
-                from: '15043020292',
-                to: textObj.number,
-                body: 'Thank you! Your offering has been added to the map.',
-              })
-            }).catch((err) => {
-              console.error(err);
-            })
-          })
+          addHaves('Food');
+        } 
+        if (split.includes('shelter')) {
+          addHaves('Shelter');
         }
       } else if (req.session.command === 'need'){
-        if (split.includes('water')){
+        let needSupply = (supply) => {
           let addressString = '';
           let pushTo = (val) => {
             return addressString = addressString + ' * ' + val;
           }
-          db.supply_info.findAll({
-            attributes: ['id_pin'],
+          db.supply.findOne({
+            attributes: ['id'],
             where: {
-              id_supply: 1,
+              type: supply,
             },
-            raw: true,
-          }).then((pinIdArray) => {
-            pinIdArray.map((pinId) => {
-              db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
-                pushTo(pin.address);
+            raw: true
+          }).then((supplyid) => {
+            db.supply_info.findAll({
+              attributes: ['id_pin'],
+              where: {
+                id_supply: supplyid.id,
+              },
+              raw: true,
+            }).then((pinIdArray) => {
+              pinIdArray.map((pinId) => {
+                db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
+                  pushTo(pin.address);
+                })
               })
-            })
-          }).then(() => {
-            setTimeout(() => {
+            }).then(() => {
+              setTimeout(() => {
                 return client.messages.create({
                   from: '15043020292',
                   to: textObj.number,
@@ -506,158 +458,56 @@ app.post('/sms', (req, res) => {
                 })
               }, 1000);
             })
-            
+          })
+        }
+        if (split.includes('water')){
+          needSupply('Water');
         } else if (split.includes('food')){
-          let addressString = '';
-          let pushTo = (val) => {
-            return addressString = addressString + ' * ' + val;
-          }
-          db.supply_info.findAll({
-            attributes: ['id_pin'],
-            where: {
-              id_supply: 2,
-            },
-            raw: true,
-          }).then((pinIdArray) => {
-            pinIdArray.map((pinId) => {
-              db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
-                pushTo(pin.address);
-              })
-            })
-          }).then(() => {
-            setTimeout(() => {
-              return client.messages.create({
-                from: '15043020292',
-                to: textObj.number,
-                body: addressString,
-              })
-            }, 1000);
-          })
-
+          needSupply('Food');
         } else if (split.includes('shelter')){
-          let addressString = '';
-          let pushTo = (val) => {
-            return addressString = addressString + ' * ' + val;
-          }
-          db.supply_info.findAll({
-            attributes: ['id_pin'],
-            where: {
-              id_supply: 3,
-            },
-            raw: true,
-          }).then((pinIdArray) => {
-            pinIdArray.map((pinId) => {
-              db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
-                pushTo(pin.address);
-              })
-            })
-          }).then(() => {
-            setTimeout(() => {
-              return client.messages.create({
-                from: '15043020292',
-                to: textObj.number,
-                body: addressString,
-              })
-            }, 1000);
-          })
-
+          needSupply('Shelter');
         }
 
       } else if (req.session.command === 'out'){  
         let split = textObj.message.toLowerCase().split(' ');
+        let outFunc = (supply) => {
+          return db.supply.findOne({
+            attributes: ['id'],
+            where: {
+              type: supply,
+            },
+            raw: true,
+          }).then((supplyId) => {
+            return db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pin) => {
+              return db.supply_info.destroy({
+                where: {
+                  id_pin: pin.id,
+                  id_supply: supplyId.id,
+                }
+              }).then(() => {
+                return db.pin.destroy({
+                  where: {
+                    id: pin.id,
+                    have: true,
+                    address: req.session.address,
+                  }
+                })
+              })
+            }).then(() => {
+              return client.messages.create({
+                from: '15043020292',
+                to: textObj.number,
+                body: 'Thank you. Your offering has been removed from the map.',
+              })
+            }).catch(err => console.error(err))
+          })
+        }
         if (split.includes('water')){
-          db.supply.findOne({
-            attributes: ['id'],
-            where: {
-              type: "Water",
-            },
-            raw: true,
-          }).then((supplyId) => {
-            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pin) => {
-              db.supply_info.destroy({
-                where: {
-                  id_pin: pin.id,
-                  id_supply: supplyId.id,
-                }
-              }).then(() => {
-                db.pin.destroy({
-                  where: {
-                    have: true,
-                    address: req.session.address,
-                    id: pin.id,
-                  }
-                })
-              })
-              }).then(() => {
-                return client.messages.create({
-                  from: '15043020292',
-                  to: textObj.number,
-                  body: 'Thank you. Your offering has been removed from the map.',
-                })
-              }).catch(err => console.error(err))
-            })
+          outFunc('Water');
         } else if (split.includes('food')) {
-          db.supply.findOne({
-            attributes: ['id'],
-            where: {
-              type: "Food",
-            },
-            raw: true,
-          }).then((supplyId) => {
-            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pin) => {
-              db.supply_info.destroy({
-                where: {
-                  id_pin: pin.id,
-                  id_supply: supplyId.id,
-                }
-              }).then(() => {
-                db.pin.destroy({
-                  where: {
-                    have: true,
-                    address: req.session.address,
-                    id: pin.id,
-                  }
-                })
-              })
-            }).then(() => {
-              return client.messages.create({
-                from: '15043020292',
-                to: textObj.number,
-                body: 'Thank you. Your offering has been removed from the map.',
-              })
-            }).catch(err => console.error(err))
-          })
+          outFunc('Food');
         } else if (split.includes('shelter')) {
-          db.supply.findOne({
-            attributes: ['id'],
-            where: {
-              type: "Shelter",
-            },
-            raw: true,
-          }).then((supplyId) => {
-            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pin) => {
-              db.supply_info.destroy({
-                where: {
-                  id_pin: pin.id,
-                  id_supply: supplyId.id,
-                }
-              }).then(() => {
-                db.pin.destroy({
-                  where: {
-                    have: true,
-                    address: req.session.address,
-                    id: pin.id,
-                  }
-                })
-              })
-            }).then(() => {
-              return client.messages.create({
-                from: '15043020292',
-                to: textObj.number,
-                body: 'Thank you. Your offering has been removed from the map.',
-              })
-            }).catch(err => console.error(err))
-          })
+          outFunc('Shelter')
         }
           
           
@@ -722,6 +572,10 @@ app.get('/getInfo', (req, res) => {
     res.send();
   }
 }); 
+
+app.get('/searchPins', (req, res) => {
+
+})
 
 // for page refresh
 app.use(fallback('index.html', {root: './dist/browser'}));
