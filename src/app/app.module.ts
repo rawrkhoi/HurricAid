@@ -68,6 +68,10 @@ import {
       apiKey: `${keys.googleMaps}`
     })
   ],
+  entryComponents: [
+    HelppinComponent,
+    HavepinComponent,
+  ],
   providers: [
     UiService,
   ],

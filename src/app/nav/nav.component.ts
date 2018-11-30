@@ -12,7 +12,7 @@ export class NavComponent implements OnInit {
   darkModeActive: boolean;
 
   userEmail: string;
-  name: string;
+  name: string = 'Please Log In';
 
   constructor(public ui: UiService, private http: HttpClient) {
 
