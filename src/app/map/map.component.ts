@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../service/maps.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HelppinComponent } from '../helppin/helppin.component';
+import { HavepinComponent } from '../havepin/havepin.component';
+import { MatDialog } from '@angular/material';
 import { keys } from '../../../config';
 import * as moment from 'moment';
 
@@ -28,7 +31,7 @@ export class MapComponent implements OnInit {
 
   supplyOptions: any[] = [];
 
-  constructor(private map: MapsService, private http: HttpClient) {
+  constructor(private map: MapsService, private http: HttpClient, public dialog: MatDialog) {
   }
 
   ngOnInit() {
@@ -117,5 +120,15 @@ export class MapComponent implements OnInit {
         }
       })
       .subscribe((response) => {})
+  }
+  helpBox(): void {
+    this.dialog.open(HelppinComponent, {
+      width: '400px',
+    });
+  }
+  haveBox(): void {
+    this.dialog.open(HavepinComponent, {
+      width: '400px',
+    });
   }
 }

@@ -14,6 +14,8 @@ import { NewsComponent } from './news/news.component';
 import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
 import { SplashComponent } from './splash/splash.component';
+import { HelppinComponent } from './helppin/helppin.component';
+import { HavepinComponent } from './havepin/havepin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
 import { UiService } from './nav/ui/ui.service';
@@ -42,6 +44,8 @@ import {
     InfoComponent,
     NavComponent,
     SplashComponent,
+    HelppinComponent,
+    HavepinComponent,
   ],
   imports: [
     CommonModule,
