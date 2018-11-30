@@ -28,10 +28,8 @@ export class NavComponent implements OnInit {
     this.showMenu = !this.showMenu;
     this.http.get('/getInfo').subscribe((info: any) => {
       if (!info){
-        this.userEmail = 'Please Log In';
-        this.name = '';
+        this.name = 'Please Log In';
       } else {
-        this.userEmail = info.email;
         this.name = info.usr.name_first;
       }
     });

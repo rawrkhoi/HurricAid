@@ -1,8 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog } from '@angular/material';
 import { SignupComponent } from '../signup/signup.component';
 import { LoginComponent } from '../login/login.component';
-import { ProfileComponent } from '../profile/profile.component';
+import { InfoComponent } from '../info/info.component';
 import { Router } from '@angular/router';
 
 export interface DialogData {
@@ -25,21 +25,18 @@ export class SplashComponent implements OnInit {
     this.router.navigate(['/map']);
   }
   loginBox(): void {
-    const dialogRef = this.dialog.open(LoginComponent, {
+    this.dialog.open(LoginComponent, {
       width: '400px',
     });
-    dialogRef.afterClosed().subscribe();
   }
   signUpBox(): void {
-    const dialogRef = this.dialog.open(SignupComponent, {
+    this.dialog.open(SignupComponent, {
       width: '400px',
     });
-    dialogRef.afterClosed().subscribe();
   }
   info() {
-    const dialogRef = this.dialog.open(ProfileComponent, {
+    this.dialog.open(InfoComponent, {
       width: '300px',
     });
-    dialogRef.afterClosed().subscribe();
   }
 }
