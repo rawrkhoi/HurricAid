@@ -19,9 +19,11 @@ import { LastnameComponent } from './profile/components/lastname/lastname.compon
 import { EmailComponent } from './profile/components/email/email.component';
 import { PhoneComponent } from './profile/components/phone/phone.component';
 import { PasswordComponent } from './profile/components/password/password.component';
+import { HelppinComponent } from './helppin/helppin.component';
+import { HavepinComponent } from './havepin/havepin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
-import { UiService } from './nav/ui/ui.service';
+import { UiService } from './service/ui.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -51,7 +53,9 @@ import {
     LastnameComponent,
     EmailComponent,
     PhoneComponent,
-    PasswordComponent
+    PasswordComponent,
+    HelppinComponent,
+    HavepinComponent,
   ],
   imports: [
     CommonModule,
@@ -79,7 +83,9 @@ import {
     LastnameComponent,
     EmailComponent,
     PhoneComponent,
-    PasswordComponent
+    PasswordComponent,
+    HelppinComponent,
+    HavepinComponent,
   ],
   providers: [
     UiService,
