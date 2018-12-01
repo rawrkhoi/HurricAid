@@ -13,15 +13,17 @@ const twilio = require('twilio');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
+const fs = require('fs');
+var NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
 const googleMapsClient = require('@google/maps').createClient({
   key: config.keys.geocode,
   Promise: Promise
 })
-const discovery = new DiscoveryV1({
-  url: 'https://gateway-tok.watsonplatform.net/natural-language-understanding/api',
-  version: '<version-date>',
-  iam_apikey: 'config.keys.watson',
-  // iam_url: '<iam_url>', // optional - the default value is https://iam.bluemix.net/identity/token
+
+var nlu = new NaturalLanguageUnderstandingV1({
+  iam_apikey: config.keys.watson,
+  version: '2018-04-05',
+  url: 'https://gateway-tok.watsonplatform.net/natural-language-understanding/api/'
 });
 
 
@@ -388,6 +390,25 @@ app.post('/sms', (req, res) => {
     // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
     if (req.session.counter > 0) {
       textObj.message = req.body.Body;
+      
+      nlu.analyze(
+        {
+          text: textObj.message, // Buffer or String
+          features: {
+            categories: {},
+            keywords: {}
+          }
+        },
+        function (err, response) {
+          if (err) {
+            console.log('error:', err);
+          } else {
+            console.log(JSON.stringify(response, null, 2));
+          }
+        }
+      );
+
+
       let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
         let addHaves = (supply) => {
