@@ -1,0 +1,17 @@
+<div class="container">
+    <form name="form" #f="ngForm">
+      <mat-form-field>
+        <input
+          matInput
+          name="last"
+          [(ngModel)]="model.last"
+          placeholder="Enter New Name"
+          color="accent"
+          required
+        >
+      </mat-form-field>
+    <br>
+      <button mat-stroked-button color="primary" (click)="updateLast()" matDialogClose>Update</button>
+    </form>
+  </div>
+  

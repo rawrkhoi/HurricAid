@@ -1,9 +1,11 @@
-agm-map{
-  height: 500px;
+agm-map {
+  height: 65vh;
+  width: 100%;
 }
 
-.pin-input {
-  margin: 0 15px;
+.pin-box {
+  margin-right: 8px;
+  margin-left: 8px;
 }
 
 .container {

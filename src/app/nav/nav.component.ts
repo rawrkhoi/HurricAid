@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UiService } from './ui/ui.service';
+import { UiService } from '../service/ui.service';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -11,8 +11,7 @@ export class NavComponent implements OnInit {
   showMenu = false;
   darkModeActive: boolean;
 
-  userEmail: string;
-  name: string;
+  name: string = 'Please Log In';
 
   constructor(public ui: UiService, private http: HttpClient) {
 
