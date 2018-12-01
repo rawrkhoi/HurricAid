@@ -5,7 +5,6 @@ import { NgModule } from '@angular/core';
 import { keys } from '../../config';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { WeatherComponent } from './weather/weather.component';
 import { SignupComponent } from './signup/signup.component';
 import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
@@ -19,6 +18,7 @@ import { LastnameComponent } from './profile/components/lastname/lastname.compon
 import { EmailComponent } from './profile/components/email/email.component';
 import { PhoneComponent } from './profile/components/phone/phone.component';
 import { PasswordComponent } from './profile/components/password/password.component';
+import { RemovepinComponent } from './profile/components/removepin/removepin.component';
 import { HelppinComponent } from './helppin/helppin.component';
 import { HavepinComponent } from './havepin/havepin.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -40,7 +40,6 @@ import {
 @NgModule({
   declarations: [
     AppComponent,
-    WeatherComponent,
     SignupComponent,
     LoginComponent,
     MapComponent,
@@ -56,6 +55,7 @@ import {
     PasswordComponent,
     HelppinComponent,
     HavepinComponent,
+    RemovepinComponent,
   ],
   imports: [
     CommonModule,
@@ -86,6 +86,7 @@ import {
     PasswordComponent,
     HelppinComponent,
     HavepinComponent,
+    RemovepinComponent,
   ],
   providers: [
     UiService,
