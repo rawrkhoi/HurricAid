@@ -67,12 +67,12 @@ export class MapComponent implements OnInit {
   }
   helpBox(): void {
     this.dialog.open(HelppinComponent, {
-      width: '500px',
+      width: '380px',
     });
   }
   haveBox(): void {
     this.dialog.open(HavepinComponent, {
-      width: '500px',
+      width: '380px',
     });
   }
 }
