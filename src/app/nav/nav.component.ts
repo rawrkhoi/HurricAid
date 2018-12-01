@@ -11,7 +11,6 @@ export class NavComponent implements OnInit {
   showMenu = false;
   darkModeActive: boolean;
 
-  userEmail: string;
   name: string = 'Please Log In';
 
   constructor(public ui: UiService, private http: HttpClient) {

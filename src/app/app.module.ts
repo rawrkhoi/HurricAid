@@ -14,6 +14,11 @@ import { NewsComponent } from './news/news.component';
 import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
 import { SplashComponent } from './splash/splash.component';
+import { FirstnameComponent } from './profile/components/firstname/firstname.component';
+import { LastnameComponent } from './profile/components/lastname/lastname.component';
+import { EmailComponent } from './profile/components/email/email.component';
+import { PhoneComponent } from './profile/components/phone/phone.component';
+import { PasswordComponent } from './profile/components/password/password.component';
 import { HelppinComponent } from './helppin/helppin.component';
 import { HavepinComponent } from './havepin/havepin.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -44,6 +49,11 @@ import {
     InfoComponent,
     NavComponent,
     SplashComponent,
+    FirstnameComponent,
+    LastnameComponent,
+    EmailComponent,
+    PhoneComponent,
+    PasswordComponent,
     HelppinComponent,
     HavepinComponent,
   ],
@@ -69,6 +79,11 @@ import {
     })
   ],
   entryComponents: [
+    FirstnameComponent,
+    LastnameComponent,
+    EmailComponent,
+    PhoneComponent,
+    PasswordComponent,
     HelppinComponent,
     HavepinComponent,
   ],
