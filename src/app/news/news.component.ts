@@ -20,7 +20,7 @@ export class NewsComponent implements OnInit {
 
   ngOnInit() {
     this.map.getLocation().subscribe(data => {
-      console.log(data);
+      // console.log(data);
       this.lat = data.latitude;
       this.lng = data.longitude;
       this.http.get((`https://api.predicthq.com/v1/events/?category=severe-weather,disasters,terror&within=10km@${this.lat},${this.lng}`), 
