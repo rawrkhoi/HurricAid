@@ -483,19 +483,32 @@ app.post('/sms', (req, res) => {
     if (req.session.counter > 0) {
       textObj.message = req.body.Body;
       
+      let supplyStr = '';
+      let foodInfo = {
+        foodKeywords: ["food industry", "food and drink"],
+        foodTable: 'Food'
+      };
       nlu.analyze(
         {
-          text: textObj.message, // Buffer or String
+          text: textObj.message,
           features: {
-            categories: {},
-            keywords: {}
+            categories: {}
           }
         },
         function (err, response) {
+          let resultStr = '';
           if (err) {
-            console.log('error:', err);
+            console.error(err);
           } else {
-            console.log(JSON.stringify(response, null, 2));
+            response.categories.map((result) => {
+              resultStr += result.label;
+            })
+            foodInfo.foodKeywords.forEach((keyword) => {
+              if (resultStr.includes(keyword)){
+                supplyStr = foodInfo.foodTable;
+              }
+            })
+            console.log(supplyStr, 'YES INDEED GIRL U GOT THIS');
           }
         }
       );
