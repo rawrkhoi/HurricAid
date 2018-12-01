@@ -12,18 +12,14 @@ import * as moment from 'moment';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-  zoom: number = 8;
-  model: any = {};
 
-  message: string;
-  address: string;
+  zoom: number = 8;
   lat: any;
   lng: any;
   markers: any = [];
 
   haveUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|4286f4';
   helpUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000';
-
 
   constructor(private map: MapsService, private http: HttpClient, public dialog: MatDialog) {
   }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UiService } from './ui/ui.service';
+import { UiService } from '../service/ui.service';
 import { HttpClient } from '@angular/common/http';
 
 @Component({

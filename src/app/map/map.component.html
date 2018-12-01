@@ -1,56 +1,59 @@
 <h1 style="text-align: center"><u>Map Markers</u></h1>
-<button mat-fab color="warn" (click)="helpBox()">Help</button>
-<button mat-fab color="primary" (click)="haveBox()">Have</button>
+<button mat-fab class="pin-box" color="warn" (click)="helpBox()">Help</button>
+<button mat-fab class="pin-box" color="primary" (click)="haveBox()">Have</button>
+<br><br>
+<div class="map-full-card-content">
+  <agm-map
+    [gestureHandling]="cooperative"
+    [scrollwheel]="null"
+    [streetViewControl]="false"
+    [latitude]="lat"
+    [longitude]="lng"
+    [zoom]="zoom"
+  >
+    <div *ngFor="let m of markers;let i = index">
+      <agm-marker
+        *ngIf="m.help"
+        [latitude]="m.latitude"
+        [longitude]="m.longitude"
+        [iconUrl]="helpUrl"
+      >
+        <agm-info-window>
+          <div>
+            <strong>Help</strong>
+          </div>
+          {{m.message}}
+          <br>
+          <i>Address: </i> {{m.address}}
+          <br>
+          <i>Created: </i> {{m.createdAt}}
+          <br>
+          <!-- <button mat-flat-button color="warn">Remove Pin</button> -->
+        </agm-info-window>
+      </agm-marker>
 
-<hr>
-<agm-map
-  [latitude]="lat"
-  [longitude]="lng"
-  [zoom]="zoom"
->
-  <div *ngFor="let m of markers;let i = index">
-    <agm-marker
-      *ngIf="m.help"
-      [latitude]="m.latitude"
-      [longitude]="m.longitude"
-      [iconUrl]="helpUrl"
-    >
-      <agm-info-window>
-        <div>
-          <strong>Help</strong>
-        </div>
-        {{m.message}}
-        <br>
-        <i>Address: </i> {{m.address}}
-        <br>
-        <i>Created: </i> {{m.createdAt}}
-        <br>
-        <!-- <button mat-flat-button color="warn">Remove Pin</button> -->
-      </agm-info-window>
-    </agm-marker>
-
-    <agm-marker
-      *ngIf="m.have"
-      [latitude]="m.latitude"
-      [longitude]="m.longitude"
-      [iconUrl]="haveUrl"
-    >
-      <agm-info-window>
-        <div>
-          <strong>Have</strong>
-        </div>
-        {{m.message}}
-        <br>
-        <i>Address: </i> {{m.address}}
-        <br>
-        <i>Created: </i> {{m.createdAt}}
-        <br>
-        <!-- <button mat-flat-button color="warn">Remove Pin</button> -->
-      </agm-info-window>
-    </agm-marker>
-  </div>
-</agm-map>
-<hr>
+      <agm-marker
+        *ngIf="m.have"
+        [latitude]="m.latitude"
+        [longitude]="m.longitude"
+        [iconUrl]="haveUrl"
+      >
+        <agm-info-window>
+          <div>
+            <strong>Have</strong>
+          </div>
+          {{m.message}}
+          <br>
+          <i>Address: </i> {{m.address}}
+          <br>
+          <i>Created: </i> {{m.createdAt}}
+          <br>
+          <!-- <button mat-flat-button color="warn">Remove Pin</button> -->
+        </agm-info-window>
+      </agm-marker>
+    </div>
+  </agm-map>
+</div>
 <!-- <div class="container">
   <div class="row">
     <div class="col-md-8 offset-md-2">

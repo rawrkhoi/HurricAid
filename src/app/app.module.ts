@@ -18,7 +18,7 @@ import { HelppinComponent } from './helppin/helppin.component';
 import { HavepinComponent } from './havepin/havepin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
-import { UiService } from './nav/ui/ui.service';
+import { UiService } from './service/ui.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
