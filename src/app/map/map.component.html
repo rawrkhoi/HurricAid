@@ -1,5 +1,5 @@
 <h1 style="text-align: center"><u>Map Markers</u></h1>
-<button mat-fab class="pin-box" color="warn" (click)="helpBox()">Help</button>
+<button mat-fab class="pin-box" color="warn" (click)="helpBox()" *ngIf="isLoggedIn$ | async">Help</button>
 <button mat-fab class="pin-box" color="primary" (click)="haveBox()">Have</button>
 <br><br>
 <div class="map-full-card-content">
@@ -13,7 +13,7 @@
   >
     <div *ngFor="let m of markers;let i = index">
       <agm-marker
-        *ngIf="m.help"
+        *ngIf="m.help && isLoggedIn$ | async"
         [latitude]="m.latitude"
         [longitude]="m.longitude"
         [iconUrl]="helpUrl"
