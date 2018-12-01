@@ -63,6 +63,7 @@
     "ts-loader": "4.2.0",
     "tslint-config-airbnb": "^5.11.1",
     "twilio": "^3.24.0",
+    "watson-developer-cloud": "^3.13.1",
     "webpack-cli": "^2.1.4",
     "zone.js": "~0.8.26"
   },

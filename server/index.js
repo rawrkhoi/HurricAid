@@ -17,6 +17,14 @@ const googleMapsClient = require('@google/maps').createClient({
   key: config.keys.geocode,
   Promise: Promise
 })
+const discovery = new DiscoveryV1({
+  url: 'https://gateway-tok.watsonplatform.net/natural-language-understanding/api',
+  version: '<version-date>',
+  iam_apikey: 'config.keys.watson',
+  // iam_url: '<iam_url>', // optional - the default value is https://iam.bluemix.net/identity/token
+});
+
+
 const app = express();
 
 app.use(express.static(`${__dirname}/../dist/browser`));
