@@ -14,9 +14,11 @@ import { NewsComponent } from './news/news.component';
 import { InfoComponent } from './info/info.component';
 import { NavComponent } from './nav/nav.component';
 import { SplashComponent } from './splash/splash.component';
+import { HelppinComponent } from './helppin/helppin.component';
+import { HavepinComponent } from './havepin/havepin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AgmCoreModule } from '@agm/core';
-import { UiService } from './nav/ui/ui.service';
+import { UiService } from './service/ui.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -42,6 +44,8 @@ import {
     InfoComponent,
     NavComponent,
     SplashComponent,
+    HelppinComponent,
+    HavepinComponent,
   ],
   imports: [
     CommonModule,
@@ -63,6 +67,10 @@ import {
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`
     })
+  ],
+  entryComponents: [
+    HelppinComponent,
+    HavepinComponent,
   ],
   providers: [
     UiService,

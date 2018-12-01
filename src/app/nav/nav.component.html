@@ -7,27 +7,26 @@
       </div>
       <div class="account-details">
         <span class="name__text">{{name}}</span>
-        <span class="email__text">{{userEmail}}</span>
       </div>
     </section>
     <section class="menu-body">
       <nav>
         <ul>
-          <div><a style="text-decoration: none" routerLink="/">Home</a></div>
-          <br>
           <!-- <div><a style="text-decoration: none" routerLink="/signup">Sign Up</a></div>
-          <br>
-          <div><a style="text-decoration: none" routerLink="/login">Login</a></div>
           <br> -->
-          <div><a style="text-decoration: none" routerLink="/map">Map</a></div>
+          <!-- <div><a style="text-decoration: none" routerLink="/login">Login</a></div>
+          <br> -->
+          <!-- <div><a style="text-decoration: none" routerLink="/weather" (click)="toggleMenu()">Weather</a></div>
+          <br> -->
+          <div><a style="text-decoration: none" routerLink="/" (click)="toggleMenu()">Home</a></div>
           <br>
-          <div><a style="text-decoration: none" routerLink="/weather">Weather</a></div>
+          <div><a style="text-decoration: none" routerLink="/map" (click)="toggleMenu()">Map</a></div>
           <br>
-          <div><a style="text-decoration: none" routerLink="/news">News</a></div>
+          <div><a style="text-decoration: none" routerLink="/news" (click)="toggleMenu()">News</a></div>
           <br>
-          <div><a style="text-decoration: none" routerLink="/info">Information</a></div>
+          <div><a style="text-decoration: none" routerLink="/info" (click)="toggleMenu()">Information</a></div>
           <br>
-          <div><a style="text-decoration: none" routerLink="/profile">Profile</a></div>
+          <div><a style="text-decoration: none" routerLink="/profile" (click)="toggleMenu()">Profile</a></div>
           <br>
         </ul>
       </nav>
@@ -66,7 +65,7 @@
     <h3 class="date__text"></h3>
 
     <div class="mode-toggle__container">
-        <a style="text-decoration: none" routerLink="/logout">Logout</a>
+        <!-- <a style="text-decoration: none" routerLink="/logout">Logout</a> -->
     </div>
   </header>
 
