@@ -135,7 +135,6 @@ app.post('/signup', (req, res) => {
   });
 });
 
-
 // Login========================================
 app.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, cred) => {
@@ -150,7 +149,6 @@ app.post('/login', (req, res, next) => {
         return next(err);
       }
       return req.session.regenerate(() =>{
-        req.session.cred = cred.email;
         req.session.credId = cred.id;
         res.send('true');
       })
@@ -161,40 +159,53 @@ app.post('/login', (req, res, next) => {
 
 app.post('/addPin', (req, res) => {
   let { help, have, message, address, lat, lng, supply } = req.body.pin;
-  db.pin.create({
-    help: help,
-    have: have,
-    message: message,
-    address: address, 
-    latitude: lat,
-    longitude: lng,
-  }, (error) => {
-    console.log('error creating pin: ', error);
-    res.status(500).send(error);
-  }).then(() => {
-    db.pin.findOne({ where: { address: address }, raw:true }, 
-      (error) => {
-        console.log('error finding pin: ', error);
-        res.status(500).send(error);
-      }).then((pin) => {
-      if (pin.have === true){
-        supply.forEach((sup) => {
-          db.supply_info.create({
-            id_supply: sup,
-            id_pin: pin.id,
-          }, (error) => {
-            console.log('error adding supply info: ', error);
-            res.status(500).send(error);
-          });
-        });
-      }
-      console.log('pin created', pin);
-      res.status(201).send(pin);
-    }, (error) => {
-      console.log('error finding pin: ', error);
+  if(req.session.credId){
+    db.user.findOne({ where: { id_credential: req.session.credId }, raw:true }, (error) => {
+      console.log('error finding user: ', error);
       res.status(500).send(error);
-    }); 
-  }); 
+    }).then((user) => {
+      db.phone.findOne({ where: { id: user.id_phone }, raw:true }, (error) => {
+        console.log('error finding phone: ', error);
+        res.status(500).send(error);
+      }).then((ph) => {
+        db.pin.create({
+          help: help,
+          have: have,
+          message: message,
+          id_phone: ph.id,
+          address: address, 
+          latitude: lat,
+          longitude: lng,
+        }, (error) => {
+          console.log('error creating pin: ', error);
+          res.status(500).send(error);
+        }).then(() => {
+          db.pin.findOne({ where: { address: address }, raw:true }, 
+            (error) => {
+              console.log('error finding pin: ', error);
+              res.status(500).send(error);
+            }).then((pin) => {
+            if (pin.have === true){
+              supply.forEach((sup) => {
+                db.supply_info.create({
+                  id_supply: sup,
+                  id_pin: pin.id,
+                }, (error) => {
+                  console.log('error adding supply info: ', error);
+                  res.status(500).send(error);
+                });
+              });
+            }
+            console.log('pin created', pin);
+            res.status(201).send(pin);
+          }, (error) => {
+            console.log('error finding pin: ', error);
+            res.status(500).send(error);
+          }); 
+        }); 
+      });
+    });
+  }
 }); 
 
 app.get('/getPins', (req, res) => {
@@ -213,6 +224,86 @@ app.get('/getSupplies', (req, res) => {
     console.log('error finding supplies: ', error);
     res.status(500).send(error);
   });
+});
+
+app.get('/getInfo', (req, res) => {
+  let credId = req.session.credId;
+  if (credId){
+    db.user.findOne({ where: { id_credential: credId }, raw:true }, (error) => {
+      console.log('error finding user: ', error);
+      res.status(500).send(error);
+    }).then((user) => {
+      db.phone.findOne({ where: { id: user.id_phone }, raw:true }, (error) => {
+        console.log('error finding phone: ', error);
+        res.status(500).send(error);
+      }).then((ph) => {
+        db.credential.findOne({ where: { id: user.id_credential }, raw:true }, (error) => {
+          console.log('error finding cred: ', error);
+          res.status(500).send(error);
+        }).then((cred) => {
+          let info = {
+            usr: user,
+            email: cred.email,
+            phoneNum: ph.number,
+          }
+          res.status(200).send(info);
+        });
+      });
+    });
+  } else {
+    res.send();
+  }
+}); 
+
+app.post('/updateInfo', (req, res) => {
+  let { firstName, lastName, email, phone, password, current } = req.body;
+  console.log(password, 'password');
+  console.log(current, 'current');
+  if(firstName){
+    db.user.update({ name_first: firstName }, { where: { id_credential: req.session.credId } }).then(() => {
+      console.log('first name updated');
+    });
+  }
+  if(lastName){
+    db.user.update({ name_last: lastName }, {  where: { id_credential: req.session.credId } }).then(() => {
+      console.log('last name updated');
+    });
+  }
+  if(email){
+    db.credential.update({ email: email }, {  where: { id: req.session.credId } }).then(() => {
+      console.log('email updated');
+    });
+  }
+  if(phone){
+    db.user.findOne({ where: { id_credential: req.session.credId }, raw:true }, (error) => {
+      console.log('error finding user: ', error);
+      res.status(500).send(error);
+    }).then((user) => {
+      db.phone.update({ number: phone}, { where: { id: user.id_phone } }).then(() => {
+        console.log('phone number updated');
+      });
+    });
+  }
+  if(password && current){
+    db.credential.findOne({ where: { id: req.session.credId }, raw:true }, (error) => {
+      console.log('error finding cred: ', error);
+      res.status(500).send(error);
+    }).then((cred) => {
+      if (bcrypt.compareSync(current, cred.password) === true) {
+        console.log('here');
+        var generateHash = function (pws) {
+          return bcrypt.hashSync(pws, bcrypt.genSaltSync(8), null);
+        };
+        var cryptPassword = generateHash(password);
+        db.credential.update({ password: cryptPassword }, { where: { id: req.session.credId } }, (error) => {
+          console.log('error updating password: ', error);
+          res.status(500).send(error);
+        }).then(() => {
+          console.log('password updated');
+        });
+      }
+    });
+  }
 });
 
 app.post('/sms', (req, res) => {
@@ -291,7 +382,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What would you like to offer? Text Food, Water, or Shelter and details',
+      body: 'What would you like to offer?',
     }).then(() => {
       return db.phone.findOne({
         where: { number: textObj.number },
@@ -327,7 +418,8 @@ app.post('/sms', (req, res) => {
         latitude: latitude,
         longitude: longitude,
       }) 
-    }).then(() => {
+    }).then((pin) => {
+      req.session.pinId = pin.id;
       req.session.counter = smsCount + 1;
       console.log(req.session, 'REQUEST SESSION, LOOK FOR COMMAND AND COUNTER');
       res.send('done');
@@ -412,33 +504,34 @@ app.post('/sms', (req, res) => {
       let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
         let addHaves = (supply) => {
-          return db.supply.findOne({
+          db.supply.findOne({
             attributes: ['id'],
             where: {
               type: supply,
             },
             raw: true
           }).then((supplyId) => {
-            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pinId) => {
               return db.supply_info.create({
                 id_supply: supplyId.id,
-                id_pin: pinId.id,
+                id_pin: req.session.pinId,
               }).then(() => {
                 return db.pin.update({ message: req.body.Body },
                   {
                     where: {
-                      id: `${pinId.id}`,
+                      id: req.session.pinId,
                       have: true,
                       address: req.session.address,
                     }
                   })
               })
-            }).then(() => {
+            .then(() => {
               return client.messages.create({
                 from: '15043020292',
                 to: textObj.number,
                 body: 'Thank you! Your offering has been added to the map.',
               })
+            }).then(() => {
+              req.session.pinId = null;
             }).catch((err) => {
               console.error(err);
             })
@@ -581,30 +674,6 @@ app.post('/sms', (req, res) => {
 
 }
 });
-
-app.get('/getInfo', (req, res) => {
-  let credEmail = req.session.cred;
-  let credId = req.session.credId;
-
-  if (req.session.cred){
-    db.user.findOne({ where: { id_credential: credId }, raw:true }, (error) => {
-      console.log('error finding user: ', error);
-      res.status(500).send(error);
-    }).then((user) => {
-      let info = {
-        usr: user,
-        email: credEmail
-      }
-      res.status(200).send(info);
-    });
-  } else {
-    res.send();
-  }
-}); 
-
-app.get('/searchPins', (req, res) => {
-
-})
 
 // for page refresh
 app.use(fallback('index.html', {root: './dist/browser'}));
