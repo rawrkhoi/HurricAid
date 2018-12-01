@@ -25,10 +25,28 @@ export class MapComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.map.getLocation().subscribe(data => {
-      this.lat = data.latitude;
-      this.lng = data.longitude;
-    });
+    // location by browser or by ip if error or navigator unavailable
+    if (!navigator.geolocation) {
+      this.map.getLocation().subscribe(data => {
+        this.lat = data.latitude;
+        this.lng = data.longitude;
+      });
+    }
+    const success = (position) => {
+      console.log(this);
+      this.lat = position.coords.latitude;
+      this.lng = position.coords.longitude;
+    }
+
+    const error = () => {
+      this.map.getLocation().subscribe(data => {
+        this.lat = data.latitude;
+        this.lng = data.longitude;
+      });
+    }
+
+    navigator.geolocation.getCurrentPosition(success, error);
+
     // query all the pins from db and push to markers
     this.http.get('/getPins').subscribe((pins: any) => {
       for (let i = 0; i < pins.length; i ++) {
@@ -57,61 +75,4 @@ export class MapComponent implements OnInit {
       width: '500px',
     });
   }
-  // setMsgAddress() {
-  //   const supplyTypes = [];
-  //   for (let i = 0; i < this.supplyOptions.length; i++) {
-  //     if (this.supplyOptions[i].value === true) {
-  //       supplyTypes.push(this.supplyOptions[i].id);
-  //     }
-  //   }
-  //   this.message = this.model.message;
-  //   this.address = this.model.address;
-  //   this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
-  //     {
-  //       params: {
-  //         address: this.address,
-  //         key: keys.geocode,
-  //       }
-  //     })
-  //     .subscribe((response: any) => {
-  //       const newPin = {
-  //         help: this.help,
-  //         have: this.have,
-  //         message: this.message,
-  //         lat: response.results[0].geometry.location.lat,
-  //         lng: response.results[0].geometry.location.lng,
-  //         address: response.results[0].formatted_address,
-  //         supply: supplyTypes,
-  //       }
-  //       // insert the pin into the database
-  //       const headers = new HttpHeaders({
-  //         'Content-Type': 'application/json',
-  //       });
-  //       const options = {
-  //         headers,
-  //         withCredentials: true
-  //       };
-  //       this.http.post('/addPin', { pin: newPin }, options).subscribe((data) => {
-  //         console.log(data);
-  //       });
-  //     })
-  // }
-  // toggleHelp() {
-  //   this.help = true;
-  //   this.have = false;
-  // }
-  // toggleHave() {
-  //   this.have = true;
-  //   this.help = false;
-  // }
-  // getAddress() {
-  //   this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
-  //     {
-  //       params: {
-  //         latlng: `${this.lat},${this.lng}`,
-  //         key: keys.geocode,
-  //       }
-  //     })
-  //     .subscribe((response) => {})
-  // }
 }

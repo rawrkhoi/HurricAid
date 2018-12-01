@@ -60,7 +60,7 @@ export class ProfileComponent implements OnInit {
 
   editPassword(): void {
     this.dialog.open(PasswordComponent, {
-      width: '250px',
+      width: '300px',
     });
   }
 
