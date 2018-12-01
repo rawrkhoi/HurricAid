@@ -9,6 +9,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class PasswordComponent implements OnInit {
   model: any = {};
   constructor(private http: HttpClient) { }
+  oldHide = false;
+  newHide = false;
 
   ngOnInit() {
   }

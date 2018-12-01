@@ -15,8 +15,7 @@ export interface DialogData {
   styleUrls: ['./splash.component.css']
 })
 export class SplashComponent implements OnInit {
-  animal: string;
-  name: string;
+
   constructor(public dialog: MatDialog, private router: Router) { }
 
   ngOnInit() {
@@ -26,12 +25,12 @@ export class SplashComponent implements OnInit {
   }
   loginBox(): void {
     this.dialog.open(LoginComponent, {
-      width: '400px',
+      width: '300px',
     });
   }
   signUpBox(): void {
     this.dialog.open(SignupComponent, {
-      width: '400px',
+      width: '300px',
     });
   }
   info() {
