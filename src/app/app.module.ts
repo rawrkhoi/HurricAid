@@ -18,6 +18,7 @@ import { LastnameComponent } from './profile/components/lastname/lastname.compon
 import { EmailComponent } from './profile/components/email/email.component';
 import { PhoneComponent } from './profile/components/phone/phone.component';
 import { PasswordComponent } from './profile/components/password/password.component';
+import { RemovepinComponent } from './profile/components/removepin/removepin.component';
 import { HelppinComponent } from './helppin/helppin.component';
 import { HavepinComponent } from './havepin/havepin.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -54,6 +55,7 @@ import {
     PasswordComponent,
     HelppinComponent,
     HavepinComponent,
+    RemovepinComponent,
   ],
   imports: [
     CommonModule,
@@ -84,6 +86,7 @@ import {
     PasswordComponent,
     HelppinComponent,
     HavepinComponent,
+    RemovepinComponent,
   ],
   providers: [
     UiService,

@@ -35,52 +35,32 @@ export class ProfileComponent implements OnInit {
   }
 
   editFirst(): void {
-    const dialogRef = this.dialog.open(FirstnameComponent, {
-      width: '500px',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+    this.dialog.open(FirstnameComponent, {
+      width: '250px',
     });
   }
 
   editLast(): void {
-    const dialogRef = this.dialog.open(LastnameComponent, {
-      width: '500px',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+    this.dialog.open(LastnameComponent, {
+      width: '250px',
     });
   }
 
   editEmail(): void {
-    const dialogRef = this.dialog.open(EmailComponent, {
-      width: '500px',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+    this.dialog.open(EmailComponent, {
+      width: '250px',
     });
   }
 
   editPhone(): void {
-    const dialogRef = this.dialog.open(PhoneComponent, {
-      width: '500px',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+    this.dialog.open(PhoneComponent, {
+      width: '250px',
     });
   }
 
   editPassword(): void {
-    const dialogRef = this.dialog.open(PasswordComponent, {
-      width: '500px',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+    this.dialog.open(PasswordComponent, {
+      width: '250px',
     });
   }
 
