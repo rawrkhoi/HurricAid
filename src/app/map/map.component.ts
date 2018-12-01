@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MapsService } from '../service/maps.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { HelppinComponent } from '../helppin/helppin.component';
 import { HavepinComponent } from '../havepin/havepin.component';
 import { MatDialog } from '@angular/material';
