@@ -372,7 +372,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What would you like to offer? Text Food, Water, or Shelter and details',
+      body: 'What would you like to offer?',
     }).then(() => {
       return db.phone.findOne({
         where: { number: textObj.number },
@@ -408,7 +408,8 @@ app.post('/sms', (req, res) => {
         latitude: latitude,
         longitude: longitude,
       }) 
-    }).then(() => {
+    }).then((pin) => {
+      req.session.pinId = pin.id;
       req.session.counter = smsCount + 1;
       console.log(req.session, 'REQUEST SESSION, LOOK FOR COMMAND AND COUNTER');
       res.send('done');
@@ -474,33 +475,34 @@ app.post('/sms', (req, res) => {
       let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
         let addHaves = (supply) => {
-          return db.supply.findOne({
+          db.supply.findOne({
             attributes: ['id'],
             where: {
               type: supply,
             },
             raw: true
           }).then((supplyId) => {
-            db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pinId) => {
               return db.supply_info.create({
                 id_supply: supplyId.id,
-                id_pin: pinId.id,
+                id_pin: req.session.pinId,
               }).then(() => {
                 return db.pin.update({ message: req.body.Body },
                   {
                     where: {
-                      id: `${pinId.id}`,
+                      id: req.session.pinId,
                       have: true,
                       address: req.session.address,
                     }
                   })
               })
-            }).then(() => {
+            .then(() => {
               return client.messages.create({
                 from: '15043020292',
                 to: textObj.number,
                 body: 'Thank you! Your offering has been added to the map.',
               })
+            }).then(() => {
+              req.session.pinId = null;
             }).catch((err) => {
               console.error(err);
             })
