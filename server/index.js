@@ -14,17 +14,17 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
 const fs = require('fs');
-var NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
+const NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
 const googleMapsClient = require('@google/maps').createClient({
   key: config.keys.geocode,
   Promise: Promise
 })
-
-var nlu = new NaturalLanguageUnderstandingV1({
+const nlu = new NaturalLanguageUnderstandingV1({
   iam_apikey: config.keys.watson,
   version: '2018-04-05',
   url: 'https://gateway-tok.watsonplatform.net/natural-language-understanding/api/'
 });
+const watsonCats = require('../watson/keywords');
 
 
 const app = express();
@@ -484,35 +484,37 @@ app.post('/sms', (req, res) => {
       textObj.message = req.body.Body;
       
       let supplyStr = '';
-      let foodInfo = {
-        foodKeywords: ["food industry", "food and drink"],
-        foodTable: 'Food'
-      };
-      nlu.analyze(
-        {
-          text: textObj.message,
-          features: {
-            categories: {}
-          }
-        },
-        function (err, response) {
-          let resultStr = '';
-          if (err) {
-            console.error(err);
-          } else {
-            response.categories.map((result) => {
-              resultStr += result.label;
-            })
-            foodInfo.foodKeywords.forEach((keyword) => {
-              if (resultStr.includes(keyword)){
-                supplyStr = foodInfo.foodTable;
+      let analyzeCat = () => {
+        return new Promise ((res, rej) => {
+          nlu.analyze(
+            {
+              text: textObj.message,
+              features: {
+                categories: {}
               }
-            })
-            console.log(supplyStr, 'YES INDEED GIRL U GOT THIS');
-          }
-        }
-      );
-
+            },
+            function (err, response) {
+              let catStr = '';
+              if (err) {
+                console.error(err);
+              } else {
+                console.log(response);
+                response.categories.map((result) => {
+                  catStr += result.label;
+                });
+                Object.values(watsonCats.watsonCategories).forEach((category) => {
+                  category.keywords.forEach((keyword) => {
+                    if (catStr.includes(keyword)){
+                      supplyStr = category.table;
+                    }
+                  })
+                })
+                res(supplyStr);
+              }
+            }
+          );
+        })
+      }
 
       let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
@@ -550,15 +552,18 @@ app.post('/sms', (req, res) => {
             })
           })
         }
-        if (split.includes('water')) {
-          addHaves('Water');
-        }
-        if (split.includes('food')) {
-          addHaves('Food');
-        } 
-        if (split.includes('shelter')) {
-          addHaves('Shelter');
-        }
+        analyzeCat().then((tableName) => {
+          if (tableName === "Water"){
+            addHaves('Water');
+          }
+          if (tableName === "Food"){
+            addHaves('Food');
+          }
+          if (tableName === "Shelter") {
+            addHaves('Shelter');
+          }
+          // ADD THE REST OF THE CATEGORIES HERE!!!!!!!!!!!
+        })
       } else if (req.session.command === 'need'){
         let needSupply = (supply) => {
           let addressString = '';
