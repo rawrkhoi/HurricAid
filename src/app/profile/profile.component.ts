@@ -5,6 +5,7 @@ import { LastnameComponent} from './components/lastname/lastname.component';
 import { EmailComponent} from './components/email/email.component';
 import { PhoneComponent} from './components/phone/phone.component';
 import { PasswordComponent} from './components/password/password.component';
+import { ManageComponent } from './components/manage/manage.component';
 import { HttpClient } from '@angular/common/http';
 
 export interface DialogData {
@@ -62,6 +63,12 @@ export class ProfileComponent implements OnInit {
     this.dialog.open(PasswordComponent, {
       width: '300px',
     });
+  }
+
+  managePins(): void {
+    this.dialog.open(ManageComponent, {
+      width: '300px'
+    })
   }
 
 }

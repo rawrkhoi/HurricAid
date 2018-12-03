@@ -18,6 +18,7 @@ import { LastnameComponent } from './profile/components/lastname/lastname.compon
 import { EmailComponent } from './profile/components/email/email.component';
 import { PhoneComponent } from './profile/components/phone/phone.component';
 import { PasswordComponent } from './profile/components/password/password.component';
+import { ManageComponent } from './profile/components/manage/manage.component';
 import { RemovepinComponent } from './profile/components/removepin/removepin.component';
 import { HelppinComponent } from './helppin/helppin.component';
 import { HavepinComponent } from './havepin/havepin.component';
@@ -56,6 +57,7 @@ import {
     HelppinComponent,
     HavepinComponent,
     RemovepinComponent,
+    ManageComponent,
   ],
   imports: [
     CommonModule,
@@ -87,6 +89,7 @@ import {
     HelppinComponent,
     HavepinComponent,
     RemovepinComponent,
+    ManageComponent,
   ],
   providers: [
     UiService,
