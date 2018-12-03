@@ -41,7 +41,6 @@ export class NavComponent implements OnInit {
 
   logout(): void {
     this.http.get('/logout').subscribe(() => {
-      this.toggleMenu();
       this.router.navigate(['/']);
     });
   }

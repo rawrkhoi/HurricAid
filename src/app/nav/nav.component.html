@@ -9,7 +9,6 @@
         <span class="name__text">{{name}}</span>
       </div>
       <br>
-      <button (click)="logout()">Logout</button>
     </section>
     <section class="menu-body">
       <nav>
@@ -65,7 +64,7 @@
     <h3 class="date__text"></h3>
 
     <div class="mode-toggle__container">
-        <!-- <a style="text-decoration: none" routerLink="/logout">Logout</a> -->
+        <button mat-button color="primary" (click)="logout()">Logout</button>
     </div>
   </header>
 
