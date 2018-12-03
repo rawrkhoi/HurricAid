@@ -17,6 +17,8 @@ export interface DialogData {
 export class SplashComponent implements OnInit {
   animal: string;
   name: string;
+  
+  imgSrc: string = '../../hurricane.png'; 
   constructor(public dialog: MatDialog, private router: Router) { }
 
   ngOnInit() {
