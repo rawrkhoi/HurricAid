@@ -562,7 +562,31 @@ app.post('/sms', (req, res) => {
           if (tableName === "Shelter") {
             addHaves('Shelter');
           }
-          // ADD THE REST OF THE CATEGORIES HERE!!!!!!!!!!!
+          if (tableName === "Equipment"){
+            addHaves('Equipment');
+          }
+          if (tableName === "Clothing") {
+            addHaves('Clothing');
+          }
+          if (tableName === "Power") {
+            addHaves('Power');
+          }
+          if (tableName === "Pet") {
+            addHaves('Pet');
+          }
+          if (tableName === "Transportation") {
+            addHaves('Transportation');
+          }
+          if (tableName === "Health") {
+            addHaves('Health');
+          }
+          if (tableName === "Household") {
+            addHaves('Household');
+          }
+          // we need to do something about the other condition
+          if (tableName === "Other") {
+            addHaves('Other');
+          }
         })
       } else if (req.session.command === 'need'){
         let needSupply = (supply) => {
