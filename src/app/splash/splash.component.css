@@ -1,10 +1,9 @@
-#name{
-  padding-top: 50px;
-  color: blue;
-  fill: "#432c85";
-  font-family: "SegoeUI-Semibold,Segoe UI";
-  font-size: "100";
-  font-weight: "600";
+.test {
+  background-color: #3E7CB1;
+}
+
+.test2 {
+  background-color: #829CBC;
 }
 img { 
   margin: 20px 0px 0px 0px;
