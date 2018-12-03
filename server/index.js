@@ -471,7 +471,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What do you need? Text Food, Water, or Shelter',
+      body: 'What do you need? Please tell us in 3 words or more.',
     }).then(() => {
       return googleMapsClient.geocode({
         address: textObj.address
@@ -551,7 +551,6 @@ app.post('/sms', (req, res) => {
         })
       }
 
-      let split = textObj.message.toLowerCase().split(' ');
       if (req.session.command === 'have') {
         let addHaves = (supply) => {
           db.supply.findOne({
@@ -626,8 +625,8 @@ app.post('/sms', (req, res) => {
       } else if (req.session.command === 'need'){
         let needSupply = (supply) => {
           let addressString = '';
-          let pushTo = (val) => {
-            return addressString = addressString + ' * ' + val;
+          let pushTo = (addressVal, msgVal) => {
+            return addressString = addressString + ' * ' + addressVal + ': ' + msgVal;
           }
           db.supply.findOne({
             attributes: ['id'],
@@ -645,7 +644,8 @@ app.post('/sms', (req, res) => {
             }).then((pinIdArray) => {
               pinIdArray.map((pinId) => {
                 db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
-                  pushTo(pin.address);
+                  console.log(pin, 'THIS IS THE PIN WE\'RE TALKING ABOUT GUYS')
+                  pushTo(pin.address, pin.message);
                 })
               })
             }).then(() => {
@@ -659,13 +659,42 @@ app.post('/sms', (req, res) => {
             })
           })
         }
-        if (split.includes('water')){
-          needSupply('Water');
-        } else if (split.includes('food')){
-          needSupply('Food');
-        } else if (split.includes('shelter')){
-          needSupply('Shelter');
-        }
+        analyzeCat().then((tableName) => {
+          if (tableName === 'Water') {
+            needSupply('Water');
+          }
+          if (tableName === "Food") {
+            needSupply('Food');
+          }
+          if (tableName === "Shelter") {
+            needSupply('Shelter');
+          }
+          if (tableName === "Equipment") {
+            needSupply('Equipment');
+          }
+          if (tableName === "Clothing") {
+            needSupply('Clothing');
+          }
+          if (tableName === "Power") {
+            needSupply('Power');
+          }
+          if (tableName === "Pet") {
+            needSupply('Pet');
+          }
+          if (tableName === "Transportation") {
+            needSupply('Transportation');
+          }
+          if (tableName === "Health") {
+            needSupply('Health');
+          }
+          if (tableName === "Household") {
+            needSupply('Household');
+          }
+          // we need to do something about the other condition
+          if (tableName === "Other") {
+            needSupply('Other');
+          }
+        })
 
       } else if (req.session.command === 'out'){  
         let outFunc = (supply) => {
