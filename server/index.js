@@ -338,7 +338,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: "Try one of these commands: \nHelp@[address], \nHave@[address], \nNeed@[address]",
+      body: "Try one of these commands: \nHelp@Your-Address, \nHave@Your-Address, \nNeed@Your-Address",
     }).catch(err => console.error(err))
     
     // HELP //
@@ -549,6 +549,7 @@ app.post('/sms', (req, res) => {
             },
             raw: true
           }).then((supplyId) => {
+            console.log(supplyId, 'SUPPLY ID!!!!!!!!!!!!!!!')
               return db.supply_info.create({
                 id_supply: supplyId.id,
                 id_pin: req.session.pinId,
@@ -730,7 +731,9 @@ app.post('/sms', (req, res) => {
       return client.messages.create({
         from: '15043020292',
         to: textObj.number,
-        body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]',
+        body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@Your-Address, \nHave@Your-Address, \nNeed@Your-Address',
+      }).then(() => {
+        res.send('done');
       }).catch(err => console.error(err))
     }
   
