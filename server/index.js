@@ -306,6 +306,29 @@ app.post('/updateInfo', (req, res) => {
   }
 });
 
+app.get('/getPinsByUser', (req, res) => {
+  db.user.findOne({ where: { id_credential: req.session.credId }, raw:true }, (error) => {
+    console.log('error finding user: ', error); 
+    res.status(500).send(error);
+  }).then((user) => {
+    db.phone.findOne({ where: { id: user.id_phone }, raw:true }, (error) => {
+      console.log('error finding phone: ', error);
+      res.status(500).send(error);
+    }).then((ph) => {
+      db.pin.findAll({ where: { id_phone: ph.id }, raw:true }, (error) => {
+        console.log('error finding pins: ', error);
+        res.status(500).send(error);
+      }).then((userPins) => {
+        res.status(200).send(userPins);
+      });
+    });
+  });
+});
+
+app.post('/removePin', (req, res) => {
+  
+});
+
 app.post('/sms', (req, res) => {
   let textObj = {};
   const smsCount = req.session.counter || 0;

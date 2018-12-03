@@ -1,6 +1,6 @@
 .root__container {
   width: 100%;
-  height: 10%;
+  height: 100%;
   display: grid;
   grid-template-columns: auto;
   grid-template-rows: 0.5fr auto;
@@ -262,7 +262,7 @@
   left: 0;
   z-index: -2;
   opacity: 0;
-  background: white;
+  background: red;
   transition: opacity 300ms linear;
 }
 
