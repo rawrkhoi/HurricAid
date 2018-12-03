@@ -689,8 +689,39 @@ app.post('/sms', (req, res) => {
           })
         }
         analyzeCat().then((tableName) => {
-          if (tableName === 'Food'){
+          if (tableName === 'Water'){
+            outFunc('Water');
+          }
+          if (tableName === "Food") {
             outFunc('Food');
+          }
+          if (tableName === "Shelter") {
+            outFunc('Shelter');
+          }
+          if (tableName === "Equipment") {
+            outFunc('Equipment');
+          }
+          if (tableName === "Clothing") {
+            outFunc('Clothing');
+          }
+          if (tableName === "Power") {
+            outFunc('Power');
+          }
+          if (tableName === "Pet") {
+            outFunc('Pet');
+          }
+          if (tableName === "Transportation") {
+            outFunc('Transportation');
+          }
+          if (tableName === "Health") {
+            outFunc('Health');
+          }
+          if (tableName === "Household") {
+            outFunc('Household');
+          }
+          // we need to do something about the other condition
+          if (tableName === "Other") {
+            outFunc('Other');
           }
         })
           
