@@ -301,22 +301,29 @@ app.get('/getPinsByUser', (req, res) => {
     console.log('error finding user: ', error); 
     res.status(500).send(error);
   }).then((user) => {
-    db.phone.findOne({ where: { id: user.id_phone }, raw:true }, (error) => {
-      console.log('error finding phone: ', error);
-      res.status(500).send(error);
-    }).then((ph) => {
-      db.pin.findAll({ where: { id_phone: ph.id }, raw:true }, (error) => {
+      db.pin.findAll({ where: { id_phone: user.id_phone }, raw:true }, (error) => {
         console.log('error finding pins: ', error);
         res.status(500).send(error);
       }).then((userPins) => {
         res.status(200).send(userPins);
       });
     });
-  });
 });
 
 app.post('/removePin', (req, res) => {
-  
+  // need to delete pin by id from pins table and also delete from supply_infos table
+  let { pinId } = req.body;
+  db.supply_info.destroy({ where: { id_pin: pinId } }, (error) => {
+    console.log('error removing pin from supply infos table: ', error);
+    res.status(500).send(error);
+  }).then(() => {
+    db.pin.destroy({ where: { id: pinId } }, (error) => {
+      console.log('error removing pin from pins table: ', error);
+      res.status(500).send(error);
+    }).then(() => {
+      console.log('pin removed');
+    });
+  });
 });
 
 app.post('/sms', (req, res) => {
