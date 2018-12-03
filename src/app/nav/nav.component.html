@@ -8,13 +8,12 @@
       <div class="account-details">
         <span class="name__text">{{name}}</span>
       </div>
+      <br>
     </section>
     <section class="menu-body">
       <nav>
         <ul>
           <!-- <div><a style="text-decoration: none" routerLink="/signup">Sign Up</a></div>
-          <br> -->
-          <!-- <div><a style="text-decoration: none" routerLink="/login">Login</a></div>
           <br> -->
           <!-- <div><a style="text-decoration: none" routerLink="/weather" (click)="toggleMenu()">Weather</a></div>
           <br> -->
@@ -65,7 +64,7 @@
     <h3 class="date__text"></h3>
 
     <div class="mode-toggle__container">
-        <!-- <a style="text-decoration: none" routerLink="/logout">Logout</a> -->
+        <button mat-button color="primary" (click)="logout()">Logout</button>
     </div>
   </header>
 
