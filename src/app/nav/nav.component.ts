@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UiService } from '../service/ui.service';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-nav',
@@ -13,7 +14,7 @@ export class NavComponent implements OnInit {
 
   name: string = 'Please Log In';
 
-  constructor(public ui: UiService, private http: HttpClient) {
+  constructor(public ui: UiService, private http: HttpClient, private router: Router) {
 
   }
 
@@ -36,6 +37,13 @@ export class NavComponent implements OnInit {
 
   modeToggleSwitch() {
     this.ui.darkModeState.next(!this.darkModeActive);
+  }
+
+  logout(): void {
+    this.http.get('/logout').subscribe(() => {
+      this.toggleMenu();
+      this.router.navigate(['/']);
+    });
   }
 
 }

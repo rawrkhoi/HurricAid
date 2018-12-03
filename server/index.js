@@ -326,6 +326,11 @@ app.post('/removePin', (req, res) => {
   });
 });
 
+app.get('/logout', function(req, res){
+  req.session.destroy();
+  res.send();
+});
+
 app.post('/sms', (req, res) => {
   let textObj = {};
   const smsCount = req.session.counter || 0;
