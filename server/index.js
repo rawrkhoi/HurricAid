@@ -485,7 +485,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What are you out of? Text Food, Water, or Shelter',
+      body: 'What are you out of? Please describe in 3 or more words.',
     }).then(() => {
       return db.phone.findOne({ where: { number: textObj.number }, raw: true});
     }).then((phone) => {
@@ -549,7 +549,6 @@ app.post('/sms', (req, res) => {
             },
             raw: true
           }).then((supplyId) => {
-            console.log(supplyId, 'SUPPLY ID!!!!!!!!!!!!!!!')
               return db.supply_info.create({
                 id_supply: supplyId.id,
                 id_pin: req.session.pinId,
@@ -657,7 +656,6 @@ app.post('/sms', (req, res) => {
         }
 
       } else if (req.session.command === 'out'){  
-        let split = textObj.message.toLowerCase().split(' ');
         let outFunc = (supply) => {
           return db.supply.findOne({
             attributes: ['id'],
@@ -690,14 +688,11 @@ app.post('/sms', (req, res) => {
             }).catch(err => console.error(err))
           })
         }
-        if (split.includes('water')){
-          outFunc('Water');
-        } else if (split.includes('food')) {
-          outFunc('Food');
-        } else if (split.includes('shelter')) {
-          outFunc('Shelter')
-        }
-          
+        analyzeCat().then((tableName) => {
+          if (tableName === 'Food'){
+            outFunc('Food');
+          }
+        })
           
       } else if (req.session.command === 'help'){
           db.phone.findOne({
