@@ -569,14 +569,13 @@ app.post('/sms', (req, res) => {
                       address: req.session.address,
                     }
                   })
-              })
-            .then(() => {
-              return client.messages.create({
-                from: '15043020292',
-                to: textObj.number,
-                body: 'Thank you! Your offering has been added to the map.',
-              })
-            }).then(() => {
+              }).then(() => {
+                return client.messages.create({
+                  from: '15043020292',
+                  to: textObj.number,
+                  body: 'Thank you! Your offering has been added to the map.',
+                })
+              }).then(() => {
               req.session.pinId = null;
             }).catch((err) => {
               console.error(err);
@@ -613,9 +612,8 @@ app.post('/sms', (req, res) => {
           }
           if (tableName === "Household") {
             addHaves('Household');
-          }
-          // we need to do something about the other condition
-          if (tableName === "Other") {
+          } 
+          else if (!tableName){
             addHaves('Other');
           }
         })
@@ -687,8 +685,7 @@ app.post('/sms', (req, res) => {
           if (tableName === "Household") {
             needSupply('Household');
           }
-          // we need to do something about the other condition
-          if (tableName === "Other") {
+          else if (!tableName) {
             needSupply('Other');
           }
         })
@@ -769,8 +766,7 @@ app.post('/sms', (req, res) => {
           if (tableName === "Household") {
             outFunc('Household');
           }
-          // we need to do something about the other condition
-          if (tableName === "Other") {
+          else if (!tableName) {
             outFunc('Other');
           }
         })
