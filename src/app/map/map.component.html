@@ -1,6 +1,6 @@
 <form>
   <mat-form-field>
-    <mat-select placeholder="Select Supply" [(ngModel)]="model.selectSupply" [ngModelOptions]="{standalone: true}">
+    <mat-select [ngClass]="select" placeholder="Select Supply" [(ngModel)]="model.selectSupply" [ngModelOptions]="{standalone: true}">
       <mat-option *ngFor="let supply of supplyOptions" [value]="supply.id">
         {{supply.type}}
       </mat-option>

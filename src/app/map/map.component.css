@@ -12,8 +12,5 @@ agm-map {
   padding-top: 0%;
 }
 ::ng-deep .mat-form-field-empty.mat-form-field-label {
-  color: white;
-}
-:host /deep/ .mat-select-value-text {
-  color: white !important;
+  color: lightgray;
 }
