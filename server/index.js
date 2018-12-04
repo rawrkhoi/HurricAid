@@ -335,7 +335,7 @@ app.post('/removePin', (req, res) => {
   });
 });
 
-app.get('/filterPinsBySupply', (req, res) => {
+app.post('/filterPinsBySupply', (req, res) => {
   const { supplyId } = req.body;
   db.supply_info.findAll({ where: { id_supply: supplyId }, raw:true }, (error) => {
     console.log('error finding supply: ', error);

@@ -5,10 +5,9 @@
 .info {
   background-color: #829CBC;
 }
-img { 
-  margin: -200px 0px 0px -100px;
-  width: 50%; 
-  position: fixed;
+img {
+  max-width: 200px;
+  position: relative;
 }
 .locate {
   padding-top: 50px;
@@ -24,24 +23,22 @@ img {
   margin-left: 8px;
 }
 @keyframes ticker {
-  0% { transform: translate3d(10%, 0, 0); }
+  0% { transform: translate3d(100%, 0, 0); }
   100% { transform: translate3d(-100%, 0, 0); }
 }
 .tcontainer{
   width: 100%;
   overflow: hidden;
-  margin: -275px 0px 0px 0px;
+  margin: -230px 0px 0px 0px;
   position: fixed;
 }
 .ticker-wrap {
   width: 100%;
-  /* padding-left: 100%; */
   background-color: #eee;
 }
 .ticker-move {
   display: inline-block;
   white-space: nowrap;
-  /* padding-right: 100%; */
   animation-iteration-count: infinite;
   animation-timing-function: linear;
   animation-name: ticker;
@@ -53,4 +50,35 @@ img {
 .ticker-item{
   display: inline-block;
   padding: 0 2rem;
+}
+@media only screen and (max-width: 700px){
+  @keyframes ticker {
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+  }
+  .tcontainer{
+    width: 100%;
+    overflow: hidden;
+    margin: -170px 0px 0px 0px;
+    position: fixed;
+  }
+  .ticker-wrap {
+    width: 100%;
+    background-color: #eee;
+  }
+  .ticker-move {
+    display: inline-block;
+    white-space: nowrap;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-name: ticker;
+    animation-duration: 30s;
+  }
+  .ticker-move:hover{
+    animation-play-state: paused;
+  }
+  .ticker-item{
+    display: inline-block;
+    padding: 0 2rem;
+  }
 }

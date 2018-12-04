@@ -11,3 +11,6 @@ agm-map {
 .map-full-card-content {
   padding-top: 0%;
 }
+::ng-deep .mat-form-field-empty.mat-form-field-label {
+  color: lightgray;
+}

@@ -1,4 +1,13 @@
-<!-- <p style="text-align: center; color: aqua">Sir Maps-a-Lot</p> -->
+<form>
+  <mat-form-field>
+    <mat-select [ngClass]="select" placeholder="Select Supply" [(ngModel)]="model.selectSupply" [ngModelOptions]="{standalone: true}">
+      <mat-option *ngFor="let supply of supplyOptions" [value]="supply.id">
+        {{supply.type}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button mat-flat-button style="background-color: #3E7CB1; color: whitesmoke" (click)="sendSupply()">Filter</button>
+</form>
 <div class="map-full-card-content">
   <agm-map
     #gm
