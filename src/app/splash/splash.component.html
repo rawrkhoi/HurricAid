@@ -1,5 +1,12 @@
-<!-- <img src="../../assets/images/hurricane.png"> -->
-
+<div class="tcontainer">
+    <div class="ticker-wrap">
+      <div class="ticker-move">
+        <div class="ticker-item" *ngIf="newsDisplay">no disasters today</div>
+        <div class="ticker-item" >{{article}}</div>
+      </div>
+    </div>
+</div>
+<img src="../../assets/images/hurricane.png">
 <div class="locate">
   <button class="test" mat-raised-button color="primary" (click)="moveToMap()">What's in my area?</button>
 </div>
