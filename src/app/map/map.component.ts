@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapsService } from '../service/maps.service';
 import { HttpClient } from '@angular/common/http';
 import { HelppinComponent } from '../helppin/helppin.component';
@@ -13,9 +13,9 @@ import * as moment from 'moment';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy {
 
-  isLoggedIn$: Observable<boolean>;
+  loggedIn: boolean = false;
   zoom: number = 12;
   lat: any;
   lng: any;
@@ -31,8 +31,13 @@ export class MapComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isLoggedIn$ = this.authService.isLoggedIn;
-
+    this.http.get('/getInfo').subscribe((info: any) => {
+      if (!info) {
+        this.loggedIn = false;
+      } else {
+        this.loggedIn = true;
+      }
+    });
     // location by browser or by ip if error or navigator unavailable
     if (!navigator.geolocation) {
       this.map.getLocation().subscribe(data => {
@@ -72,14 +77,29 @@ export class MapComponent implements OnInit {
       }
     });
   }
+  ngOnDestroy() {
+    this.markers = [];
+  }
   helpBox(): void {
-    this.dialog.open(HelppinComponent, {
+    const dialogRef = this.dialog.open(HelppinComponent, {
       width: '380px',
+    });
+    this.ngOnDestroy();
+    dialogRef.afterClosed().subscribe(() => {
+      setTimeout(() => {
+        this.ngOnInit();
+      }, 3000);
     });
   }
   haveBox(): void {
-    this.dialog.open(HavepinComponent, {
+    const dialogRef = this.dialog.open(HavepinComponent, {
       width: '380px',
+    });
+    this.ngOnDestroy();
+    dialogRef.afterClosed().subscribe(() => {
+      setTimeout(() => {
+        this.ngOnInit();
+      }, 3000);
     });
   }
 }
