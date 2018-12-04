@@ -23,6 +23,7 @@
           <br>
           <div><a style="color: whitesmoke; text-decoration: none" routerLink="/profile" (click)="toggleMenu()">Profile</a></div>
           <br>
+          <div *ngIf="logged"><a style="color: whitesmoke; text-decoration: none" routerLink="/" (click)="logout()">Logout</a></div>
         </ul>
       </nav>
     </section>
@@ -60,7 +61,6 @@
     <h3 class="date__text"></h3>
 
     <div class="mode-toggle__container">
-        <button mat-button color="primary" style="color: whitesmoke" (click)="logout()">Logout</button>
     </div>
   </header>
 

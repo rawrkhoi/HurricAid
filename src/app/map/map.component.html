@@ -53,5 +53,5 @@
   </agm-map>
 </div>
 <br><br>
-<button mat-fab class="pin-box" style="background-color: rgb(206, 61, 61)" (click)="helpBox()">Help</button>
-<button mat-fab class="pin-box" style="background-color: #3E7CB1" color="primary" (click)="haveBox()">Have</button>
+<button mat-fab class="pin-box" style="background-color: rgb(206, 61, 61)" (click)="helpBox()" *ngIf="isLoggedIn$ | async">Help</button>
+<button mat-fab class="pin-box" style="background-color: #3E7CB1" color="primary" (click)="haveBox()" *ngIf="isLoggedIn$ | async">Have</button>

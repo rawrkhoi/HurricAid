@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { UiService } from '../service/ui.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -9,20 +8,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit {
-  showMenu = false;
-  darkModeActive: boolean;
 
+  showMenu = false;
+  logged: boolean = false;
   name: string = 'Please Log In';
 
-  constructor(public ui: UiService, private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient, private router: Router ) {}
 
-  }
-
-  ngOnInit() {
-    this.ui.darkModeState.subscribe((value) => {
-      this.darkModeActive = value;
-    });
-  }
+  ngOnInit() {}
 
   toggleMenu() {
     this.showMenu = !this.showMenu;
@@ -30,16 +23,15 @@ export class NavComponent implements OnInit {
       if (!info){
         this.name = 'Please Log In';
       } else {
+        this.logged = true;
         this.name = info.usr.name_first;
       }
     });
   }
 
-  modeToggleSwitch() {
-    this.ui.darkModeState.next(!this.darkModeActive);
-  }
-
   logout(): void {
+    this.logged = false;
+    this.showMenu = !this.showMenu;
     this.http.get('/logout').subscribe(() => {
       this.router.navigate(['/']);
     });
