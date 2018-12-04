@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapsService } from '../service/maps.service';
 import { HttpClient } from '@angular/common/http';
 import { HelppinComponent } from '../helppin/helppin.component';
@@ -13,7 +13,7 @@ import * as moment from 'moment';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy {
 
   isLoggedIn$: Observable<boolean>;
   zoom: number = 12;
@@ -72,14 +72,25 @@ export class MapComponent implements OnInit {
       }
     });
   }
+  ngOnDestroy() {
+    this.markers = [];
+  }
   helpBox(): void {
-    this.dialog.open(HelppinComponent, {
+    const dialogRef = this.dialog.open(HelppinComponent, {
       width: '380px',
+    });
+    this.ngOnDestroy();
+    dialogRef.afterClosed().subscribe(() => {
+      this.ngOnInit();
     });
   }
   haveBox(): void {
-    this.dialog.open(HavepinComponent, {
+    const dialogRef = this.dialog.open(HavepinComponent, {
       width: '380px',
+    });
+    this.ngOnDestroy();
+    dialogRef.afterClosed().subscribe(() => {
+      this.ngOnInit();
     });
   }
 }

@@ -11,7 +11,8 @@
   >
     <div *ngFor="let m of markers;let i = index">
       <agm-marker
-        *ngIf="m.help"
+        *ngIf="m.help && isLoggedIn$ | async"
+        [animation]="'DROP'"
         [latitude]="m.latitude"
         [longitude]="m.longitude"
         [iconUrl]="helpUrl"
@@ -29,9 +30,9 @@
           <br>
         </agm-info-window>
       </agm-marker>
-
       <agm-marker
         *ngIf="m.have"
+        [animation]="'DROP'"
         [latitude]="m.latitude"
         [longitude]="m.longitude"
         [iconUrl]="haveUrl"
