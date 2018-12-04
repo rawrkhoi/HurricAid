@@ -1,11 +1,14 @@
-<div class="tcontainer">
-    <div class="ticker-wrap">
-      <div class="ticker-move">
-        <div class="ticker-item" *ngIf="newsDisplay">No Disasters in the Area</div>
-        <div class="ticker-item" >{{article}}</div>
+<header>
+  <div class="tcontainer">
+      <div class="ticker-wrap">
+        <div class="ticker-move">
+          <div class="ticker-item" *ngIf="newsDisplay">No Disasters in the Area</div>
+          <div class="ticker-item" >{{article}}</div>
+        </div>
       </div>
-    </div>
-</div>
+  </div>
+</header>
+<br>
 <img src="../../assets/images/hurricane.png">
 <div class="locate">
   <button class="cred" mat-raised-button color="primary" (click)="moveToMap()">What's in my area?</button>
