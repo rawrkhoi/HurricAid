@@ -499,8 +499,6 @@ app.post('/sms', (req, res) => {
       to: textObj.number,
       body: 'What are you out of? Please describe in 3 or more words.',
     }).then(() => {
-      return db.phone.findOne({ where: { number: textObj.number }, raw: true});
-    }).then((phone) => {
       return googleMapsClient.geocode({
         address: textObj.address
       }).asPromise().then((response) => {
@@ -705,21 +703,33 @@ app.post('/sms', (req, res) => {
             },
             raw: true,
           }).then((supplyId) => {
-            return db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pin) => {
+            return db.pin.findAll({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pins) => {
+              pins.filter((pin) => {
+                req.session.pin = pin;
+                return db.supply_info.findOne({
+                  attributes: ['id'],
+                  where: {
+                    id_supply: supplyId.id,
+                    id_pin: req.session.pin.id,
+                  },
+                  raw: true,
+                })
+              })
+            }).then(() => {
               return db.supply_info.destroy({
                 where: {
-                  id_pin: pin.id,
+                  id_pin: req.session.pin.id,
                   id_supply: supplyId.id,
                 }
-              }).then(() => {
+              })
+            }).then(() => {
                 return db.pin.destroy({
                   where: {
-                    id: pin.id,
+                    id: req.session.pin.id,
                     have: true,
                     address: req.session.address,
                   }
                 })
-              })
             }).then(() => {
               return client.messages.create({
                 from: '15043020292',

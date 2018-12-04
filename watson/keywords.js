@@ -13,7 +13,7 @@ let watsonCategories = {
     table: 'Shelter',
   },
   equipmentInfo: {
-    keywords: ['construction', 'gardening and landscaping', 'home improvement and repair', 'remodeling and construction', 'sports'],
+    keywords: ['construction', 'gardening and landscaping', 'home improvement and repair', 'remodeling and construction', 'sports', 'homicide'],
     table: 'Equipment',
   },
   clothingInfo: {
