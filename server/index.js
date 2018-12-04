@@ -374,7 +374,7 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
     
     // HELP //
-  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'help@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'helpat') {
     req.session.command = 'help';
     textObj.address = req.body.Body.slice(5);
     if (!req.session.counter){
@@ -427,7 +427,7 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
 
     // HAVE //
-  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'have@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'haveat') {
     req.session.command = 'have';
     textObj.address = req.body.Body.slice(5);
     if (!req.session.counter) {
@@ -480,7 +480,7 @@ app.post('/sms', (req, res) => {
     
 
     // NEED //
-  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'need@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'needat') {
     req.session.command = "need";
     textObj.address = req.body.Body.slice(5);
     if (!req.session.counter) {
@@ -506,7 +506,7 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
 
     // OUT //
-  } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 4).toLowerCase() === 'out@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'outat') {
     req.session.command = "out";
     textObj.address = req.body.Body.slice(4);
     if (!req.session.counter) {
