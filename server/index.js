@@ -362,7 +362,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'SOS marker created. You may now send a brief message with details (optional).',
+      body: 'SOS marker created. You may now add a message with any details (optional).',
     }).then(() => {
       return db.phone.findOne({
         where: {
@@ -402,7 +402,6 @@ app.post('/sms', (req, res) => {
       })
     }).then(() => {
       req.session.counter = smsCount + 1;
-      console.log(req.session, 'REQUEST SESSION, LOOK FOR command AND COUNTER');
       res.send('done');
     }).catch(err => console.error(err))
 
@@ -416,7 +415,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What would you like to offer?',
+      body: 'What would you like to offer? Ex: "I have plenty of bread to offer."',
     }).then(() => {
       return db.phone.findOne({
         where: { number: textObj.number },
@@ -455,7 +454,6 @@ app.post('/sms', (req, res) => {
     }).then((pin) => {
       req.session.pinId = pin.id;
       req.session.counter = smsCount + 1;
-      console.log(req.session, 'REQUEST SESSION, LOOK FOR COMMAND AND COUNTER');
       res.send('done');
     }).catch(err => console.error(err))
     
@@ -470,7 +468,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What do you need? Please tell us in 3 words or more.',
+      body: 'What do you need? Ex: "I need shelter for the night".',
     }).then(() => {
       return googleMapsClient.geocode({
         address: textObj.address
@@ -496,7 +494,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What are you out of? Please describe in 3 or more words.',
+      body: 'What are you out of? Ex: "I am out of bread."',
     }).then(() => {
       return googleMapsClient.geocode({
         address: textObj.address
@@ -573,12 +571,18 @@ app.post('/sms', (req, res) => {
                 return client.messages.create({
                   from: '15043020292',
                   to: textObj.number,
-                  body: 'Thank you! Your offering has been added to the map.',
+                  body: 'Thank you! Your offering has been added to the map. Please type "Out@Your-Address" if you run out of this offering.',
                 })
               }).then(() => {
               req.session.pinId = null;
             }).catch((err) => {
               console.error(err);
+              // this is meant to send to a user if they type less than 3 words, but it is not working
+              // return client.messages.create({
+              //   from: '15043020292',
+              //   to: textObj.number,
+              //   body: 'We didn\'t understand your text message. Please describe your offering in 3 words.',
+              // })
             })
           })
         }
@@ -639,7 +643,6 @@ app.post('/sms', (req, res) => {
             }).then((pinIdArray) => {
               pinIdArray.map((pinId) => {
                 db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
-                  console.log(pin, 'THIS IS THE PIN WE\'RE TALKING ABOUT GUYS')
                   pushTo(pin.address, pin.message);
                 })
               })
@@ -791,7 +794,7 @@ app.post('/sms', (req, res) => {
             return client.messages.create({
               from: '15043020292',
               to: textObj.number,
-              body: 'Message added to marker.',
+              body: 'Thank you, your message has been added to the marker.',
             })
           })
           .then(() => {
