@@ -15,10 +15,12 @@ import * as moment from 'moment';
 })
 export class MapComponent implements OnInit, OnDestroy {
 
+  model: any = {};
   loggedIn: boolean = false;
   zoom: number = 12;
   lat: any;
   lng: any;
+  supplyOptions: any = [];
   markers: any = [];
   haveUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|4286f4';
   helpUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000';
@@ -38,6 +40,14 @@ export class MapComponent implements OnInit, OnDestroy {
         this.loggedIn = true;
       }
     });
+
+    this.http.get('/getSupplies').subscribe((supply: any) => {
+      supply.map((sup) => {
+        sup.value = false;
+      })
+      this.supplyOptions = supply;
+    });
+
     // location by browser or by ip if error or navigator unavailable
     const success = (position) => {
       this.lat = position.coords.latitude;
@@ -79,6 +89,26 @@ export class MapComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     this.markers = [];
+  }
+  sendSupply() {
+    this.ngOnDestroy();
+    this.http.post('/filterPinsBySupply', { supplyId: this.model.selectSupply })
+    .subscribe((pins: any) => {
+      for (let i = 0; i < pins.length; i++) {
+        this.markers.push({
+          id: pins[i].id,
+          help: pins[i].help,
+          have: pins[i].have,
+          address: pins[i].address,
+          id_phone: pins[i].id_phone,
+          latitude: pins[i].latitude,
+          longitude: pins[i].longitude,
+          message: pins[i].message,
+          createdAt: moment(pins[i].createdAt).format('llll'),
+          updatedAt: moment(pins[i].updatedAt).format('llll'),
+        });
+      }
+    });
   }
   helpBox(): void {
     const dialogRef = this.dialog.open(HelppinComponent, {
