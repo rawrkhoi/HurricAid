@@ -331,15 +331,26 @@ app.post('/removePin', (req, res) => {
   });
 });
 
-// app.get('/filterPinsBySupply', (req, res) => {
-//   const { supplyId } = req.body;
-//   db.supply_info.findAll({ where: { id_supply: suppyId }, raw:true }, (error) => {
-//     console.log('error finding supply: ', error);
-//     res.status(500).send(error);
-//   }).then((supplyPins) => {
-
-//   });
-// });
+app.get('/filterPinsBySupply', (req, res) => {
+  const { supplyId } = req.body;
+  db.supply_info.findAll({ where: { id_supply: supplyId }, raw:true }, (error) => {
+    console.log('error finding supply: ', error);
+    res.status(500).send(error);
+  }).then((supplyPins) => {
+    let pinArr = [];
+      supplyPins.forEach((sup) => {
+        db.pin.findOne({ where: { id: sup.id_pin }, raw:true }, (error) => {
+          console.log('error finding pin: ', error);
+          res.status(500).send(error);
+        }).then((pin) => {
+          pinArr.push(pin);
+        });
+      });
+      setTimeout(() => {
+        res.send(pinArr);
+      }, 1000);
+  });
+});
 
 app.get('/logout', (req, res) => {
   req.session.destroy();
