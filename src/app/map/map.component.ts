@@ -15,7 +15,7 @@ import * as moment from 'moment';
 })
 export class MapComponent implements OnInit, OnDestroy {
 
-  isLoggedIn$: Observable<boolean>;
+  loggedIn: boolean = false;
   zoom: number = 12;
   lat: any;
   lng: any;
@@ -31,8 +31,13 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.isLoggedIn$ = this.authService.isLoggedIn;
-
+    this.http.get('/getInfo').subscribe((info: any) => {
+      if (!info) {
+        this.loggedIn = false;
+      } else {
+        this.loggedIn = true;
+      }
+    });
     // location by browser or by ip if error or navigator unavailable
     if (!navigator.geolocation) {
       this.map.getLocation().subscribe(data => {
@@ -81,7 +86,9 @@ export class MapComponent implements OnInit, OnDestroy {
     });
     this.ngOnDestroy();
     dialogRef.afterClosed().subscribe(() => {
-      this.ngOnInit();
+      setTimeout(() => {
+        this.ngOnInit();
+      }, 3000);
     });
   }
   haveBox(): void {
@@ -90,7 +97,9 @@ export class MapComponent implements OnInit, OnDestroy {
     });
     this.ngOnDestroy();
     dialogRef.afterClosed().subscribe(() => {
-      this.ngOnInit();
+      setTimeout(() => {
+        this.ngOnInit();
+      }, 3000);
     });
   }
 }
