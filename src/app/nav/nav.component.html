@@ -17,12 +17,13 @@
           <br>
           <div><a style="color: whitesmoke; text-decoration: none" routerLink="/map" (click)="toggleMenu()">Map</a></div>
           <br>
+          <div><a style="color: whitesmoke; text-decoration: none" routerLink="/profile" (click)="toggleMenu()">Profile</a></div>
+          <br>
+          <div *ngIf="logged"><a style="color: whitesmoke; text-decoration: none" routerLink="/" (click)="logout()">Logout</a></div>
           <!-- <div><a style="color: whitesmoke; text-decoration: none" routerLink="/news" (click)="toggleMenu()">News</a></div> -->
           <!-- <br> -->
           <!-- <div><a style="color: whitesmoke; text-decoration: none" routerLink="/info" (click)="toggleMenu()">Information</a></div> -->
           <!-- <br> -->
-          <div><a style="color: whitesmoke; text-decoration: none" routerLink="/profile" (click)="toggleMenu()">Profile</a></div>
-          <br>
         </ul>
       </nav>
     </section>
@@ -30,7 +31,7 @@
 </aside>
 
 <div class="root__container">
-  <header [ngClass]="{'main__header-dark': darkModeActive}" class="main__header">
+  <header class="main__header">
 
     <div class="left__section">
       <svg (click)="toggleMenu()" class="hamburger__icon" id="Menu_Burger_Icon" data-name="Menu Burger Icon" viewBox="31.5 30 49.9 32">
@@ -39,18 +40,18 @@
             fill: #38ca92
           }</style>
         </defs>
-        <rect id="Rectangle_9" width="49.9" height="4" [ngClass]="{'hamburger__icon__fill-dark': darkModeActive}" class="hamburger__icon__fill"
+        <rect id="Rectangle_9" width="49.9" height="4" class="hamburger__icon__fill"
           data-name="Rectangle 9" rx="2" transform="translate(31.5 58)" />
-        <rect id="Rectangle_10" width="49.9" height="4" [ngClass]="{'hamburger__icon__fill-dark': darkModeActive}"
-          class="hamburger__icon__fill" data-name="Rectangle 10" rx="2" transform="translate(31.5 44)" />
-        <rect id="Rectangle_11" width="49.9" height="4" [ngClass]="{'hamburger__icon__fill-dark': darkModeActive}"
-          class="hamburger__icon__fill" data-name="Rectangle 11" rx="2" transform="translate(31.5 30)" />
+        <rect id="Rectangle_10" width="49.9" height="4" class="hamburger__icon__fill"
+          data-name="Rectangle 10" rx="2" transform="translate(31.5 44)" />
+        <rect id="Rectangle_11" width="49.9" height="4" class="hamburger__icon__fill"
+          data-name="Rectangle 11" rx="2" transform="translate(31.5 30)" />
       </svg>
 
       <svg class="logo__icon" viewBox="150.3 22.2 280 42.8">
         <!-- <path fill="#00ff9b" d="M150.3 65V22.2L193 65z" data-name="Path 1" />
         <path fill="#003eff" d="M193.1 65h-42.8L193 22.2z" data-name="Path 2" /> -->
-        <text [ngClass]="{'logo__text-dark': darkModeActive}" class="logo__text" fill="#432c85" font-family="SegoeUI-Semibold,Segoe UI"
+        <text class="logo__text" fill="#432c85" font-family="SegoeUI-Semibold,Segoe UI"
           font-size="30" font-weight="600" letter-spacing=".1em" transform="translate(237 56)">
           <tspan x="0" y="0">HurricAid</tspan>
         </text>
@@ -60,11 +61,10 @@
     <h3 class="date__text"></h3>
 
     <div class="mode-toggle__container">
-        <button mat-button color="primary" style="color: whitesmoke" (click)="logout()">Logout</button>
     </div>
   </header>
 
   <main class="main__container">
-    <div class="main-container__bg" [ngClass]="{'main-container__bg-dark': darkModeActive}"></div>
+    <div class="main-container__bg"></div>
     <router-outlet></router-outlet>
   </main>

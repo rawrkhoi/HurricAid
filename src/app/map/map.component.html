@@ -1,9 +1,7 @@
-<!-- <h1 style="text-align: center"><u>Map Markers</u></h1> -->
-<button mat-fab class="pin-box" color="warn" (click)="helpBox()">Help</button>
-<button mat-fab class="pin-box" color="primary" (click)="haveBox()">Have</button>
-<br><br>
+<p style="text-align: center; color: aqua">Sir Maps-a-Lot</p>
 <div class="map-full-card-content">
   <agm-map
+    #gm
     [gestureHandling]="cooperative"
     [scrollwheel]="null"
     [streetViewControl]="false"
@@ -17,8 +15,9 @@
         [latitude]="m.latitude"
         [longitude]="m.longitude"
         [iconUrl]="helpUrl"
+        (markerClick)="gm.lastOpen?.close(); gm.lastOpen = infoWindow"
       >
-        <agm-info-window>
+        <agm-info-window #infoWindow>
           <div>
             <strong>Help</strong>
           </div>
@@ -36,8 +35,9 @@
         [latitude]="m.latitude"
         [longitude]="m.longitude"
         [iconUrl]="haveUrl"
+        (markerClick)="gm.lastOpen?.close(); gm.lastOpen = infoWindow"
       >
-        <agm-info-window>
+        <agm-info-window #infoWindow>
           <div>
             <strong>Have</strong>
           </div>
@@ -52,49 +52,6 @@
     </div>
   </agm-map>
 </div>
-<!-- <div class="container">
-  <div class="row">
-    <div class="col-md-8 offset-md-2">
-      <form name="form" onSubmit="return false" #f="ngForm" novalidate>
-        <h2><u>Add Pin</u></h2>
-        <h3>Where are you?</h3>
-        <div class="address-input">
-          <mat-form-field>
-            <input matInput name="address" [(ngModel)]="model.address" placeholder="Address">
-          </mat-form-field>
-        </div>
-      </form>
-      <form>
-        <h4>Do you need help or wanting to help?</h4>
-        <mat-radio-button class="marker" (click)="toggleHelp()"> Help me!</mat-radio-button><br>
-        <div *ngIf="help" class="pin-input">
-          <mat-form-field>
-            <input matInput name="message" matInput #message maxlength="255" [(ngModel)]="model.message" placeholder="Message (Optional)">
-            <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
-          </mat-form-field>
-          <br>
-          <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
-        </div>
-
-        <mat-radio-button class="marker" (click)="toggleHave()"> Offer amenities</mat-radio-button>
-        <div *ngIf="have" class="pin-input">
-          <div class="supply-info">
-            <mat-form-field>
-              <mat-select placeholder="Supplies" multiple>
-                <label *ngFor="let supply of supplyOptions">
-                <mat-option (click)="supply.value=!supply.value">{{supply.type}}</mat-option>
-                </label>
-              </mat-select>
-            </mat-form-field>
-            <br>
-            <mat-form-field hintLabel="At least one supply must be selected">
-              <input matInput name="description_supply" [(ngModel)]="model.message" [ngModelOptions]="{standalone: true}" placeholder="Supply Description (Optional)">
-              <br>
-            </mat-form-field>
-          </div>
-          <button mat-flat-button color="primary" (click)="setMsgAddress()">Create Pin</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div> -->
+<br><br>
+<button mat-fab class="pin-box" style="background-color: rgb(206, 61, 61)" (click)="helpBox()" *ngIf="isLoggedIn$ | async">Help</button>
+<button mat-fab class="pin-box" style="background-color: #3E7CB1" color="primary" (click)="haveBox()" *ngIf="isLoggedIn$ | async">Have</button>
