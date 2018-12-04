@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { HelppinComponent } from '../helppin/helppin.component';
 import { HavepinComponent } from '../havepin/havepin.component';
 import { MatDialog } from '@angular/material';
+import { Observable } from 'rxjs';
+import { AuthService } from '../service/auth.service';
 import * as moment from 'moment';
 
 @Component({
@@ -13,18 +15,24 @@ import * as moment from 'moment';
 })
 export class MapComponent implements OnInit {
 
-  zoom: number = 8;
+  isLoggedIn$: Observable<boolean>;
+  zoom: number = 12;
   lat: any;
   lng: any;
   markers: any = [];
-
   haveUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|4286f4';
   helpUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000';
 
-  constructor(private map: MapsService, private http: HttpClient, public dialog: MatDialog) {
+  constructor(
+    private map: MapsService,
+    private http: HttpClient,
+    public dialog: MatDialog,
+    private authService: AuthService) {
   }
 
   ngOnInit() {
+    this.isLoggedIn$ = this.authService.isLoggedIn;
+
     // location by browser or by ip if error or navigator unavailable
     if (!navigator.geolocation) {
       this.map.getLocation().subscribe(data => {
@@ -33,7 +41,6 @@ export class MapComponent implements OnInit {
       });
     }
     const success = (position) => {
-      console.log(this);
       this.lat = position.coords.latitude;
       this.lng = position.coords.longitude;
     }
