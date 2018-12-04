@@ -317,7 +317,6 @@ app.get('/getPinsByUser', (req, res) => {
 });
 
 app.post('/removePin', (req, res) => {
-  // need to delete pin by id from pins table and also delete from supply_infos table
   const { pinId } = req.body;
   db.supply_info.destroy({ where: { id_pin: pinId } }, (error) => {
     console.log('error removing pin from supply infos table: ', error);
@@ -329,6 +328,27 @@ app.post('/removePin', (req, res) => {
     }).then(() => {
       console.log('pin removed');
     });
+  });
+});
+
+app.get('/filterPinsBySupply', (req, res) => {
+  const { supplyId } = req.body;
+  db.supply_info.findAll({ where: { id_supply: supplyId }, raw:true }, (error) => {
+    console.log('error finding supply: ', error);
+    res.status(500).send(error);
+  }).then((supplyPins) => {
+    let pinArr = [];
+      supplyPins.forEach((sup) => {
+        db.pin.findOne({ where: { id: sup.id_pin }, raw:true }, (error) => {
+          console.log('error finding pin: ', error);
+          res.status(500).send(error);
+        }).then((pin) => {
+          pinArr.push(pin);
+        });
+      });
+      setTimeout(() => {
+        res.send(pinArr);
+      }, 1000);
   });
 });
 
