@@ -536,7 +536,7 @@ app.post('/sms', (req, res) => {
       
       let supplyStr = '';
       let analyzeCat = () => {
-        if (textObj.message.split(' ').length > 3){
+        if (textObj.message.split(' ').length > 4){
           return new Promise ((res, rej) => {
             nlu.analyze(
               {
@@ -570,8 +570,9 @@ app.post('/sms', (req, res) => {
           return new Promise ((res, rej) => {
             let splitArr = textObj.message.split(' ');
             splitArr.forEach((word) => {
-              supplyStr += word;
+              supplyStr += ' ' + word;
             })
+            console.log(supplyStr, 'THIS IS THE SUPPLY STRING!!!!!!!!!!!!!!!!!!!!!')
             res(supplyStr);
           })
         }
@@ -618,6 +619,7 @@ app.post('/sms', (req, res) => {
           })
         }
         analyzeCat().then((tableName) => {
+          console.log(tableName, 'THIS IS THE TABLE NAME!!!!!!!!!!!!!!')
           if (tableName === "Water" || tableName.toLowerCase().includes('water')){
             addHaves('Water');
           }
@@ -648,7 +650,7 @@ app.post('/sms', (req, res) => {
           if (tableName === "Household") {
             addHaves('Household');
           } 
-          else if (!tableName){
+          else if (tableName.includes(' ')){
             addHaves('Other');
           }
         })
