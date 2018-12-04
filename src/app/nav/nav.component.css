@@ -119,14 +119,14 @@
 .profile-image__container {
   grid-area: image;
   margin-right: 0.5rem;
-  border-radius: 50%;
+  /* border-radius: 50%; */
   height: 4rem;
   width: 4rem;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  /* background-color: white; */
   align-self: center;
   margin-left: 2rem;
 }
