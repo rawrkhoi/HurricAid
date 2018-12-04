@@ -5,7 +5,7 @@
   grid-template-columns: auto;
   grid-template-rows: 0.5fr auto;
   position: relative;
-  background: white;
+  background: #2F3F70;
   text-align: center;
 }
 
@@ -37,7 +37,7 @@
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: #0c1066;
+  background-color: #3E7CB1;
   opacity: 0;
   transition: opacity 300ms linear;
   will-change: opacity;
@@ -57,7 +57,7 @@
   height: 100%;
   width: 90%;
   max-width: 26rem;
-  background-color: white;
+  background-color: #2F3F70;
   box-shadow: 0 0 2rem rgba(0, 0, 255, 0.1);
   display: grid;
   grid-template-columns: 1fr;
@@ -72,7 +72,7 @@
 }
 
 .menu-header {
-  background: lightskyblue;
+  background: #3E7CB1;
   display: grid;
   grid-template-rows: 1fr 4fr;
   grid-template-columns: 1fr 4fr;
@@ -80,7 +80,7 @@
   box-sizing: border-box;
   width: 100%;
   align-content: center;
-  color: white;
+  color: #C0D6DF;
   box-shadow: 0 0.5rem 2rem rgba(0, 0, 255, 0.2);
 }
 
@@ -147,11 +147,11 @@
   align-items: center;
   transition: background-color 500ms linear;
   animation: fadein 1s ease-in-out 0ms 1;
-  background-color: lightskyblue;
+  background-color: #3E7CB1;
 }
 
 .main__header-dark {
-  background-color: #2B244D;
+  background-color: #468189;
   color: white;
 }
 
@@ -233,7 +233,7 @@
 }
 
 .logo__text {
-  fill: #2B244D;
+  fill: whitesmoke;
 }
 
 .logo__text-dark {
