@@ -536,35 +536,45 @@ app.post('/sms', (req, res) => {
       
       let supplyStr = '';
       let analyzeCat = () => {
-        return new Promise ((res, rej) => {
-          nlu.analyze(
-            {
-              text: textObj.message,
-              features: {
-                categories: {}
-              }
-            },
-            function (err, response) {
-              let catStr = '';
-              if (err) {
-                console.error(err);
-              } else {
-                console.log(response);
-                response.categories.map((result) => {
-                  catStr += result.label;
-                });
-                Object.values(watsonCats.watsonCategories).forEach((category) => {
-                  category.keywords.forEach((keyword) => {
-                    if (catStr.includes(keyword)){
-                      supplyStr = category.table;
-                    }
+        if (textObj.message.split(' ').length > 3){
+          return new Promise ((res, rej) => {
+            nlu.analyze(
+              {
+                text: textObj.message,
+                features: {
+                  categories: {}
+                }
+              },
+              function (err, response) {
+                let catStr = '';
+                if (err) {
+                  console.error(err);
+                } else {
+                  console.log(response);
+                  response.categories.map((result) => {
+                    catStr += result.label;
+                  });
+                  Object.values(watsonCats.watsonCategories).forEach((category) => {
+                    category.keywords.forEach((keyword) => {
+                      if (catStr.includes(keyword)){
+                        supplyStr = category.table;
+                      }
+                    })
                   })
-                })
-                res(supplyStr);
+                  res(supplyStr);
+                }
               }
-            }
-          );
-        })
+            );
+          })
+        } else {
+          return new Promise ((res, rej) => {
+            let splitArr = textObj.message.split(' ');
+            splitArr.forEach((word) => {
+              supplyStr += word;
+            })
+            res(supplyStr);
+          })
+        }
       }
 
       if (req.session.command === 'have') {
@@ -608,22 +618,22 @@ app.post('/sms', (req, res) => {
           })
         }
         analyzeCat().then((tableName) => {
-          if (tableName === "Water"){
+          if (tableName === "Water" || tableName.toLowerCase().includes('water')){
             addHaves('Water');
           }
-          if (tableName === "Food"){
+          if (tableName === "Food" || tableName.toLowerCase().includes('food')){
             addHaves('Food');
           }
-          if (tableName === "Shelter") {
+          if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
             addHaves('Shelter');
           }
           if (tableName === "Equipment"){
             addHaves('Equipment');
           }
-          if (tableName === "Clothing") {
+          if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing') || tableName.toLowerCase().includes('clothes')) {
             addHaves('Clothing');
           }
-          if (tableName === "Power") {
+          if (tableName === "Power" || tableName.toLowerCase().includes('power' || tableName.toLowerCase().includes('electricity'))) {
             addHaves('Power');
           }
           if (tableName === "Pet") {
@@ -643,6 +653,8 @@ app.post('/sms', (req, res) => {
           }
         })
       } else if (req.session.command === 'need'){
+
+
         let needSupply = (supply) => {
           let addressString = '';
           let pushTo = (addressVal, msgVal) => {
@@ -663,6 +675,9 @@ app.post('/sms', (req, res) => {
               raw: true,
             }).then((pinIdArray) => {
               pinIdArray.map((pinId) => {
+                let findDistance = (needCoords, haveCoords) => {
+
+                }
                 db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
                   pushTo(pin.address, pin.message);
                 })
@@ -679,22 +694,22 @@ app.post('/sms', (req, res) => {
           })
         }
         analyzeCat().then((tableName) => {
-          if (tableName === 'Water') {
+          if (tableName === 'Water' || tableName.toLowerCase().includes('water')) {
             needSupply('Water');
           }
-          if (tableName === "Food") {
+          if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
             needSupply('Food');
           }
-          if (tableName === "Shelter") {
+          if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
             needSupply('Shelter');
           }
           if (tableName === "Equipment") {
             needSupply('Equipment');
           }
-          if (tableName === "Clothing") {
+          if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing') || tableName.toLowerCase().includes('clothes')) {
             needSupply('Clothing');
           }
-          if (tableName === "Power") {
+          if (tableName === "Power" || tableName.toLowerCase().includes('power') || tableName.toLowerCase().includes('electricity')) {
             needSupply('Power');
           }
           if (tableName === "Pet") {
@@ -723,34 +738,42 @@ app.post('/sms', (req, res) => {
             },
             raw: true,
           }).then((supplyId) => {
-            return db.pin.findAll({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pins) => {
-              pins.filter((pin) => {
-                req.session.pin = pin;
-                return db.supply_info.findOne({
-                  attributes: ['id'],
-                  where: {
-                    id_supply: supplyId.id,
-                    id_pin: req.session.pin.id,
-                  },
-                  raw: true,
-                })
+            return db.pin.findAll({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true })
+              .then((pins) => {
+                return Promise.all(pins.map((pin) => {
+                  return db.supply_info.findOne({
+                    attributes: ['id', 'id_pin'],
+                    where: {
+                      id_supply: supplyId.id,
+                      id_pin: pin.id,
+                    },
+                    raw: true,
+                  })
+              }))
+              .then((supplyInfoIds) => {
+                return supplyInfoIds.filter((id) => {
+                  return id !== null;
+                })[0]
               })
-            }).then(() => {
-              return db.supply_info.destroy({
-                where: {
-                  id_pin: req.session.pin.id,
-                  id_supply: supplyId.id,
-                }
-              })
-            }).then(() => {
-                return db.pin.destroy({
+              .then((supplyInfo) => {
+                return db.supply_info.destroy({
                   where: {
-                    id: req.session.pin.id,
-                    have: true,
-                    address: req.session.address,
+                    id: supplyInfo.id,
                   }
+                }).then(() => {
+                  return supplyInfo.id_pin;
                 })
-            }).then(() => {
+              })
+              .then((pinId) => {
+                  return db.pin.destroy({
+                    where: {
+                      id: pinId,
+                      have: true,
+                    }
+                  })
+              })
+            })
+            .then(() => {
               return client.messages.create({
                 from: '15043020292',
                 to: textObj.number,
@@ -760,22 +783,22 @@ app.post('/sms', (req, res) => {
           })
         }
         analyzeCat().then((tableName) => {
-          if (tableName === 'Water'){
+          if (tableName === 'Water' || tableName.toLowerCase().includes('water')){
             outFunc('Water');
           }
-          if (tableName === "Food") {
+          if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
             outFunc('Food');
           }
-          if (tableName === "Shelter") {
+          if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
             outFunc('Shelter');
           }
           if (tableName === "Equipment") {
             outFunc('Equipment');
           }
-          if (tableName === "Clothing") {
+          if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing' || tableName.toLowerCase().includes('clothes'))) {
             outFunc('Clothing');
           }
-          if (tableName === "Power") {
+          if (tableName === "Power" || tableName.toLowerCase().includes('power') || tableName.toLowerCase().includes('electricity')) {
             outFunc('Power');
           }
           if (tableName === "Pet") {
