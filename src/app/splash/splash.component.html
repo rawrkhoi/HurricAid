@@ -1,10 +1,17 @@
-<img src="https://image.flaticon.com/icons/svg/46/46257.svg">
-
+<div class="tcontainer">
+    <div class="ticker-wrap">
+      <div class="ticker-move">
+        <div class="ticker-item" *ngIf="newsDisplay">no disasters today</div>
+        <div class="ticker-item" >{{article}}</div>
+      </div>
+    </div>
+</div>
+<img src="../../assets/images/hurricane.png">
 <div class="locate">
-  <button mat-raised-button color="primary" (click)="moveToMap()">What's in my area?</button>
+  <button class="cred" mat-raised-button color="primary" (click)="moveToMap()">What's in my area?</button>
 </div>
 <div class="auth">
-  <button mat-fab color="primary" (click)="signUpBox()">Sign Up</button>
-  <button mat-fab color="primary" (click)="loginBox()">Login</button>
-  <button mat-fab color="accent" (click)="info()">Info</button>
+  <button class="cred" mat-fab (click)="signUpBox()">Sign Up</button>
+  <button class="cred" mat-fab (click)="loginBox()">Login</button>
+  <button class="info" mat-fab (click)="info()">Info</button>
 </div>

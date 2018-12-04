@@ -5,7 +5,7 @@ import { HelppinComponent } from '../helppin/helppin.component';
 import { HavepinComponent } from '../havepin/havepin.component';
 import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs';
-import { AuthService } from '../service/auth.service'
+import { AuthService } from '../service/auth.service';
 import * as moment from 'moment';
 
 @Component({
@@ -20,7 +20,6 @@ export class MapComponent implements OnInit {
   lat: any;
   lng: any;
   markers: any = [];
-
   haveUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|4286f4';
   helpUrl = 'https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FF0000';
 

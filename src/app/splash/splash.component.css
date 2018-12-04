@@ -1,13 +1,14 @@
-#name{
-  padding-top: 50px;
-  color: blue;
-  fill: "#432c85";
-  font-family: "SegoeUI-Semibold,Segoe UI";
-  font-size: "100";
-  font-weight: "600";
+.cred {
+  background-color: #3E7CB1;
+}
+
+.info {
+  background-color: #829CBC;
 }
 img { 
-    width: 25%; 
+  margin: -200px 0px 0px -100px;
+  width: 50%; 
+  position: fixed;
 }
 .locate {
   padding-top: 50px;
@@ -21,4 +22,35 @@ img {
 .auth button {
   margin-right: 8px;
   margin-left: 8px;
+}
+@keyframes ticker {
+  0% { transform: translate3d(10%, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+.tcontainer{
+  width: 100%;
+  overflow: hidden;
+  margin: -275px 0px 0px 0px;
+  position: fixed;
+}
+.ticker-wrap {
+  width: 100%;
+  /* padding-left: 100%; */
+  background-color: #eee;
+}
+.ticker-move {
+  display: inline-block;
+  white-space: nowrap;
+  /* padding-right: 100%; */
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-name: ticker;
+  animation-duration: 30s;
+}
+.ticker-move:hover{
+  animation-play-state: paused;
+}
+.ticker-item{
+  display: inline-block;
+  padding: 0 2rem;
 }

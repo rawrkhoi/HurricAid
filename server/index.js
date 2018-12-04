@@ -13,10 +13,20 @@ const twilio = require('twilio');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
+const fs = require('fs');
+const NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
 const googleMapsClient = require('@google/maps').createClient({
   key: config.keys.geocode,
   Promise: Promise
 })
+const nlu = new NaturalLanguageUnderstandingV1({
+  iam_apikey: config.keys.watson,
+  version: '2018-04-05',
+  url: 'https://gateway-tok.watsonplatform.net/natural-language-understanding/api/'
+});
+const watsonCats = require('../watson/keywords');
+
+
 const app = express();
 
 app.use(express.static(`${__dirname}/../dist/browser`));
@@ -296,6 +306,61 @@ app.post('/updateInfo', (req, res) => {
   }
 });
 
+app.get('/getPinsByUser', (req, res) => {
+  db.user.findOne({ where: { id_credential: req.session.credId }, raw:true }, (error) => {
+    console.log('error finding user: ', error); 
+    res.status(500).send(error);
+  }).then((user) => {
+      db.pin.findAll({ where: { id_phone: user.id_phone }, raw:true }, (error) => {
+        console.log('error finding pins: ', error);
+        res.status(500).send(error);
+      }).then((userPins) => {
+        res.status(200).send(userPins);
+      });
+    });
+});
+
+app.post('/removePin', (req, res) => {
+  const { pinId } = req.body;
+  db.supply_info.destroy({ where: { id_pin: pinId } }, (error) => {
+    console.log('error removing pin from supply infos table: ', error);
+    res.status(500).send(error);
+  }).then(() => {
+    db.pin.destroy({ where: { id: pinId } }, (error) => {
+      console.log('error removing pin from pins table: ', error);
+      res.status(500).send(error);
+    }).then(() => {
+      console.log('pin removed');
+    });
+  });
+});
+
+app.get('/filterPinsBySupply', (req, res) => {
+  const { supplyId } = req.body;
+  db.supply_info.findAll({ where: { id_supply: supplyId }, raw:true }, (error) => {
+    console.log('error finding supply: ', error);
+    res.status(500).send(error);
+  }).then((supplyPins) => {
+    let pinArr = [];
+      supplyPins.forEach((sup) => {
+        db.pin.findOne({ where: { id: sup.id_pin }, raw:true }, (error) => {
+          console.log('error finding pin: ', error);
+          res.status(500).send(error);
+        }).then((pin) => {
+          pinArr.push(pin);
+        });
+      });
+      setTimeout(() => {
+        res.send(pinArr);
+      }, 1000);
+  });
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.send();
+});
+
 app.post('/sms', (req, res) => {
   let textObj = {};
   const smsCount = req.session.counter || 0;
@@ -305,7 +370,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: "Try one of these commands: \nHelp@[address], \nHave@[address], \nNeed@[address]",
+      body: "Try one of these commands: \nHelp@Your-Address, \nHave@Your-Address, \nNeed@Your-Address",
     }).catch(err => console.error(err))
     
     // HELP //
@@ -318,7 +383,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'SOS marker created. You may now send a brief message with details (optional).',
+      body: 'SOS marker created. You may now add a message with any details (optional).',
     }).then(() => {
       return db.phone.findOne({
         where: {
@@ -358,7 +423,6 @@ app.post('/sms', (req, res) => {
       })
     }).then(() => {
       req.session.counter = smsCount + 1;
-      console.log(req.session, 'REQUEST SESSION, LOOK FOR command AND COUNTER');
       res.send('done');
     }).catch(err => console.error(err))
 
@@ -372,7 +436,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What would you like to offer?',
+      body: 'What would you like to offer? Ex: "I have plenty of bread to offer."',
     }).then(() => {
       return db.phone.findOne({
         where: { number: textObj.number },
@@ -411,7 +475,6 @@ app.post('/sms', (req, res) => {
     }).then((pin) => {
       req.session.pinId = pin.id;
       req.session.counter = smsCount + 1;
-      console.log(req.session, 'REQUEST SESSION, LOOK FOR COMMAND AND COUNTER');
       res.send('done');
     }).catch(err => console.error(err))
     
@@ -426,7 +489,7 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What do you need? Text Food, Water, or Shelter',
+      body: 'What do you need? Ex: "I need shelter for the night".',
     }).then(() => {
       return googleMapsClient.geocode({
         address: textObj.address
@@ -452,10 +515,8 @@ app.post('/sms', (req, res) => {
     return client.messages.create({
       from: '15043020292',
       to: textObj.number,
-      body: 'What are you out of? Text Food, Water, or Shelter',
+      body: 'What are you out of? Ex: "I am out of bread."',
     }).then(() => {
-      return db.phone.findOne({ where: { number: textObj.number }, raw: true});
-    }).then((phone) => {
       return googleMapsClient.geocode({
         address: textObj.address
       }).asPromise().then((response) => {
@@ -472,7 +533,40 @@ app.post('/sms', (req, res) => {
     // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
     if (req.session.counter > 0) {
       textObj.message = req.body.Body;
-      let split = textObj.message.toLowerCase().split(' ');
+      
+      let supplyStr = '';
+      let analyzeCat = () => {
+        return new Promise ((res, rej) => {
+          nlu.analyze(
+            {
+              text: textObj.message,
+              features: {
+                categories: {}
+              }
+            },
+            function (err, response) {
+              let catStr = '';
+              if (err) {
+                console.error(err);
+              } else {
+                console.log(response);
+                response.categories.map((result) => {
+                  catStr += result.label;
+                });
+                Object.values(watsonCats.watsonCategories).forEach((category) => {
+                  category.keywords.forEach((keyword) => {
+                    if (catStr.includes(keyword)){
+                      supplyStr = category.table;
+                    }
+                  })
+                })
+                res(supplyStr);
+              }
+            }
+          );
+        })
+      }
+
       if (req.session.command === 'have') {
         let addHaves = (supply) => {
           db.supply.findOne({
@@ -494,34 +588,65 @@ app.post('/sms', (req, res) => {
                       address: req.session.address,
                     }
                   })
-              })
-            .then(() => {
-              return client.messages.create({
-                from: '15043020292',
-                to: textObj.number,
-                body: 'Thank you! Your offering has been added to the map.',
-              })
-            }).then(() => {
+              }).then(() => {
+                return client.messages.create({
+                  from: '15043020292',
+                  to: textObj.number,
+                  body: 'Thank you! Your offering has been added to the map. Please type "Out@Your-Address" if you run out of this offering.',
+                })
+              }).then(() => {
               req.session.pinId = null;
             }).catch((err) => {
               console.error(err);
+              // this is meant to send to a user if they type less than 3 words, but it is not working
+              // return client.messages.create({
+              //   from: '15043020292',
+              //   to: textObj.number,
+              //   body: 'We didn\'t understand your text message. Please describe your offering in 3 words.',
+              // })
             })
           })
         }
-        if (split.includes('water')) {
-          addHaves('Water');
-        }
-        if (split.includes('food')) {
-          addHaves('Food');
-        } 
-        if (split.includes('shelter')) {
-          addHaves('Shelter');
-        }
+        analyzeCat().then((tableName) => {
+          if (tableName === "Water"){
+            addHaves('Water');
+          }
+          if (tableName === "Food"){
+            addHaves('Food');
+          }
+          if (tableName === "Shelter") {
+            addHaves('Shelter');
+          }
+          if (tableName === "Equipment"){
+            addHaves('Equipment');
+          }
+          if (tableName === "Clothing") {
+            addHaves('Clothing');
+          }
+          if (tableName === "Power") {
+            addHaves('Power');
+          }
+          if (tableName === "Pet") {
+            addHaves('Pet');
+          }
+          if (tableName === "Transportation") {
+            addHaves('Transportation');
+          }
+          if (tableName === "Health") {
+            addHaves('Health');
+          }
+          if (tableName === "Household") {
+            addHaves('Household');
+          } 
+          else if (!tableName){
+            addHaves('Other');
+          }
+        })
       } else if (req.session.command === 'need'){
         let needSupply = (supply) => {
           let addressString = '';
-          let pushTo = (val) => {
-            return addressString = addressString + ' * ' + val;
+          let pushTo = (addressVal, msgVal) => {
+            return addressString = addressString + ' * ' + addressVal + ': ' + msgVal;
           }
           db.supply.findOne({
             attributes: ['id'],
@@ -539,7 +664,7 @@ app.post('/sms', (req, res) => {
             }).then((pinIdArray) => {
               pinIdArray.map((pinId) => {
                 db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
-                  pushTo(pin.address);
+                  pushTo(pin.address, pin.message);
                 })
               })
             }).then(() => {
@@ -553,16 +678,43 @@ app.post('/sms', (req, res) => {
             })
           })
         }
-        if (split.includes('water')){
-          needSupply('Water');
-        } else if (split.includes('food')){
-          needSupply('Food');
-        } else if (split.includes('shelter')){
-          needSupply('Shelter');
-        }
+        analyzeCat().then((tableName) => {
+          if (tableName === 'Water') {
+            needSupply('Water');
+          }
+          if (tableName === "Food") {
+            needSupply('Food');
+          }
+          if (tableName === "Shelter") {
+            needSupply('Shelter');
+          }
+          if (tableName === "Equipment") {
+            needSupply('Equipment');
+          }
+          if (tableName === "Clothing") {
+            needSupply('Clothing');
+          }
+          if (tableName === "Power") {
+            needSupply('Power');
+          }
+          if (tableName === "Pet") {
+            needSupply('Pet');
+          }
+          if (tableName === "Transportation") {
+            needSupply('Transportation');
+          }
+          if (tableName === "Health") {
+            needSupply('Health');
+          }
+          if (tableName === "Household") {
+            needSupply('Household');
+          }
+          else if (!tableName) {
+            needSupply('Other');
+          }
+        })
 
       } else if (req.session.command === 'out'){  
-        let split = textObj.message.toLowerCase().split(' ');
         let outFunc = (supply) => {
           return db.supply.findOne({
             attributes: ['id'],
@@ -571,21 +723,33 @@ app.post('/sms', (req, res) => {
             },
             raw: true,
           }).then((supplyId) => {
-            return db.pin.findOne({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pin) => {
+            return db.pin.findAll({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pins) => {
+              pins.filter((pin) => {
+                req.session.pin = pin;
+                return db.supply_info.findOne({
+                  attributes: ['id'],
+                  where: {
+                    id_supply: supplyId.id,
+                    id_pin: req.session.pin.id,
+                  },
+                  raw: true,
+                })
+              })
+            }).then(() => {
               return db.supply_info.destroy({
                 where: {
-                  id_pin: pin.id,
+                  id_pin: req.session.pin.id,
                   id_supply: supplyId.id,
                 }
-              }).then(() => {
+              })
+            }).then(() => {
                 return db.pin.destroy({
                   where: {
-                    id: pin.id,
+                    id: req.session.pin.id,
                     have: true,
                     address: req.session.address,
                   }
                 })
-              })
             }).then(() => {
               return client.messages.create({
                 from: '15043020292',
@@ -595,14 +759,41 @@ app.post('/sms', (req, res) => {
             }).catch(err => console.error(err))
           })
         }
-        if (split.includes('water')){
-          outFunc('Water');
-        } else if (split.includes('food')) {
-          outFunc('Food');
-        } else if (split.includes('shelter')) {
-          outFunc('Shelter')
-        }
-          
+        analyzeCat().then((tableName) => {
+          if (tableName === 'Water'){
+            outFunc('Water');
+          }
+          if (tableName === "Food") {
+            outFunc('Food');
+          }
+          if (tableName === "Shelter") {
+            outFunc('Shelter');
+          }
+          if (tableName === "Equipment") {
+            outFunc('Equipment');
+          }
+          if (tableName === "Clothing") {
+            outFunc('Clothing');
+          }
+          if (tableName === "Power") {
+            outFunc('Power');
+          }
+          if (tableName === "Pet") {
+            outFunc('Pet');
+          }
+          if (tableName === "Transportation") {
+            outFunc('Transportation');
+          }
+          if (tableName === "Health") {
+            outFunc('Health');
+          }
+          if (tableName === "Household") {
+            outFunc('Household');
+          }
+          else if (!tableName) {
+            outFunc('Other');
+          }
+        })
           
       } else if (req.session.command === 'help'){
           db.phone.findOne({
@@ -624,7 +815,7 @@ app.post('/sms', (req, res) => {
             return client.messages.create({
               from: '15043020292',
               to: textObj.number,
-              body: 'Message added to marker.',
+              body: 'Thank you, your message has been added to the marker.',
             })
           })
           .then(() => {
@@ -636,7 +827,9 @@ app.post('/sms', (req, res) => {
       return client.messages.create({
         from: '15043020292',
         to: textObj.number,
-        body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@[address], \nHave@[address], \nNeed@[address]',
+        body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@Your-Address, \nHave@Your-Address, \nNeed@Your-Address',
+      }).then(() => {
+        res.send('done');
       }).catch(err => console.error(err))
     }
   
