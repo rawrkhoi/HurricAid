@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { keys } from '../../../config';
 
@@ -8,11 +8,11 @@ import { keys } from '../../../config';
   styleUrls: ['./havepin.component.css']
 })
 export class HavepinComponent implements OnInit {
-  model: any = {};
 
+  addr: any;
+  model: any = {};
   help: boolean = false;
   have: boolean = false;
-
   message: string;
   address: string;
   lat: any;
@@ -20,7 +20,7 @@ export class HavepinComponent implements OnInit {
   suppliesToSend: any = [];
   supplyOptions: any[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private zone: NgZone) { }
 
   ngOnInit() {
     this.have = true;
@@ -32,6 +32,12 @@ export class HavepinComponent implements OnInit {
       this.supplyOptions = supply;
     });
   }
+  setAddress(addrObj) {
+    this.zone.run(() => {
+      this.addr = addrObj;
+      this.address = this.addr.formatted_address;
+    });
+  }
   setMsgAddress() {
     const supplyTypes = [];
     for (let i = 0; i < this.supplyOptions.length; i++) {
@@ -40,7 +46,6 @@ export class HavepinComponent implements OnInit {
       }
     }
     this.message = this.model.message;
-    this.address = this.model.address;
     this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
       {
         params: {

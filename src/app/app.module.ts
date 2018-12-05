@@ -26,6 +26,7 @@ import { AgmCoreModule } from '@agm/core';
 import { UiService } from './service/ui.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { GooglePlacesDirective } from './google-places.directive';
 import {
   MatFormFieldModule,
   MatButtonModule,
@@ -35,6 +36,7 @@ import {
   MatRadioModule,
   MatDialogModule,
   MatIconModule,
+  MatAutocompleteModule,
 } from '@angular/material';
 
 @NgModule({
@@ -56,6 +58,7 @@ import {
     HelppinComponent,
     HavepinComponent,
     ManageComponent,
+    GooglePlacesDirective,
   ],
   imports: [
     CommonModule,
@@ -73,9 +76,11 @@ import {
     MatRadioModule,
     MatDialogModule,
     MatIconModule,
+    MatAutocompleteModule,
     ReactiveFormsModule,
     AgmCoreModule.forRoot({
-      apiKey: `${keys.googleMaps}`
+      apiKey: `${keys.googleMaps}`,
+      libraries: ['places']
     })
   ],
   entryComponents: [
