@@ -403,7 +403,7 @@ setInterval(() => {
       client.messages.create({
         from: '15043020292',
         to: num,
-        body: 'Hello, you currently have a help pin that is still posted. If you have already been helped, please text [this command] to remove your pin.',
+        body: 'Hello, you currently have a help pin that is still posted. If you have already been helped, please text delete@Your-Address to remove your pin.',
       }).catch(err => console.error(err))
     });
   });

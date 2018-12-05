@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-manage',
@@ -10,13 +11,26 @@ export class ManageComponent implements OnInit {
 
   constructor(private http: HttpClient) { }
 
-  userPins: any;
+  userPins: any = [];
   display: boolean = true;
   
   ngOnInit() {
     this.http.get('/getPinsByUser').subscribe((pins: any) => {
       if (pins.length !== 0){
-        this.userPins = pins;
+        for (let i = 0; i < pins.length; i ++) {
+          this.userPins.push({
+            id: pins[i].id,
+            help: pins[i].help,
+            have: pins[i].have,
+            address: pins[i].address,
+            id_phone: pins[i].id_phone,
+            latitude: pins[i].latitude,
+            longitude: pins[i].longitude,
+            message: pins[i].message,
+            createdAt: moment(pins[i].createdAt).format('llll'),
+            updatedAt: moment(pins[i].updatedAt).format('llll'),
+          });
+        }
         this.display = false;
       }
     });
