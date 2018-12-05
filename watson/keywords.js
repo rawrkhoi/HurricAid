@@ -4,7 +4,7 @@ let watsonCategories = {
     table: 'Food',
   },
   waterInfo: {
-    keywords: ['bottled water'],
+    keywords: ['bottled water', 'metals', 'water', 'freshwater'],
     table: 'Water',
   },
   shelterInfo: {

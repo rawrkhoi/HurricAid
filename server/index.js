@@ -535,12 +535,11 @@ app.post('/sms', (req, res) => {
       textObj.message = req.body.Body;
       
       let supplyStr = '';
-      let analyzeCat = () => {
-        if (textObj.message.split(' ').length > 4){
+      let analyzeCat = (msg) => {
           return new Promise ((res, rej) => {
             nlu.analyze(
               {
-                text: textObj.message,
+                text: msg,
                 features: {
                   categories: {}
                 }
@@ -553,11 +552,13 @@ app.post('/sms', (req, res) => {
                   console.log(response);
                   response.categories.map((result) => {
                     catStr += result.label;
+                    console.log(catStr, 'THIS IS THE CATEGORY STRING')
                   });
                   Object.values(watsonCats.watsonCategories).forEach((category) => {
                     category.keywords.forEach((keyword) => {
-                      if (catStr.includes(keyword)){
+                      if (catStr.split('/').includes(keyword)){
                         supplyStr = category.table;
+                        console.log(supplyStr, 'THIS IS THE SUPPLY STRING')
                       }
                     })
                   })
@@ -566,16 +567,16 @@ app.post('/sms', (req, res) => {
               }
             );
           })
-        } else {
-          return new Promise ((res, rej) => {
-            let splitArr = textObj.message.split(' ');
-            splitArr.forEach((word) => {
-              supplyStr += ' ' + word;
-            })
-            res(supplyStr);
-          })
         }
-      }
+
+      let checkLength = (message) => {
+        if (message.split(' ').length > 3) {
+          return analyzeCat(message);
+        } else {
+          let longerMessage = "I want to offer : " + message + "to whoever needs it.";
+          return analyzeCat(longerMessage);
+        }
+    }
 
       if (req.session.command === 'have') {
         let addHaves = (supply) => {
@@ -617,8 +618,8 @@ app.post('/sms', (req, res) => {
             })
           })
         }
-        analyzeCat().then((tableName) => {
-          if (tableName === "Water" || tableName.toLowerCase().includes('water')){
+        checkLength(textObj.message).then((tableName) => {
+          if (tableName === "Water" || textObj.message.toLowerCase().includes('water')){
             addHaves('Water');
           } else if (tableName === "Food" || tableName.toLowerCase().includes('food')){
             addHaves('Food');
@@ -734,8 +735,8 @@ app.post('/sms', (req, res) => {
           })
           })
         }
-        analyzeCat().then((tableName) => {
-          if (tableName === 'Water' || tableName.toLowerCase().includes('water')) {
+        checkLength(textObj.message).then((tableName) => {
+          if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')) {
             needSupply('Water');
           } else if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
             needSupply('Food');
