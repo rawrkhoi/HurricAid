@@ -1,9 +1,8 @@
+<br>
 <form>
   <mat-form-field>
     <mat-select [ngClass]="select" placeholder="Select Supply" [(ngModel)]="model.selectSupply" [ngModelOptions]="{standalone: true}">
-      <mat-option *ngFor="let supply of supplyOptions" [value]="supply.id">
-        {{supply.type}}
-      </mat-option>
+      <mat-option *ngFor="let supply of supplyOptions" [value]="supply.id">{{supply.type}}</mat-option>
     </mat-select>
   </mat-form-field>
   <button mat-flat-button style="background-color: #3E7CB1; color: whitesmoke" (click)="sendSupply()">Filter</button>
@@ -65,3 +64,4 @@
 <br><br>
 <button mat-fab class="pin-box" style="background-color: rgb(206, 61, 61)" (click)="helpBox()" *ngIf="loggedIn">Help</button>
 <button mat-fab class="pin-box" style="background-color: #3E7CB1" color="primary" (click)="haveBox()" *ngIf="loggedIn">Have</button>
+<button mat-fab class="pin-box" style="background-color: #3E7CB1" color="primary" (click)="ngOnInit()">Reset</button>
