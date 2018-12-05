@@ -2,18 +2,17 @@
   <hr> 
   <div *ngIf="pin.help">
     <strong>Help</strong> <br>
-    <i>Message:</i> {{pin.message}} <br>
-    <i>Address:</i> {{pin.address}} <br>
-    <i>Time Created:</i> {{pin.createdAt}} <br>
+    <i><u>Message:</u></i> {{pin.message}} <br>
+    <i><u>Address:</u></i> {{pin.address}} <br>
+    <i><u>Time Created:</u></i> {{pin.createdAt}} <br>
     <button mat-flat-button color="warn" (click)="removePin(pin.id)">Remove</button>
   </div>
   <div *ngIf="pin.have">
     <strong>Have</strong> <br>
-    <i>Message:</i> {{pin.message}} <br>
-    <i>Address:</i> {{pin.address}} <br>
-    <i>Time Created:</i> {{pin.createdAt}} <br>
+    <i><u>Message:</u></i> {{pin.message}} <br>
+    <i><u>Address:</u></i> {{pin.address}} <br>
+    <i><u>Time Created:</u></i> {{pin.createdAt}} <br>
     <button mat-flat-button color="warn" (click)="removePin(pin.id)">Remove</button>
   </div>
-  <hr> 
 </div>
 <div *ngIf="display">You currently have no pins</div>
