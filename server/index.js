@@ -713,9 +713,14 @@ app.post('/sms', (req, res) => {
                   })
                 })
               })).then((addrMsgDistArr) => {
-                console.log(addrMsgDistArr.sort((a, b) => {
+                return addrMsgDistArr.sort((a, b) => {
                   return a.distance - b.distance;
-                }));
+                })
+              }).then((sortedArr) => {
+                pushTo(sortedArr[0].address, sortedArr[0].message);
+                pushTo(sortedArr[1].address, sortedArr[1].message);
+                pushTo(sortedArr[2].address, sortedArr[2].message);
+                return addressString;
               })
             .then(() => {
               setTimeout(() => {
