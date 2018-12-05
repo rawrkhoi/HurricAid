@@ -621,15 +621,15 @@ app.post('/sms', (req, res) => {
         checkLength(textObj.message).then((tableName) => {
           if (tableName === "Water" || textObj.message.toLowerCase().includes('water')){
             addHaves('Water');
-          } else if (tableName === "Food" || tableName.toLowerCase().includes('food')){
+          } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')){
             addHaves('Food');
-          } else if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
+          } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
             addHaves('Shelter');
           } else if (tableName === "Equipment"){
             addHaves('Equipment');
-          } else if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing') || tableName.toLowerCase().includes('clothes')) {
+          } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing') || textObj.message.toLowerCase().includes('clothes')) {
             addHaves('Clothing');
-          } else if (tableName === "Power" || tableName.toLowerCase().includes('power' || tableName.toLowerCase().includes('electricity'))) {
+          } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power' || textObj.message.toLowerCase().includes('electricity'))) {
             addHaves('Power');
           } else if (tableName === "Pet") {
             addHaves('Pet');
@@ -738,15 +738,15 @@ app.post('/sms', (req, res) => {
         checkLength(textObj.message).then((tableName) => {
           if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')) {
             needSupply('Water');
-          } else if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
+          } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')) {
             needSupply('Food');
-          } else if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
+          } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
             needSupply('Shelter');
           } else if (tableName === "Equipment") {
             needSupply('Equipment');
-          } else if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing') || tableName.toLowerCase().includes('clothes')) {
+          } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing') || textObj.message.toLowerCase().includes('clothes')) {
             needSupply('Clothing');
-          } else if (tableName === "Power" || tableName.toLowerCase().includes('power') || tableName.toLowerCase().includes('electricity')) {
+          } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power') || textObj.message.toLowerCase().includes('electricity')) {
             needSupply('Power');
           } else if (tableName === "Pet") {
             needSupply('Pet');
@@ -814,18 +814,18 @@ app.post('/sms', (req, res) => {
             }).catch(err => console.error(err))
           })
         }
-        analyzeCat().then((tableName) => {
-          if (tableName === 'Water' || tableName.toLowerCase().includes('water')){
+        checkLength(textObj.message).then((tableName) => {
+          if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')){
             outFunc('Water');
-          } else if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
+          } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')) {
             outFunc('Food');
-          } else if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
+          } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
             outFunc('Shelter');
           } else if (tableName === "Equipment") {
             outFunc('Equipment');
-          } else if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing' || tableName.toLowerCase().includes('clothes'))) {
+          } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing' || textObj.message.toLowerCase().includes('clothes'))) {
             outFunc('Clothing');
-          } else if (tableName === "Power" || tableName.toLowerCase().includes('power') || tableName.toLowerCase().includes('electricity')) {
+          } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power') || textObj.message.toLowerCase().includes('electricity')) {
             outFunc('Power');
           } else if (tableName === "Pet") {
             outFunc('Pet');
