@@ -36,7 +36,12 @@
           <br>
           <i>Created: </i> {{m.createdAt}}
           <br>
-          <button (click)="goHelp(m.id_phone)">Go Help</button>
+          <button mat-button color="primary" (click)="prompt()">Help?</button>
+          <div *ngIf="showPrompt">
+            <p>Clicking yes will send YOUR name and number to this person and assign you as the helper. Are you sure you want to help?</p>
+            <button mat-button color="warn" (click)="goHelp(m.id_phone, m.address)">Yes</button>
+            <button mat-button color="warn" (click)="prompt()">No</button>
+          </div>
         </agm-info-window>
       </agm-marker>
       <agm-marker

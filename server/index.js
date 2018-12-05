@@ -358,7 +358,7 @@ app.post('/filterPinsBySupply', (req, res) => {
 });
 
 app.post('/goHelp', (req, res) => {
-  const { phoneId } = req.body;
+  const { phoneId, pinAddress } = req.body;
   db.phone.findOne({ where: { id: phoneId }, raw:true }, (error) => {
     console.log('error finding phone: ', error);
     res.status(500).send(error);
@@ -376,7 +376,14 @@ app.post('/goHelp', (req, res) => {
           from: '15043020292',
           to: number,
           body: `${user.name_first} ${user.name_last} is coming to help. You may reach them at ${userPhone.number}.`,
-        }).catch(err => console.error(err))
+        });
+        return userPhone.number;
+      }).then((num) => {
+        client.messages.create({
+          from: '15043020292',
+          to: num,
+          body: `Here is the address and phone number of the person you are helping: ${pinAddress} | ${phone.number}`,
+        });
       });
     });
   });

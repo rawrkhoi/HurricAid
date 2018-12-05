@@ -4,8 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { HelppinComponent } from '../helppin/helppin.component';
 import { HavepinComponent } from '../havepin/havepin.component';
 import { MatDialog } from '@angular/material';
-import { Observable } from 'rxjs';
-import { AuthService } from '../service/auth.service';
 import * as moment from 'moment';
 
 @Component({
@@ -17,6 +15,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   model: any = {};
   loggedIn: boolean = false;
+  showPrompt: boolean = false;
   zoom: number = 12;
   lat: any;
   lng: any;
@@ -28,8 +27,7 @@ export class MapComponent implements OnInit, OnDestroy {
   constructor(
     private map: MapsService,
     private http: HttpClient,
-    public dialog: MatDialog,
-    private authService: AuthService) {
+    public dialog: MatDialog) {
   }
 
   ngOnInit() {
@@ -132,10 +130,12 @@ export class MapComponent implements OnInit, OnDestroy {
       }, 3000);
     });
   }
-
-  goHelp(id) {
-    this.http.post('/goHelp', { phoneId: id}).subscribe(() => {
+  goHelp(id, address) {
+    this.http.post('/goHelp', { phoneId: id, pinAddress: address }).subscribe(() => {
       console.log('helped');
     });
+  }
+  prompt() {
+    this.showPrompt = !this.showPrompt;
   }
 }
