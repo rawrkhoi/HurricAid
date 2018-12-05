@@ -4,12 +4,12 @@ let watsonCategories = {
     table: 'Food',
   },
   waterInfo: {
-    keywords: ['bottled water'],
+    keywords: ['bottled water', 'metals', 'water', 'freshwater'],
     table: 'Water',
   },
   shelterInfo: {
     // we may want to change the 'welfare' one to move it somewhere else
-    keywords: ['hotels', 'law, government, and politics', 'apartments', 'society/crime', 'budget travel', 'social services'],
+    keywords: ['hotels', 'law, government, and politics', 'apartments', 'society/crime', 'budget travel', 'social services', 'sleep', 'bed and bath'],
     table: 'Shelter',
   },
   equipmentInfo: {
@@ -37,7 +37,7 @@ let watsonCategories = {
     table: 'Health',
   },
   householdInfo: {
-    keywords: ['appliances', 'bed and bath', 'laundry', 'pest control'],
+    keywords: ['appliances', 'laundry', 'pest control'],
     table: 'Household',
   },
 }

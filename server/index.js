@@ -386,6 +386,7 @@ app.get('/logout', (req, res) => {
   res.send();
 });
 
+// Twilio ======================================
 app.post('/sms', (req, res) => {
   let textObj = {};
   const smsCount = req.session.counter || 0;
@@ -399,7 +400,7 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
     
     // HELP //
-  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'help@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'helpat') {
     req.session.command = 'help';
     textObj.address = req.body.Body.slice(5);
     if (!req.session.counter){
@@ -452,7 +453,7 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
 
     // HAVE //
-  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'have@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'haveat') {
     req.session.command = 'have';
     textObj.address = req.body.Body.slice(5);
     if (!req.session.counter) {
@@ -505,7 +506,7 @@ app.post('/sms', (req, res) => {
     
 
     // NEED //
-  } else if (req.body.Body.replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'need@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'needat') {
     req.session.command = "need";
     textObj.address = req.body.Body.slice(5);
     if (!req.session.counter) {
@@ -531,7 +532,7 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
 
     // OUT //
-  } else if (req.body.Body.replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 4).toLowerCase() === 'out@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'outat') {
     req.session.command = "out";
     textObj.address = req.body.Body.slice(4);
     if (!req.session.counter) {
@@ -560,37 +561,45 @@ app.post('/sms', (req, res) => {
       textObj.message = req.body.Body;
       
       let supplyStr = '';
-      let analyzeCat = () => {
-        return new Promise ((res, rej) => {
-          nlu.analyze(
-            {
-              text: textObj.message,
-              features: {
-                categories: {}
-              }
-            },
-            function (err, response) {
-              let catStr = '';
-              if (err) {
-                console.error(err);
-              } else {
-                console.log(response);
-                response.categories.map((result) => {
-                  catStr += result.label;
-                });
-                Object.values(watsonCats.watsonCategories).forEach((category) => {
-                  category.keywords.forEach((keyword) => {
-                    if (catStr.includes(keyword)){
-                      supplyStr = category.table;
-                    }
+      let analyzeCat = (msg) => {
+          return new Promise ((res, rej) => {
+            nlu.analyze(
+              {
+                text: msg,
+                features: {
+                  categories: {}
+                }
+              },
+              function (err, response) {
+                let catStr = '';
+                if (err) {
+                  console.error(err);
+                } else {
+                  response.categories.map((result) => {
+                    catStr += result.label;
+                  });
+                  Object.values(watsonCats.watsonCategories).forEach((category) => {
+                    category.keywords.forEach((keyword) => {
+                      if (catStr.split('/').includes(keyword)){
+                        supplyStr = category.table;
+                      }
+                    })
                   })
-                })
-                res(supplyStr);
+                  res(supplyStr);
+                }
               }
-            }
-          );
-        })
-      }
+            );
+          })
+        }
+
+      let checkLength = (message) => {
+        if (message.split(' ').length > 3) {
+          return analyzeCat(message);
+        } else {
+          let longerMessage = "I want to offer : " + message + "to whoever needs it.";
+          return analyzeCat(longerMessage);
+        }
+    }
 
       if (req.session.command === 'have') {
         let addHaves = (supply) => {
@@ -632,42 +641,65 @@ app.post('/sms', (req, res) => {
             })
           })
         }
-        analyzeCat().then((tableName) => {
-          if (tableName === "Water"){
+        checkLength(textObj.message).then((tableName) => {
+          if (tableName === "Water" || textObj.message.toLowerCase().includes('water')){
             addHaves('Water');
-          }
-          if (tableName === "Food"){
+          } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')){
             addHaves('Food');
-          }
-          if (tableName === "Shelter") {
+          } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
             addHaves('Shelter');
-          }
-          if (tableName === "Equipment"){
+          } else if (tableName === "Equipment"){
             addHaves('Equipment');
-          }
-          if (tableName === "Clothing") {
+          } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing') || textObj.message.toLowerCase().includes('clothes')) {
             addHaves('Clothing');
-          }
-          if (tableName === "Power") {
+          } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power' || textObj.message.toLowerCase().includes('electricity'))) {
             addHaves('Power');
-          }
-          if (tableName === "Pet") {
+          } else if (tableName === "Pet") {
             addHaves('Pet');
-          }
-          if (tableName === "Transportation") {
+          } else if (tableName === "Transportation") {
             addHaves('Transportation');
-          }
-          if (tableName === "Health") {
+          } else if (tableName === "Health") {
             addHaves('Health');
-          }
-          if (tableName === "Household") {
+          } else if (tableName === "Household") {
             addHaves('Household');
-          } 
-          else if (!tableName){
+          } else {
             addHaves('Other');
           }
         })
       } else if (req.session.command === 'need'){
+        let getLatLong = (address) => {
+          return new Promise((res, rej) => {
+            return googleMapsClient.geocode({
+              address: address
+            }).asPromise().then((response) => {
+              return response
+            }).then((response) => {
+              const resultObj = response.json.results[0];
+              const latitude = resultObj.geometry.location.lat;
+              const longitude = resultObj.geometry.location.lng;
+              const formatAddress = resultObj.formatted_address;
+              req.session.address = formatAddress;
+              res(resultObj.geometry.location);
+            })
+          })
+        }
+
+        let degreesToRadians = (degrees) => {
+          return degrees * Math.PI / 180;
+        }
+
+        let distanceInKmBetweenEarthCoordinates = (lat1, lon1, lat2, lon2) => {
+          var earthRadiusKm = 6371;
+          var dLat = degreesToRadians(lat2 - lat1);
+          var dLon = degreesToRadians(lon2 - lon1);
+          lat1 = degreesToRadians(lat1);
+          lat2 = degreesToRadians(lat2);
+          var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+          var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return earthRadiusKm * c;
+        }
+
         let needSupply = (supply) => {
           let addressString = '';
           let pushTo = (addressVal, msgVal) => {
@@ -686,13 +718,41 @@ app.post('/sms', (req, res) => {
                 id_supply: supplyid.id,
               },
               raw: true,
-            }).then((pinIdArray) => {
-              pinIdArray.map((pinId) => {
-                db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
-                  pushTo(pin.address, pin.message);
+            })
+            .then((pinIdArray) => {
+              return Promise.all(pinIdArray.map((pinId) => {
+                return db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
+                  return getLatLong(req.session.address).then((result) => {
+                    let resLatRad = degreesToRadians(result.lat);
+                    let resLngRad = degreesToRadians(result.lng);
+                    let pinLatRad = degreesToRadians(Number(pin.latitude));
+                    let pinLngRad = degreesToRadians(Number(pin.longitude));
+                    let distanceObj = {
+                      address: pin.address,
+                      distance: distanceInKmBetweenEarthCoordinates(resLatRad, resLngRad, pinLatRad, pinLngRad),
+                      message: pin.message
+                    }
+                    return distanceObj;
+                  })
                 })
+              })).then((addrMsgDistArr) => {
+                return addrMsgDistArr.sort((a, b) => {
+                  return a.distance - b.distance;
+                })
+              }).then((sortedArr) => {
+                if (sortedArr.length >= 3){
+                  pushTo(sortedArr[0].address, sortedArr[0].message);
+                  pushTo(sortedArr[1].address, sortedArr[1].message);
+                  pushTo(sortedArr[2].address, sortedArr[2].message);
+                } else if (sortedArr.length === 2){
+                  pushTo(sortedArr[0].address, sortedArr[0].message);
+                  pushTo(sortedArr[1].address, sortedArr[1].message);
+                } else {
+                  pushTo(sortedArr[0].address, sortedArr[0].message);
+                }
+                return addressString;
               })
-            }).then(() => {
+            .then(() => {
               setTimeout(() => {
                 return client.messages.create({
                   from: '15043020292',
@@ -702,39 +762,31 @@ app.post('/sms', (req, res) => {
               }, 1000);
             })
           })
+          })
         }
-        analyzeCat().then((tableName) => {
-          if (tableName === 'Water') {
+
+        checkLength(textObj.message).then((tableName) => {
+          if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')) {
             needSupply('Water');
-          }
-          if (tableName === "Food") {
+          } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')) {
             needSupply('Food');
-          }
-          if (tableName === "Shelter") {
+          } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
             needSupply('Shelter');
-          }
-          if (tableName === "Equipment") {
+          } else if (tableName === "Equipment") {
             needSupply('Equipment');
-          }
-          if (tableName === "Clothing") {
+          } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing') || textObj.message.toLowerCase().includes('clothes')) {
             needSupply('Clothing');
-          }
-          if (tableName === "Power") {
+          } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power') || textObj.message.toLowerCase().includes('electricity')) {
             needSupply('Power');
-          }
-          if (tableName === "Pet") {
+          } else if (tableName === "Pet") {
             needSupply('Pet');
-          }
-          if (tableName === "Transportation") {
+          } else if (tableName === "Transportation") {
             needSupply('Transportation');
-          }
-          if (tableName === "Health") {
+          } else if (tableName === "Health") {
             needSupply('Health');
-          }
-          if (tableName === "Household") {
+          }  else if (tableName === "Household") {
             needSupply('Household');
-          }
-          else if (!tableName) {
+          } else {
             needSupply('Other');
           }
         })
@@ -748,34 +800,42 @@ app.post('/sms', (req, res) => {
             },
             raw: true,
           }).then((supplyId) => {
-            return db.pin.findAll({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true }).then((pins) => {
-              pins.filter((pin) => {
-                req.session.pin = pin;
-                return db.supply_info.findOne({
-                  attributes: ['id'],
-                  where: {
-                    id_supply: supplyId.id,
-                    id_pin: req.session.pin.id,
-                  },
-                  raw: true,
-                })
+            return db.pin.findAll({ attributes: ['id'], where: { have: true, address: req.session.address }, raw: true })
+              .then((pins) => {
+                return Promise.all(pins.map((pin) => {
+                  return db.supply_info.findOne({
+                    attributes: ['id', 'id_pin'],
+                    where: {
+                      id_supply: supplyId.id,
+                      id_pin: pin.id,
+                    },
+                    raw: true,
+                  })
+              }))
+              .then((supplyInfoIds) => {
+                return supplyInfoIds.filter((id) => {
+                  return id !== null;
+                })[0]
               })
-            }).then(() => {
-              return db.supply_info.destroy({
-                where: {
-                  id_pin: req.session.pin.id,
-                  id_supply: supplyId.id,
-                }
-              })
-            }).then(() => {
-                return db.pin.destroy({
+              .then((supplyInfo) => {
+                return db.supply_info.destroy({
                   where: {
-                    id: req.session.pin.id,
-                    have: true,
-                    address: req.session.address,
+                    id: supplyInfo.id,
                   }
+                }).then(() => {
+                  return supplyInfo.id_pin;
                 })
-            }).then(() => {
+              })
+              .then((pinId) => {
+                  return db.pin.destroy({
+                    where: {
+                      id: pinId,
+                      have: true,
+                    }
+                  })
+              })
+            })
+            .then(() => {
               return client.messages.create({
                 from: '15043020292',
                 to: textObj.number,
@@ -784,38 +844,28 @@ app.post('/sms', (req, res) => {
             }).catch(err => console.error(err))
           })
         }
-        analyzeCat().then((tableName) => {
-          if (tableName === 'Water'){
+        checkLength(textObj.message).then((tableName) => {
+          if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')){
             outFunc('Water');
-          }
-          if (tableName === "Food") {
+          } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')) {
             outFunc('Food');
-          }
-          if (tableName === "Shelter") {
+          } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
             outFunc('Shelter');
-          }
-          if (tableName === "Equipment") {
+          } else if (tableName === "Equipment") {
             outFunc('Equipment');
-          }
-          if (tableName === "Clothing") {
+          } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing' || textObj.message.toLowerCase().includes('clothes'))) {
             outFunc('Clothing');
-          }
-          if (tableName === "Power") {
+          } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power') || textObj.message.toLowerCase().includes('electricity')) {
             outFunc('Power');
-          }
-          if (tableName === "Pet") {
+          } else if (tableName === "Pet") {
             outFunc('Pet');
-          }
-          if (tableName === "Transportation") {
+          } else if (tableName === "Transportation") {
             outFunc('Transportation');
-          }
-          if (tableName === "Health") {
+          } else if (tableName === "Health") {
             outFunc('Health');
-          }
-          if (tableName === "Household") {
+          } else if (tableName === "Household") {
             outFunc('Household');
-          }
-          else if (!tableName) {
+          } else {
             outFunc('Other');
           }
         })
@@ -835,7 +885,6 @@ app.post('/sms', (req, res) => {
                 address: req.session.address
               }}
             )
-            console.log(req.session);
           }).then(() => {
             return client.messages.create({
               from: '15043020292',
