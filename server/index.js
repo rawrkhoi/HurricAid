@@ -718,9 +718,16 @@ app.post('/sms', (req, res) => {
                   return a.distance - b.distance;
                 })
               }).then((sortedArr) => {
-                pushTo(sortedArr[0].address, sortedArr[0].message);
-                pushTo(sortedArr[1].address, sortedArr[1].message);
-                pushTo(sortedArr[2].address, sortedArr[2].message);
+                if (sortedArr.length >= 3){
+                  pushTo(sortedArr[0].address, sortedArr[0].message);
+                  pushTo(sortedArr[1].address, sortedArr[1].message);
+                  pushTo(sortedArr[2].address, sortedArr[2].message);
+                } else if (sortedArr.length === 2){
+                  pushTo(sortedArr[0].address, sortedArr[0].message);
+                  pushTo(sortedArr[1].address, sortedArr[1].message);
+                } else {
+                  pushTo(sortedArr[0].address, sortedArr[0].message);
+                }
                 return addressString;
               })
             .then(() => {
@@ -735,6 +742,7 @@ app.post('/sms', (req, res) => {
           })
           })
         }
+
         checkLength(textObj.message).then((tableName) => {
           if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')) {
             needSupply('Water');
