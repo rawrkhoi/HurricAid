@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { keys } from '../../../config';
 
@@ -8,26 +8,32 @@ import { keys } from '../../../config';
   styleUrls: ['./helppin.component.css']
 })
 export class HelppinComponent implements OnInit {
-  model: any = {};
 
+  addr: any;
+  model: any = {};
   help: boolean = false;
   have: boolean = false;
-
   message: string;
   address: string;
   lat: any;
   lng: any;
   markers: any = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private zone: NgZone) { }
 
   ngOnInit() {
     this.help = true;
     this.have = false;
   }
+  setAddress(addrObj) {
+    this.zone.run(() => {
+      this.addr = addrObj;
+      this.address = this.addr.formatted_address;
+    });
+    console.log(this.address)
+  }
   setMsgAddress() {
     this.message = this.model.message;
-    this.address = this.model.address;
     this.http.get((`https://maps.googleapis.com/maps/api/geocode/json`),
       {
         params: {

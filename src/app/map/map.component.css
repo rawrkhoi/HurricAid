@@ -12,17 +12,17 @@ agm-map {
   padding-top: 0%;
 }
 ::ng-deep .mat-form-field-empty.mat-form-field-label {
-  color: lightgray !important;
+  color: gray !important;
 }
 ::ng-deep .mat-form-field-label {
-  color: lightgray !important;
+  color: gray !important;
 }
 ::ng-deep .mat-form-field-underline {
-  background-color: lightgray !important;
+  background-color: gray !important;
 } 
 ::ng-deep .mat-select-content {
-  color: lightgray !important;
+  color: gray !important;
 }
 ::ng-deep .mat-select-value-text {
-  color: lightgray !important;
+  color: gray !important;
 }
