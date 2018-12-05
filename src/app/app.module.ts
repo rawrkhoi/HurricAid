@@ -26,7 +26,6 @@ import { AgmCoreModule } from '@agm/core';
 import { UiService } from './service/ui.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GooglePlaceModule } from "ngx-google-places-autocomplete";
 import { GooglePlacesDirective } from './google-places.directive';
 import {
   MatFormFieldModule,
@@ -79,7 +78,6 @@ import {
     MatIconModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
-    GooglePlaceModule,
     AgmCoreModule.forRoot({
       apiKey: `${keys.googleMaps}`,
       libraries: ['places']
