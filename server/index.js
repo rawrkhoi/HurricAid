@@ -549,16 +549,13 @@ app.post('/sms', (req, res) => {
                 if (err) {
                   console.error(err);
                 } else {
-                  console.log(response);
                   response.categories.map((result) => {
                     catStr += result.label;
-                    console.log(catStr, 'THIS IS THE CATEGORY STRING')
                   });
                   Object.values(watsonCats.watsonCategories).forEach((category) => {
                     category.keywords.forEach((keyword) => {
                       if (catStr.split('/').includes(keyword)){
                         supplyStr = category.table;
-                        console.log(supplyStr, 'THIS IS THE SUPPLY STRING')
                       }
                     })
                   })
@@ -697,7 +694,6 @@ app.post('/sms', (req, res) => {
               raw: true,
             })
             .then((pinIdArray) => {
-              console.log(pinIdArray, 'THIS IS THE PIN ID ARRAY');
               return Promise.all(pinIdArray.map((pinId) => {
                 return db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
                   return getLatLong(req.session.address).then((result) => {
@@ -863,7 +859,6 @@ app.post('/sms', (req, res) => {
                 address: req.session.address
               }}
             )
-            console.log(req.session);
           }).then(() => {
             return client.messages.create({
               from: '15043020292',
