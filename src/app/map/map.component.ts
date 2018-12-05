@@ -132,4 +132,10 @@ export class MapComponent implements OnInit, OnDestroy {
       }, 3000);
     });
   }
+
+  goHelp(id) {
+    this.http.post('/goHelp', { phoneId: id}).subscribe(() => {
+      console.log('helped');
+    });
+  }
 }
