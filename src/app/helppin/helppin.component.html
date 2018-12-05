@@ -1,17 +1,31 @@
 <div class="row">
-  <form name="form" onSubmit="return false" #f="ngForm" novalidate>
+  <form novalidate>
     <h3>Where are you?</h3>
     <div class="address-input">
       <mat-form-field>
-        <input matInput name="address" [(ngModel)]="model.address" placeholder="Address">
+        <input 
+          matInput
+          class="google-place-input"
+          google-place
+          (onSelect)="setAddress($event)"
+          placeholder="Address"
+        >
       </mat-form-field>
     </div>
   </form>
   <form>
     <div class="pin-input">
       <mat-form-field>
-        <input matInput name="message" matInput #message maxlength="255" [(ngModel)]="model.message" placeholder="Message (Optional)">
+        <input
+          matInput
+          name="message"
+          #message
+          maxlength="255"
+          [(ngModel)]="model.message"
+          placeholder="Message (Optional)"
+        >
         <mat-hint align="end">{{message.value.length}} / 255</mat-hint>
+        <br>
       </mat-form-field>
       <br>
       <button mat-flat-button color="primary" (click)="setMsgAddress()" matDialogClose>Create Pin</button>
