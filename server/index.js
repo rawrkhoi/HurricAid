@@ -620,40 +620,61 @@ app.post('/sms', (req, res) => {
         analyzeCat().then((tableName) => {
           if (tableName === "Water" || tableName.toLowerCase().includes('water')){
             addHaves('Water');
-          }
-          if (tableName === "Food" || tableName.toLowerCase().includes('food')){
+          } else if (tableName === "Food" || tableName.toLowerCase().includes('food')){
             addHaves('Food');
-          }
-          if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
+          } else if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
             addHaves('Shelter');
-          }
-          if (tableName === "Equipment"){
+          } else if (tableName === "Equipment"){
             addHaves('Equipment');
-          }
-          if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing') || tableName.toLowerCase().includes('clothes')) {
+          } else if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing') || tableName.toLowerCase().includes('clothes')) {
             addHaves('Clothing');
-          }
-          if (tableName === "Power" || tableName.toLowerCase().includes('power' || tableName.toLowerCase().includes('electricity'))) {
+          } else if (tableName === "Power" || tableName.toLowerCase().includes('power' || tableName.toLowerCase().includes('electricity'))) {
             addHaves('Power');
-          }
-          if (tableName === "Pet") {
+          } else if (tableName === "Pet") {
             addHaves('Pet');
-          }
-          if (tableName === "Transportation") {
+          } else if (tableName === "Transportation") {
             addHaves('Transportation');
-          }
-          if (tableName === "Health") {
+          } else if (tableName === "Health") {
             addHaves('Health');
-          }
-          if (tableName === "Household") {
+          } else if (tableName === "Household") {
             addHaves('Household');
-          } 
-          else if (tableName.includes(' ')){
+          } else {
             addHaves('Other');
           }
         })
       } else if (req.session.command === 'need'){
+        let getLatLong = (address) => {
+          return new Promise((res, rej) => {
+            return googleMapsClient.geocode({
+              address: address
+            }).asPromise().then((response) => {
+              return response
+            }).then((response) => {
+              const resultObj = response.json.results[0];
+              const latitude = resultObj.geometry.location.lat;
+              const longitude = resultObj.geometry.location.lng;
+              const formatAddress = resultObj.formatted_address;
+              req.session.address = formatAddress;
+              res(resultObj.geometry.location);
+            })
+          })
+        }
 
+        let degreesToRadians = (degrees) => {
+          return degrees * Math.PI / 180;
+        }
+
+        let distanceInKmBetweenEarthCoordinates = (lat1, lon1, lat2, lon2) => {
+          var earthRadiusKm = 6371;
+          var dLat = degreesToRadians(lat2 - lat1);
+          var dLon = degreesToRadians(lon2 - lon1);
+          lat1 = degreesToRadians(lat1);
+          lat2 = degreesToRadians(lat2);
+          var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+          var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return earthRadiusKm * c;
+        }
 
         let needSupply = (supply) => {
           let addressString = '';
@@ -673,16 +694,30 @@ app.post('/sms', (req, res) => {
                 id_supply: supplyid.id,
               },
               raw: true,
-            }).then((pinIdArray) => {
-              pinIdArray.map((pinId) => {
-                let findDistance = (needCoords, haveCoords) => {
-
-                }
-                db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
-                  pushTo(pin.address, pin.message);
+            })
+            .then((pinIdArray) => {
+              console.log(pinIdArray, 'THIS IS THE PIN ID ARRAY');
+              return Promise.all(pinIdArray.map((pinId) => {
+                return db.pin.findOne({ where: { id: pinId.id_pin }, raw: true }).then((pin) => {
+                  return getLatLong(req.session.address).then((result) => {
+                    let resLatRad = degreesToRadians(result.lat);
+                    let resLngRad = degreesToRadians(result.lng);
+                    let pinLatRad = degreesToRadians(Number(pin.latitude));
+                    let pinLngRad = degreesToRadians(Number(pin.longitude));
+                    let distanceObj = {
+                      address: pin.address,
+                      distance: distanceInKmBetweenEarthCoordinates(resLatRad, resLngRad, pinLatRad, pinLngRad),
+                      message: pin.message
+                    }
+                    return distanceObj;
+                  })
                 })
+              })).then((addrMsgDistArr) => {
+                console.log(addrMsgDistArr.sort((a, b) => {
+                  return a.distance - b.distance;
+                }));
               })
-            }).then(() => {
+            .then(() => {
               setTimeout(() => {
                 return client.messages.create({
                   from: '15043020292',
@@ -692,39 +727,30 @@ app.post('/sms', (req, res) => {
               }, 1000);
             })
           })
+          })
         }
         analyzeCat().then((tableName) => {
           if (tableName === 'Water' || tableName.toLowerCase().includes('water')) {
             needSupply('Water');
-          }
-          if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
+          } else if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
             needSupply('Food');
-          }
-          if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
+          } else if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
             needSupply('Shelter');
-          }
-          if (tableName === "Equipment") {
+          } else if (tableName === "Equipment") {
             needSupply('Equipment');
-          }
-          if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing') || tableName.toLowerCase().includes('clothes')) {
+          } else if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing') || tableName.toLowerCase().includes('clothes')) {
             needSupply('Clothing');
-          }
-          if (tableName === "Power" || tableName.toLowerCase().includes('power') || tableName.toLowerCase().includes('electricity')) {
+          } else if (tableName === "Power" || tableName.toLowerCase().includes('power') || tableName.toLowerCase().includes('electricity')) {
             needSupply('Power');
-          }
-          if (tableName === "Pet") {
+          } else if (tableName === "Pet") {
             needSupply('Pet');
-          }
-          if (tableName === "Transportation") {
+          } else if (tableName === "Transportation") {
             needSupply('Transportation');
-          }
-          if (tableName === "Health") {
+          } else if (tableName === "Health") {
             needSupply('Health');
-          }
-          if (tableName === "Household") {
+          }  else if (tableName === "Household") {
             needSupply('Household');
-          }
-          else if (tableName.includes(' ')) {
+          } else {
             needSupply('Other');
           }
         })
@@ -785,35 +811,25 @@ app.post('/sms', (req, res) => {
         analyzeCat().then((tableName) => {
           if (tableName === 'Water' || tableName.toLowerCase().includes('water')){
             outFunc('Water');
-          }
-          if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
+          } else if (tableName === "Food" || tableName.toLowerCase().includes('food')) {
             outFunc('Food');
-          }
-          if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
+          } else if (tableName === "Shelter" || tableName.toLowerCase().includes('shelter')) {
             outFunc('Shelter');
-          }
-          if (tableName === "Equipment") {
+          } else if (tableName === "Equipment") {
             outFunc('Equipment');
-          }
-          if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing' || tableName.toLowerCase().includes('clothes'))) {
+          } else if (tableName === "Clothing" || tableName.toLowerCase().includes('clothing' || tableName.toLowerCase().includes('clothes'))) {
             outFunc('Clothing');
-          }
-          if (tableName === "Power" || tableName.toLowerCase().includes('power') || tableName.toLowerCase().includes('electricity')) {
+          } else if (tableName === "Power" || tableName.toLowerCase().includes('power') || tableName.toLowerCase().includes('electricity')) {
             outFunc('Power');
-          }
-          if (tableName === "Pet") {
+          } else if (tableName === "Pet") {
             outFunc('Pet');
-          }
-          if (tableName === "Transportation") {
+          } else if (tableName === "Transportation") {
             outFunc('Transportation');
-          }
-          if (tableName === "Health") {
+          } else if (tableName === "Health") {
             outFunc('Health');
-          }
-          if (tableName === "Household") {
+          } else if (tableName === "Household") {
             outFunc('Household');
-          }
-          else if (tableName.includes(' ')) {
+          } else {
             outFunc('Other');
           }
         })
