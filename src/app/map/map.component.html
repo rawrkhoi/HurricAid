@@ -27,16 +27,28 @@
         (markerClick)="gm.lastOpen?.close(); gm.lastOpen = infoWindow"
       >
         <agm-info-window #infoWindow>
-          <div>
-            <strong>Help</strong>
+          <b>Help Message: </b>{{m.message}}
+          <br>
+          <b>Created: </b> {{m.createdAt}}
+          <br><br>
+          <button class="help-button" style="color: red;" (click)="prompt()">Help?</button>
+          <br>
+          <div *ngIf="showPrompt">
+            <p><small>
+              Clicking yes will send YOUR name and number to this person
+              <br>
+              and assign you as the helper. Are you sure you want to help?
+            </small></p>
+            <button
+              class="help-button"
+              style="color: red;"
+              (click)="goHelp(m.id_phone, m.address)">Yes</button>
+            <button
+              class="help-button"
+              style="color: #3E7CB1;"
+              (click)="prompt()">No</button>
           </div>
-          {{m.message}}
           <br>
-          <i>Address: </i> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
-          <br>
-          <i>Created: </i> {{m.createdAt}}
-          <br>
-          <button (click)="goHelp(m.id_phone)">Go Help</button>
         </agm-info-window>
       </agm-marker>
       <agm-marker
@@ -48,9 +60,7 @@
         (markerClick)="gm.lastOpen?.close(); gm.lastOpen = infoWindow"
       >
         <agm-info-window #infoWindow>
-          <div>
-            <strong>Have</strong>
-          </div>
+          <strong>Amenities: </strong>
           {{m.message}}
           <br>
           <i>Address: </i> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>

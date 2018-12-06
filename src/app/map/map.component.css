@@ -2,12 +2,19 @@ agm-map {
   height: 65vh;
   width: 100%;
 }
-
 .pin-box {
   margin-right: 20px;
   margin-left: 20px;
 }
-
+.help-button {
+  background-color: rgba(255, 255, 255, 0);
+  align-content: center;
+  text-align: center;
+  font-size: 12px;
+  margin-right: 20px;
+  margin-left: 20px;
+  border: 0ch;
+}
 .map-full-card-content {
   padding-top: 0%;
 }
