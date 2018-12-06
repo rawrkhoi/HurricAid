@@ -31,6 +31,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.markers = [];
     this.http.get('/getInfo').subscribe((info: any) => {
       if (!info) {
         this.loggedIn = false;
@@ -109,25 +110,13 @@ export class MapComponent implements OnInit, OnDestroy {
     });
   }
   helpBox(): void {
-    const dialogRef = this.dialog.open(HelppinComponent, {
+    this.dialog.open(HelppinComponent, {
       width: '380px',
-    });
-    this.ngOnDestroy();
-    dialogRef.afterClosed().subscribe(() => {
-      setTimeout(() => {
-        this.ngOnInit();
-      }, 3000);
     });
   }
   haveBox(): void {
-    const dialogRef = this.dialog.open(HavepinComponent, {
+    this.dialog.open(HavepinComponent, {
       width: '380px',
-    });
-    this.ngOnDestroy();
-    dialogRef.afterClosed().subscribe(() => {
-      setTimeout(() => {
-        this.ngOnInit();
-      }, 3000);
     });
   }
   goHelp(id, address) {
