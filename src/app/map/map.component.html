@@ -29,6 +29,8 @@
         <agm-info-window #infoWindow>
           <b>Help Message: </b>{{m.message}}
           <br>
+          <b>Address: </b> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
+          <br>
           <b>Created: </b> {{m.createdAt}}
           <br><br>
           <button class="help-button" style="color: red;" (click)="prompt()">Help?</button>
@@ -63,9 +65,9 @@
           <strong>Amenities: </strong>
           {{m.message}}
           <br>
-          <i>Address: </i> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
+          <b>Address: </b> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
           <br>
-          <i>Created: </i> {{m.createdAt}}
+          <b>Created: </b> {{m.createdAt}}
           <br>
         </agm-info-window>
       </agm-marker>
