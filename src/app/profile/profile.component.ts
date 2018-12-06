@@ -5,7 +5,6 @@ import { LastnameComponent} from './components/lastname/lastname.component';
 import { EmailComponent} from './components/email/email.component';
 import { PhoneComponent} from './components/phone/phone.component';
 import { PasswordComponent} from './components/password/password.component';
-import { ManageComponent } from './components/manage/manage.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as moment from 'moment';
 
