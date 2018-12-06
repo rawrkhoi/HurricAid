@@ -3,7 +3,7 @@
   height: 100%;
   display: grid;
   grid-template-columns: auto;
-  grid-template-rows: 0.5fr auto;
+  grid-template-rows: 0.1fr auto;
   position: relative;
   background: #2F3F70;
   text-align: center;
