@@ -6,7 +6,8 @@ import { EmailComponent} from './components/email/email.component';
 import { PhoneComponent} from './components/phone/phone.component';
 import { PasswordComponent} from './components/password/password.component';
 import { ManageComponent } from './components/manage/manage.component';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import * as moment from 'moment';
 
 export interface DialogData {
 
@@ -23,6 +24,9 @@ export class ProfileComponent implements OnInit {
   nameLast: string;
   email: string;
   number: string;
+  showEdit: boolean = false;
+  userPins: any = [];
+  display: boolean = true;
   
   constructor(public dialog: MatDialog, private http: HttpClient) { }
 
@@ -32,6 +36,25 @@ export class ProfileComponent implements OnInit {
       this.nameLast = info.usr.name_last;
       this.email = info.email;
       this.number = info.phoneNum;
+    });
+    this.http.get('/getPinsByUser').subscribe((pins: any) => {
+      if (pins.length !== 0){
+        for (let i = 0; i < pins.length; i ++) {
+          this.userPins.push({
+            id: pins[i].id,
+            help: pins[i].help,
+            have: pins[i].have,
+            address: pins[i].address,
+            id_phone: pins[i].id_phone,
+            latitude: pins[i].latitude,
+            longitude: pins[i].longitude,
+            message: pins[i].message,
+            createdAt: moment(pins[i].createdAt).format('llll'),
+            updatedAt: moment(pins[i].updatedAt).format('llll'),
+          });
+        }
+        this.display = false;
+      }
     });
   }
 
@@ -64,11 +87,22 @@ export class ProfileComponent implements OnInit {
       width: '300px',
     });
   }
+  
+  showEdits(): void {
+    this.showEdit = !this.showEdit;
+  }
 
-  managePins(): void {
-    this.dialog.open(ManageComponent, {
-      width: '300px'
-    })
+  removePin(id): void {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    const options = {
+      headers,
+      withCredentials: true
+    };
+    this.http.post('/removePin', { pinId: id }, options).subscribe((data) => {
+      console.log(data);
+    });
   }
 
 }

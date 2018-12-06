@@ -1,13 +1,36 @@
-<div>
+<div class="info">
+  <h4 style="color: white; font-size: 20px">Profile Information</h4>
   <p style="color: whitesmoke">First Name: {{nameFirst}}</p>
-  <button mat-button color="primary" style="color: whitesmoke" (click)="editFirst()">edit</button>
+  <button class="infoedit" *ngIf="showEdit" mat-button color="primary" (click)="editFirst()">Edit First</button>
   <p style="color: whitesmoke">Last Name: {{nameLast}}</p>
-  <button mat-button color="primary" style="color: whitesmoke" (click)="editLast()">edit</button>
+  <button class="infoedit" *ngIf="showEdit" mat-button color="primary" (click)="editLast()">Edit Last</button>
   <p style="color: whitesmoke">Email: {{email}}</p>
-  <button mat-button color="primary" style="color: whitesmoke" (click)="editEmail()">edit</button>
+  <button class="infoedit" *ngIf="showEdit" mat-button color="primary" (click)="editEmail()">Edit Email</button>
   <p style="color: whitesmoke">Phone Number: {{number}}</p>
-  <button mat-button color="primary" style="color: whitesmoke" (click)="editPhone()">edit</button><br>
-  <button mat-button color="primary" style="color: whitesmoke" (click)="editPassword()">edit password</button>
+  <button class="infoedit" *ngIf="showEdit" mat-button color="primary" (click)="editPhone()">Edit Number</button><br>
+  <button class="infoedit" style="margin-top: 10px" *ngIf="showEdit" mat-button color="primary" (click)="editPassword()">Edit Password</button>
   <br>
-  <button mat-button color="primary" style="color: whitesmoke" (click)="managePins()">manage pins</button>
+  <button class="edit" mat-fab (click)="showEdits()">Edit</button>
+</div>
+
+<div class="manage">
+  <h4 style="color: white; font-size: 20px">Pin Information</h4>
+  <div *ngFor="let pin of userPins;let i = index">
+    <hr> 
+    <div *ngIf="pin.help">
+      <strong>Help</strong> <br>
+      <i><u>Message:</u></i> {{pin.message}} <br>
+      <i><u>Address:</u></i> {{pin.address}} <br>
+      <i><u>Time Created:</u></i> {{pin.createdAt}} <br>
+      <button mat-flat-button color="warn" style="margin-top: 3px" (click)="removePin(pin.id)">Remove</button>
+    </div>
+    <div *ngIf="pin.have">
+      <strong>Have</strong> <br>
+      <i><u>Message:</u></i> {{pin.message}} <br>
+      <i><u>Address:</u></i> {{pin.address}} <br>
+      <i><u>Time Created:</u></i> {{pin.createdAt}} <br>
+      <button mat-flat-button color="warn" style="margin-top: 3px" (click)="removePin(pin.id)">Remove</button>
+    </div>
+  </div>
+  <div *ngIf="display" style="color: white">You currently have no pins</div>
 </div>

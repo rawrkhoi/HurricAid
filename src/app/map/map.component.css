@@ -5,6 +5,7 @@ agm-map {
 .pin-box {
   margin-right: 20px;
   margin-left: 20px;
+  margin-bottom: 20px;
 }
 .help-button {
   background-color: rgba(255, 255, 255, 0);
@@ -15,6 +16,7 @@ agm-map {
   margin-left: 20px;
   border: 0ch;
 }
+
 .map-full-card-content {
   padding-top: 0%;
 }
