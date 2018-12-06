@@ -27,21 +27,28 @@
         (markerClick)="gm.lastOpen?.close(); gm.lastOpen = infoWindow"
       >
         <agm-info-window #infoWindow>
-          <div>
-            <strong>Help</strong>
-          </div>
-          {{m.message}}
+          <b>Help Message: </b>{{m.message}}
           <br>
-          <i>Address: </i> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
+          <b>Created: </b> {{m.createdAt}}
+          <br><br>
+          <button class="help-button" style="color: red;" (click)="prompt()">Help?</button>
           <br>
-          <i>Created: </i> {{m.createdAt}}
-          <br>
-          <button mat-button color="primary" (click)="prompt()">Help?</button>
           <div *ngIf="showPrompt">
-            <p>Clicking yes will send YOUR name and number to this person and assign you as the helper. Are you sure you want to help?</p>
-            <button mat-button color="warn" (click)="goHelp(m.id_phone, m.address)">Yes</button>
-            <button mat-button color="warn" (click)="prompt()">No</button>
+            <p><small>
+              Clicking yes will send YOUR name and number to this person
+              <br>
+              and assign you as the helper. Are you sure you want to help?
+            </small></p>
+            <button
+              class="help-button"
+              style="color: red;"
+              (click)="goHelp(m.id_phone, m.address)">Yes</button>
+            <button
+              class="help-button"
+              style="color: #3E7CB1;"
+              (click)="prompt()">No</button>
           </div>
+          <br>
         </agm-info-window>
       </agm-marker>
       <agm-marker
@@ -53,9 +60,7 @@
         (markerClick)="gm.lastOpen?.close(); gm.lastOpen = infoWindow"
       >
         <agm-info-window #infoWindow>
-          <div>
-            <strong>Have</strong>
-          </div>
+          <strong>Amenities: </strong>
           {{m.message}}
           <br>
           <i>Address: </i> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
