@@ -6,6 +6,7 @@
   background-color: #829CBC;
 }
 img {
+  padding-top: 25%;
   max-width: 200px;
   position: relative;
 }
@@ -29,7 +30,7 @@ img {
 .tcontainer{
   width: 100%;
   overflow: hidden;
-  margin: -230px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
   position: fixed;
 }
 .ticker-wrap {
@@ -59,7 +60,7 @@ img {
   .tcontainer{
     width: 100%;
     overflow: hidden;
-    margin: -170px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
     position: fixed;
   }
   .ticker-wrap {
