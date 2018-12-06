@@ -72,7 +72,7 @@ export class HavepinComponent implements OnInit {
           withCredentials: true
         };
         this.http.post('/addPin', { pin: newPin }, options).subscribe((data) => {
-          console.log(data);
+          location.reload();
         });
       })
   }

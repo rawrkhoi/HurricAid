@@ -18,7 +18,6 @@ import { LastnameComponent } from './profile/components/lastname/lastname.compon
 import { EmailComponent } from './profile/components/email/email.component';
 import { PhoneComponent } from './profile/components/phone/phone.component';
 import { PasswordComponent } from './profile/components/password/password.component';
-import { ManageComponent } from './profile/components/manage/manage.component';
 import { HelppinComponent } from './helppin/helppin.component';
 import { HavepinComponent } from './havepin/havepin.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -57,7 +56,6 @@ import {
     PasswordComponent,
     HelppinComponent,
     HavepinComponent,
-    ManageComponent,
     GooglePlacesDirective,
   ],
   imports: [
@@ -91,7 +89,6 @@ import {
     PasswordComponent,
     HelppinComponent,
     HavepinComponent,
-    ManageComponent,
   ],
   providers: [
     UiService,
