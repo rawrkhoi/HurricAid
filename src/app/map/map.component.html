@@ -16,6 +16,7 @@
     [latitude]="lat"
     [longitude]="lng"
     [zoom]="zoom"
+    [gestureHandling]="gestureHandling"
   >
     <div *ngFor="let m of markers;let i = index">
       <agm-marker
@@ -74,7 +75,7 @@
     </div>
   </agm-map>
 </div>
-<br><br>
+<br>
 <button mat-fab class="pin-box" style="background-color: rgb(206, 61, 61)" (click)="helpBox()" *ngIf="loggedIn">Help</button>
 <button mat-fab class="pin-box" style="background-color: #3E7CB1" color="primary" (click)="haveBox()" *ngIf="loggedIn">Have</button>
 <!-- <button mat-fab class="pin-box" style="background-color: #3E7CB1" color="primary" (click)="ngOnInit()">Reset</button> -->
