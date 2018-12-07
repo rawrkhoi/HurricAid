@@ -10,7 +10,7 @@ const http = require('http');
 const port = process.env.port || 8080;
 const twilio = require('twilio');
 const moment = require('moment');
-const bodyParser = require('body-parser');
+const bodyParser = require('body-parser'); 
 const cookieParser = require('cookie-parser');
 const client = new twilio(config.config.accountSid, config.config.authToken);
 const fs = require('fs');
@@ -390,7 +390,7 @@ app.post('/goHelp', (req, res) => {
 
 // reminder for help pins
 setInterval(() => {
-  db.pin.findAll({ where: { help: true, createdAt: { $lte: moment().subtract(5, 'days').toDate() } }, raw:true }).then((pins) => {
+  db.pin.findAll({ where: { help: true, createdAt: { $lte: moment().subtract(1, 'days').toDate() } }, raw:true }).then((pins) => {
     let phoneIdArr = [];
     pins.forEach((pin) => {
       phoneIdArr.push(pin.id_phone);
@@ -405,13 +405,17 @@ setInterval(() => {
       });
     }));
   }).then((numArr) => {
-    numArr[0].forEach((num) => {
+    if(!numArr.length){
+      return;
+    } else {
+      numArr[0].forEach((num) => {
       client.messages.create({
         from: '15043020292',
         to: num,
         body: 'Hello, you currently have a help pin that is still posted. If you have already been helped, please text delete@Your-Address to remove your pin.',
       }).catch(err => console.error(err))
     });
+    }
   });
 }, 600000);
 
