@@ -30,8 +30,8 @@
         <agm-info-window #infoWindow>
           <b>Help Message: </b>{{m.message}}
           <br>
-          <b>Address: </b> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
-          <br>
+          <!-- <b>Address: </b> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
+          <br> -->
           <b>Created: </b> {{m.createdAt}}
           <br><br>
           <button class="help-button" style="color: red;" (click)="prompt()">Help?</button>

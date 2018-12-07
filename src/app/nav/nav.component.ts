@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { LoginComponent } from '../login/login.component';
+import { MatDialog } from '@angular/material';
 
 @Component({
   selector: 'app-nav',
@@ -13,7 +15,7 @@ export class NavComponent implements OnInit {
   logged: boolean = false;
   name: string = 'Please Log In';
 
-  constructor(private http: HttpClient, private router: Router ) {}
+  constructor(private http: HttpClient, private router: Router, public dialog: MatDialog ) {}
 
   ngOnInit() {}
 
@@ -29,12 +31,16 @@ export class NavComponent implements OnInit {
       }
     });
   }
-
   logout(): void {
     this.logged = false;
     this.showMenu = !this.showMenu;
     this.http.get('/logout').subscribe(() => {
       this.router.navigate(['/']);
+    });
+  }
+  loginBox(): void {
+    this.dialog.open(LoginComponent, {
+      width: '300px',
     });
   }
 }
