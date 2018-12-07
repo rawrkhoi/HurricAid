@@ -21,6 +21,7 @@ export class NavComponent implements OnInit {
     this.showMenu = !this.showMenu;
     this.http.get('/getInfo').subscribe((info: any) => {
       if (!info){
+        this.logged = false;
         this.name = 'Please Log In';
       } else {
         this.logged = true;
@@ -36,5 +37,4 @@ export class NavComponent implements OnInit {
       this.router.navigate(['/']);
     });
   }
-
 }

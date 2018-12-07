@@ -17,6 +17,7 @@ export class MapComponent implements OnInit, OnDestroy {
   loggedIn: boolean = false;
   showPrompt: boolean = false;
   zoom: number = 12;
+  gestureHandling: string = 'cooperative';
   lat: any;
   lng: any;
   supplyOptions: any = [];

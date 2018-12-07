@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { SignupComponent } from '../signup/signup.component';
 import { LoginComponent } from '../login/login.component';
@@ -24,6 +24,8 @@ export class SplashComponent implements OnInit {
   imgSrc: string = '../../hurricane.png'; 
   article: any;
   newsDisplay: boolean = false;
+  logged: boolean = false;
+  name: string = 'Please Log In';
 
   constructor(public dialog: MatDialog, private router: Router, private map: MapsService, private http: HttpClient) { }
 
@@ -41,6 +43,15 @@ export class SplashComponent implements OnInit {
         }
       })
     })
+    this.http.get('/getInfo').subscribe((info: any) => {
+      if (!info) {
+        this.logged = false;
+        this.name = 'Please Log In';
+      } else {
+        this.logged = true;
+        this.name = info.usr.name_first;
+      }
+    });
   }
   moveToMap() {
     this.router.navigate(['/map']);
@@ -58,6 +69,12 @@ export class SplashComponent implements OnInit {
   info() {
     this.dialog.open(InfoComponent, {
       width: '300px',
+    });
+  }
+  logout(): void {
+    this.logged = false;
+    this.http.get('/logout').subscribe(() => {
+      this.router.navigate(['/']);
     });
   }
 }

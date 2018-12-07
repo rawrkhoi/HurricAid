@@ -17,7 +17,7 @@
           <br>
           <div><a style="color: whitesmoke; text-decoration: none" routerLink="/map" (click)="toggleMenu()">Map</a></div>
           <br>
-          <div><a style="color: whitesmoke; text-decoration: none" routerLink="/profile" (click)="toggleMenu()">Profile</a></div>
+          <div *ngIf="logged"><a style="color: whitesmoke; text-decoration: none" routerLink="/profile" (click)="toggleMenu()">Profile</a></div>
           <br>
           <div *ngIf="logged"><a style="color: whitesmoke; text-decoration: none" routerLink="/" (click)="logout()">Logout</a></div>
           <!-- <div><a style="color: whitesmoke; text-decoration: none" routerLink="/news" (click)="toggleMenu()">News</a></div> -->
