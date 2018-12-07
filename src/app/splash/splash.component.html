@@ -3,7 +3,7 @@
       <div class="ticker-wrap">
         <div class="ticker-move">
           <div class="ticker-item" *ngIf="newsDisplay">No Disasters in the Area</div>
-          <div class="ticker-item" >{{article}}</div>
+          <div class="ticker-item" routerLink="/news">{{article}}</div>
         </div>
       </div>
   </div>
@@ -14,7 +14,10 @@
   <button class="cred" mat-raised-button color="primary" (click)="moveToMap()">What's in my area?</button>
 </div>
 <div class="auth">
-  <button class="cred" mat-fab (click)="signUpBox()">Sign Up</button>
-  <button class="cred" mat-fab (click)="loginBox()">Login</button>
+  <button class="cred" mat-fab *ngIf="!logged" (click)="signUpBox()">Sign Up</button>
+  <button class="cred" mat-fab *ngIf="!logged" (click)="loginBox()">Login</button>
+  <button class="cred" mat-fab *ngIf="logged" (click)="logout()">Logout</button>
   <button class="info" mat-fab (click)="info()">Info</button>
 </div>
+<br><br><br>
+<div *ngIf="logged" style="color: white; font-size: 30px;">Welcome {{name}}!</div>

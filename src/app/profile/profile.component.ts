@@ -102,6 +102,7 @@ export class ProfileComponent implements OnInit {
     this.http.post('/removePin', { pinId: id }, options).subscribe((data) => {
       console.log(data);
     });
+    location.reload();
   }
 
 }
