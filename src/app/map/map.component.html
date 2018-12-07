@@ -16,7 +16,6 @@
     [latitude]="lat"
     [longitude]="lng"
     [zoom]="zoom"
-    [gestureHandling]="gestureHandling"
   >
     <div *ngFor="let m of markers;let i = index">
       <agm-marker
@@ -30,17 +29,18 @@
         <agm-info-window #infoWindow>
           <b>Help Message: </b>{{m.message}}
           <br>
-          <b>Address: </b> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
-          <br>
+          <!-- <b>Address: </b> <a href="https://www.google.com/maps/search/?api=1&query={{m.latitude}},{{m.longitude}}" target="_blank">{{m.address}}</a>
+          <br> -->
           <b>Created: </b> {{m.createdAt}}
           <br><br>
           <button class="help-button" style="color: red;" (click)="prompt()">Help?</button>
           <br>
           <div *ngIf="showPrompt">
             <p><small>
-              Clicking yes will send YOUR name and number to this person
-              <br>
-              and assign you as the helper. Are you sure you want to help?
+              Clicking YES will send <b>YOUR name and number</b>
+              to this person and assign you as the helper.
+              You will receive the <b>address and number of the person in need</b>.
+              Please confirm.
             </small></p>
             <button
               class="help-button"
