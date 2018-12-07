@@ -935,7 +935,7 @@ app.post('/sms', (req, res) => {
       return client.messages.create({
         from: '15043020292',
         to: textObj.number,
-        body: 'Error: We don\'t know what you mean. Please enter one of the following: \nHelp@Your-Address, \nHave@Your-Address, \nNeed@Your-Address',
+        body: 'Sorry, we didn\'t understand your message. Please enter one of the following: \nHelp@Your-Address, \nHave@Your-Address, \nNeed@Your-Address',
       }).then(() => {
         res.send('done');
       }).catch(err => console.error(err))
