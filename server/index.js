@@ -438,9 +438,9 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
     
     // HELP //
-  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'help@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'helpat') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'help@') {
     req.session.command = 'help';
-    textObj.address = req.body.Body.slice(5);
+    textObj.address = req.body.Body.replace(' ', '').replace("'", "").slice(5);
     if (!req.session.counter){
       req.session.counter = smsCount;
     } 
@@ -491,9 +491,9 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
 
     // HAVE //
-  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'have@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'haveat') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'have@') {
     req.session.command = 'have';
-    textObj.address = req.body.Body.slice(5);
+    textObj.address = req.body.Body.replace(' ', '').replace("'", "").slice(5);
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
@@ -544,9 +544,9 @@ app.post('/sms', (req, res) => {
     
 
     // NEED //
-  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'need@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 6).toLowerCase() === 'needat') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'need@') {
     req.session.command = "need";
-    textObj.address = req.body.Body.slice(5);
+    textObj.address = req.body.Body.replace(' ', '').replace("'", "").slice(5);
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
@@ -570,9 +570,9 @@ app.post('/sms', (req, res) => {
     }).catch(err => console.error(err))
 
     // OUT //
-  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 4).toLowerCase() === 'out@' || req.body.Body.replace(' ', '').replace("'", "").slice(0, 5).toLowerCase() === 'outat') {
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 4).toLowerCase() === 'out@') {
     req.session.command = "out";
-    textObj.address = req.body.Body.slice(4);
+    textObj.address = req.body.Body.replace(' ', '').replace("'", "").slice(4);
     if (!req.session.counter) {
       req.session.counter = smsCount;
     }
@@ -593,7 +593,28 @@ app.post('/sms', (req, res) => {
       res.send('done');
     }).catch(err => console.error(err));
 
+  } else if (req.body.Body.replace(' ', '').replace("'", "").slice(0, 7).toLowerCase() === 'delete@') {
+    textObj.address = req.body.Body.replace(' ', '').replace("'", "").slice(7);
+    return googleMapsClient.geocode({
+      address: textObj.address
+    }).asPromise().then((response) => {
+      const resultObj = response.json.results[0];
+      formatAddress = resultObj.formatted_address;
+      return db.pin.destroy({
+        where: {
+          help: true,
+          address: formatAddress
+        }
+      })
+    }).then(() => {
+      return client.messages.create({
+        from: '15043020292',
+        to: textObj.number,
+        body: 'Thank you. Your help pin has been removed.',
+      })
+    }).catch(err => console.error(err));
   } else {
+
     // SECOND MESSAGES AND INCORRECT MESSAGES GOES HERE //
     if (req.session.counter > 0) {
       textObj.message = req.body.Body;
@@ -634,7 +655,7 @@ app.post('/sms', (req, res) => {
         if (message.split(' ').length > 3) {
           return analyzeCat(message);
         } else {
-          let longerMessage = "I want to offer : " + message + "to whoever needs it.";
+          let longerMessage = message + " is what I have.";
           return analyzeCat(longerMessage);
         }
     }
@@ -670,12 +691,6 @@ app.post('/sms', (req, res) => {
               req.session.pinId = null;
             }).catch((err) => {
               console.error(err);
-              // this is meant to send to a user if they type less than 3 words, but it is not working
-              // return client.messages.create({
-              //   from: '15043020292',
-              //   to: textObj.number,
-              //   body: 'We didn\'t understand your text message. Please describe your offering in 3 words.',
-              // })
             })
           })
         }
@@ -804,27 +819,30 @@ app.post('/sms', (req, res) => {
         }
 
         checkLength(textObj.message).then((tableName) => {
-          if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')) {
-            needSupply('Water');
-          } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')) {
-            needSupply('Food');
-          } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
-            needSupply('Shelter');
-          } else if (tableName === "Equipment") {
-            needSupply('Equipment');
-          } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing') || textObj.message.toLowerCase().includes('clothes')) {
-            needSupply('Clothing');
-          } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power') || textObj.message.toLowerCase().includes('electricity')) {
-            needSupply('Power');
-          } else if (tableName === "Pet") {
-            needSupply('Pet');
-          } else if (tableName === "Transportation") {
-            needSupply('Transportation');
-          } else if (tableName === "Health") {
-            needSupply('Health');
-          }  else if (tableName === "Household") {
-            needSupply('Household');
-          } else {
+          if (tableName){
+            if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')) {
+              needSupply('Water');
+            } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')) {
+              needSupply('Food');
+            } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
+              needSupply('Shelter');
+            } else if (tableName === "Equipment") {
+              needSupply('Equipment');
+            } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing') || textObj.message.toLowerCase().includes('clothes')) {
+              needSupply('Clothing');
+            } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power') || textObj.message.toLowerCase().includes('electricity')) {
+              needSupply('Power');
+            } else if (tableName === "Pet") {
+              needSupply('Pet');
+            } else if (tableName === "Transportation") {
+              needSupply('Transportation');
+            } else if (tableName === "Health") {
+              needSupply('Health');
+            }  else if (tableName === "Household") {
+              needSupply('Household');
+            } 
+          }   
+          if (!tableName) {
             needSupply('Other');
           }
         })
@@ -883,27 +901,30 @@ app.post('/sms', (req, res) => {
           })
         }
         checkLength(textObj.message).then((tableName) => {
-          if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')){
-            outFunc('Water');
-          } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')) {
-            outFunc('Food');
-          } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
-            outFunc('Shelter');
-          } else if (tableName === "Equipment") {
-            outFunc('Equipment');
-          } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing' || textObj.message.toLowerCase().includes('clothes'))) {
-            outFunc('Clothing');
-          } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power') || textObj.message.toLowerCase().includes('electricity')) {
-            outFunc('Power');
-          } else if (tableName === "Pet") {
-            outFunc('Pet');
-          } else if (tableName === "Transportation") {
-            outFunc('Transportation');
-          } else if (tableName === "Health") {
-            outFunc('Health');
-          } else if (tableName === "Household") {
-            outFunc('Household');
-          } else {
+          if (tableName){
+            if (tableName === 'Water' || textObj.message.toLowerCase().includes('water')){
+              outFunc('Water');
+            } else if (tableName === "Food" || textObj.message.toLowerCase().includes('food')) {
+              outFunc('Food');
+            } else if (tableName === "Shelter" || textObj.message.toLowerCase().includes('shelter')) {
+              outFunc('Shelter');
+            } else if (tableName === "Equipment") {
+              outFunc('Equipment');
+            } else if (tableName === "Clothing" || textObj.message.toLowerCase().includes('clothing' || textObj.message.toLowerCase().includes('clothes'))) {
+              outFunc('Clothing');
+            } else if (tableName === "Power" || textObj.message.toLowerCase().includes('power') || textObj.message.toLowerCase().includes('electricity')) {
+              outFunc('Power');
+            } else if (tableName === "Pet") {
+              outFunc('Pet');
+            } else if (tableName === "Transportation") {
+              outFunc('Transportation');
+            } else if (tableName === "Health") {
+              outFunc('Health');
+            } else if (tableName === "Household") {
+              outFunc('Household');
+            } 
+          }
+          if (!tableName) {
             outFunc('Other');
           }
         })
@@ -927,7 +948,7 @@ app.post('/sms', (req, res) => {
             return client.messages.create({
               from: '15043020292',
               to: textObj.number,
-              body: 'Thank you, your message has been added to the marker.',
+              body: 'Thank you, your message has been added to the marker.  Please text "delete@Your-Address" when you have been helped.',
             })
           })
           .then(() => {
