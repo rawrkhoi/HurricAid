@@ -1,4 +1,4 @@
-<div class="newsfeed">
+<!-- <div class="newsfeed">
   <div class="newsfeed-header">
     Today's Local News
   </div>
@@ -15,7 +15,35 @@
       </li>
     </ul>
   </div>
-  
-  
+</div> -->
+
+<div class="newsfeed">
+  <div class="newsfeed-header">
+    Today's Local News
+  </div>
+  <agm-map
+    #gm
+    [scrollwheel]="null"
+    [streetViewControl]="false"
+    [latitude]="lat"
+    [longitude]="lng"
+    [zoom]="zoom"
+    [gestureHandling]="gestureHandling"
+  >
+    <div *ngFor="let m of markers;let i = index">
+      <agm-marker [animation]="'DROP'" [latitude]="m.lat" [longitude]="m.lng"
+        (markerClick)="gm.lastOpen?.close(); gm.lastOpen = infoWindow">
+        <agm-info-window #infoWindow>
+          <b>{{m.title}}</b>
+          <br>
+          <b>Start: </b>{{m.start}}
+          <b>End: </b>{{m.end}}
+          <br>
+          <b>Warning: </b>{{m.desc}}
+          <br>
+        </agm-info-window>
+      </agm-marker>
+    </div>
+  </agm-map>
 </div>
 
