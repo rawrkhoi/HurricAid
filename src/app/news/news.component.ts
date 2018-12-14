@@ -15,7 +15,7 @@ export class NewsComponent implements OnInit {
   lng: any;
   articles: Array<object>;
   newsDisplay: boolean = false;
-  zoom: number = 12;
+  zoom: number = 8;
   gestureHandling: string = 'cooperative';
   supplyOptions: any = [];
   markers: any = [];
@@ -44,7 +44,6 @@ export class NewsComponent implements OnInit {
               lng: response.results[i].location[0],
             });
           }
-          console.log(this.markers);
         }
       })
     })

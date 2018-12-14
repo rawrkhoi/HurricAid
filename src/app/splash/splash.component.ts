@@ -39,7 +39,7 @@ export class SplashComponent implements OnInit {
         if (response['results'].length === 0){
           this.newsDisplay = true;
         } else {
-          this.article = response.results[0].title + ' ' + response.results[0].description;
+          this.article = response.results[0].title + ' (Click for more information.)';
         }
       })
     })
